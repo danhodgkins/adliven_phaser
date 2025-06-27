@@ -1,4 +1,5 @@
 import * as Phaser from './phaser/phaser-3.87.0-core.js';
+import * as SpinePlugin from './spine/SpinePlugin';
 
 import { mraidAdNetworks, networkPlugin } from './networkPlugin.js';
 
@@ -18,7 +19,16 @@ const gameConfig = {
     scene: [
         Preloader,
         Game
-    ]
+    ],
+    plugins: {
+        scene: [
+            { 
+                key: 'SpinePlugin', 
+                plugin: window['SpinePlugin'], 
+                mapping: 'spine' 
+            }
+        ]
+    }
 };
 
 function initializePhaserGame() {

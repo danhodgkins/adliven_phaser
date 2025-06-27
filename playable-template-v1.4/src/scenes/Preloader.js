@@ -10,6 +10,12 @@ import { soundFxMP3 } from '../../media/audio_sound_fx.mp3.js';
 import { spaceyJPG } from '../../media/images_spacey.jpg.js';
 import { sukasukaPNG } from '../../media/images_sukasuka.png.js';
 
+// spine
+import { LoadBase64SpineFile } from '../utils/LoadBase64SpineFile.js';
+import { OperatorSlothATLAS } from '../../media/spine_Operator_Sloth.atlas.js';
+import { OperatorSlothJSON } from '../../media/spine_Operator_Sloth.json.js';
+import { OperatorSlothPNG } from '../../media/spine_Operator_Sloth.png.js';
+
 export class Preloader extends Phaser.Scene
 {
     constructor () 
@@ -41,6 +47,16 @@ export class Preloader extends Phaser.Scene
             key: 'font1',
             xml: iceicebabyXML,
             png: iceicebabyPNG
+        });
+
+        LoadBase64SpineFile(this, {
+            key: 'sloth',
+            json: OperatorSlothJSON,
+            atlas: OperatorSlothATLAS,
+            png: [
+                { key: 'Operator_Sloth.png', file: OperatorSlothPNG }
+            ],
+            preMultipliedAlpha: true
         });
     }
 

@@ -8,3 +8,6 @@ import { sukasukaPNG } from '../../media/images_sukasuka.png.js';
 import { atlas1ATLAS } from '../../media/spine_atlas1.atlas.js';
 import { atlas1PNG } from '../../media/spine_atlas1.png.js';
 import { demosJSON } from '../../media/spine_demos.json.js';
+import { OperatorSlothATLAS } from '../../media/spine_Operator_Sloth.atlas.js';
+import { OperatorSlothJSON } from '../../media/spine_Operator_Sloth.json.js';
+import { OperatorSlothPNG } from '../../media/spine_Operator_Sloth.png.js';
