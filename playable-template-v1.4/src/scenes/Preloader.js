@@ -1,4 +1,5 @@
 import * as Phaser from '../phaser/phaser-3.87.0-core.js';
+// import * as Phaser from '../phaser/phaser-3.87.0-full.js';
 
 import { Base64Manager } from '../utils/Base64Manager.js';
 import { LoadBase64Audio } from '../utils/LoadBase64Audio.js';
@@ -15,7 +16,9 @@ import { LoadBase64SpineFile } from '../utils/LoadBase64SpineFile.js';
 import { OperatorSlothATLAS } from '../../media/spine_Operator_Sloth.atlas.js';
 import { OperatorSlothJSON } from '../../media/spine_Operator_Sloth.json.js';
 import { OperatorSlothPNG } from '../../media/spine_Operator_Sloth.png.js';
+import { Scene3D } from '@enable3d/phaser-extension';
 
+// export class Preloader extends Scene3D
 export class Preloader extends Phaser.Scene
 {
     constructor () 
@@ -69,6 +72,7 @@ export class Preloader extends Phaser.Scene
     {
         adReady();
 
-        this.scene.start('Game');
+        // this.scene.start('default');
+        this.scene.start('Game3D');
     }
 }

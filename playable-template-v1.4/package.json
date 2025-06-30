@@ -14,6 +14,7 @@
   "author": "Phaser Studio <support@phaser.io> (https://phaser.io/)",
   "license": "UNLICENSED",
   "dependencies": {
+    "@enable3d/phaser-extension": "^0.26.1",
     "@originjs/vite-plugin-content": "^1.0.5",
     "enquirer": "^2.4.1",
     "vite": "^6.0.5",
