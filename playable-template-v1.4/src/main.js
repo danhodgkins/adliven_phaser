@@ -11,12 +11,14 @@ import { config } from './config.js';
 import { enable3d } from '@enable3d/phaser-extension';
 import { Game3D } from './rj/scenes/Game3D.js';
 
+
+
 const gameConfig = {
     type: Phaser.AUTO,
     parent: 'ad-container',
     width: 411,
     height: 731,
-    // transparent: true,
+    transparent: true,
     scale: {
         mode: Phaser.Scale.FIT,
         autoCenter: Phaser.Scale.CENTER_BOTH,
@@ -63,5 +65,5 @@ enable3d(() => {
     // game.scene.scenes.forEach((scene) => {
     //     console.log(`Scene key: ${scene.scene.key}`);
     // });
-} ).withPhysics('./assets/ammo/kripken')
+} );//.withPhysics('./assets/ammo/kripken')
 

@@ -1,3 +1,9 @@
+import { ammoJS } from '../../media/ammo_kripken_ammo.js.js';
+import { ammo.wasmJS } from '../../media/ammo_kripken_ammo.wasm.js.js';
+import { ammo.wasmWASM } from '../../media/ammo_kripken_ammo.wasm.wasm.js';
+import { ammoJS } from '../../media/ammo_moz_ammo.js.js';
+import { ammo.wasmJS } from '../../media/ammo_moz_ammo.wasm.js.js';
+import { ammo.wasmWASM } from '../../media/ammo_moz_ammo.wasm.wasm.js';
 import { relaxingMusicMP3 } from '../../media/audio_relaxing-music.mp3.js';
 import { soundFxMP3 } from '../../media/audio_sound_fx.mp3.js';
 import { iceicebabyPNG } from '../../media/fonts_iceicebaby.png.js';

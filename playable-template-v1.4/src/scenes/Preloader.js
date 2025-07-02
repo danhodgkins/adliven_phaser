@@ -36,31 +36,31 @@ export class Preloader extends Phaser.Scene
         //  Invoke the Base64Manager - pass in the current scene reference and a callback to invoke when it's done
         Base64Manager(this, () => this.base64LoaderComplete());
 
-        this.add.text(this.scale.width / 2, this.scale.height / 2, 'Loading...', { fontFamily: 'Arial', fontSize: 64, color: '#ffffff' }).setOrigin(0.5);
+        // this.add.text(this.scale.width / 2, this.scale.height / 2, 'Loading...', { fontFamily: 'Arial', fontSize: 64, color: '#ffffff' }).setOrigin(0.5);
 
-        //  Images load normally as base64 encoded strings
-        this.load.image('bg', spaceyJPG);
-        this.load.image('suka', sukasukaPNG);
+        // //  Images load normally as base64 encoded strings
+        // this.load.image('bg', spaceyJPG);
+        // this.load.image('suka', sukasukaPNG);
 
-        LoadBase64Audio(this, [
-            { key: 'sound_fx', data: soundFxMP3 }
-        ]);
+        // LoadBase64Audio(this, [
+        //     { key: 'sound_fx', data: soundFxMP3 }
+        // ]);
 
-        LoadBase64BitmapFont(this, {
-            key: 'font1',
-            xml: iceicebabyXML,
-            png: iceicebabyPNG
-        });
+        // LoadBase64BitmapFont(this, {
+        //     key: 'font1',
+        //     xml: iceicebabyXML,
+        //     png: iceicebabyPNG
+        // });
 
-        LoadBase64SpineFile(this, {
-            key: 'sloth',
-            json: OperatorSlothJSON,
-            atlas: OperatorSlothATLAS,
-            png: [
-                { key: 'Operator_Sloth.png', file: OperatorSlothPNG }
-            ],
-            preMultipliedAlpha: true
-        });
+        // LoadBase64SpineFile(this, {
+        //     key: 'sloth',
+        //     json: OperatorSlothJSON,
+        //     atlas: OperatorSlothATLAS,
+        //     png: [
+        //         { key: 'Operator_Sloth.png', file: OperatorSlothPNG }
+        //     ],
+        //     preMultipliedAlpha: true
+        // });
     }
 
     create ()
