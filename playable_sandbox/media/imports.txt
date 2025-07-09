@@ -1,0 +1,10 @@
+import { relaxingMusicMP3 } from '../../media/audio_relaxing-music.mp3.js';
+import { soundFxMP3 } from '../../media/audio_sound_fx.mp3.js';
+import { iceicebabyPNG } from '../../media/fonts_iceicebaby.png.js';
+import { iceicebabyXML } from '../../media/fonts_iceicebaby.xml.js';
+import { calvinPNG } from '../../media/images_calvin.png.js';
+import { spaceyJPG } from '../../media/images_spacey.jpg.js';
+import { sukasukaPNG } from '../../media/images_sukasuka.png.js';
+import { atlas1ATLAS } from '../../media/spine_atlas1.atlas.js';
+import { atlas1PNG } from '../../media/spine_atlas1.png.js';
+import { demosJSON } from '../../media/spine_demos.json.js';
