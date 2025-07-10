@@ -17,7 +17,7 @@ export default StartGame;
 
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { BoxGeometry, Color, DirectionalLight, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
+import { AmbientLight, BoxGeometry, Color, DirectionalLight, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
 import { Bunny_01_thumb } from '../../compiled/Bunny_01_thumb.js';
 
 
@@ -52,6 +52,11 @@ export class Game {
         const cube = new Mesh( geometry, material );
         scene.add( cube );
         this.cube = cube;
+
+        const color = 0xFFFFFF;
+        const intensity = 5;
+        const light = new AmbientLight(color, intensity);
+        scene.add(light);
 
         camera.position.z = 5;
 
