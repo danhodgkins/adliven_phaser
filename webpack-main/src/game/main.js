@@ -19,8 +19,9 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { AmbientLight, BoxGeometry, Color, DirectionalLight, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
 import { Bunny02EyePopGLB } from '../../media/Bunny_02_eyePop.glb.js';
-import { unwrapMP3 } from '../../media/unwrap.mp3.js';
-import {Howl, Howler} from 'howler';
+import { Bunny03ZombieGLB } from '../../media/Bunny_03_zombie.glb.js';
+// import { unwrapMP3 } from '../../media/unwrap.mp3.js';
+// import {Howl, Howler} from 'howler';
 
 export class Game {
     constructor({config, parent}) {
@@ -40,7 +41,7 @@ export class Game {
         const controls = new OrbitControls( camera, renderer.domElement );
         const loader = new GLTFLoader();
         loader.load(
-            Bunny02EyePopGLB, 
+            Bunny03ZombieGLB, 
             (e) => { console.log("loaded", e); scene.add(e.scene); }, 
             undefined, 
             (e) => { console.error("error loading model", e); }
@@ -66,19 +67,19 @@ export class Game {
         this.boundUpdate = this.update.bind(this);
         renderer.setAnimationLoop( this.boundUpdate );
 
-        const testSfx = new Howl({
-            src: [ unwrapMP3 ],
-            onload : ()=>{
-                console.log("testSfx loaded", testSfx);
-                //testSfx.play();
-            }
-        });
+        // const testSfx = new Howl({
+        //     src: [ unwrapMP3 ],
+        //     onload : ()=>{
+        //         console.log("testSfx loaded", testSfx);
+        //         //testSfx.play();
+        //     }
+        // });
 
-        document.addEventListener('click', () => {
+        // document.addEventListener('click', () => {
 
-            testSfx.play();
-            console.log("play sfx", testSfx);
-        });
+        //     testSfx.play();
+        //     console.log("play sfx", testSfx);
+        // });
     }
 
     update() {
