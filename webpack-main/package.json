@@ -3,6 +3,7 @@
     "version": "3.3.0",
     "main": "src/main.js",
     "scripts": {
+        "base64": "node base64encoder.mjs",
         "dev": "webpack-dev-server --config webpack/config.js --open",
         "build": "webpack --config webpack/config.prod.js",
         "build-inline": "webpack --config webpack/config.prod.js",
@@ -31,6 +32,7 @@
         "webpack-merge": "^6.0.0"
     },
     "dependencies": {
+        "howler": "^2.2.4",
         "three": "^0.178.0"
     }
 }
