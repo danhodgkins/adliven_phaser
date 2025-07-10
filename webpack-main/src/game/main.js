@@ -18,6 +18,7 @@ export default StartGame;
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { BoxGeometry, Color, DirectionalLight, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
+import { Bunny_01_thumb } from '../../compiled/Bunny_01_thumb.js';
 
 
 export class Game {
@@ -37,6 +38,12 @@ export class Game {
         
         const controls = new OrbitControls( camera, renderer.domElement );
         const loader = new GLTFLoader();
+        loader.load(
+            Bunny_01_thumb, 
+            (e) => { console.log("loaded", e); scene.add(e.scene); }, 
+            undefined, 
+            (e) => { console.error("error loading model", e); }
+        );
 
         console.log("new game", controls, loader);
 
