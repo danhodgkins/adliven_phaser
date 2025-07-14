@@ -23,6 +23,10 @@ import { Bunny03ZombieGLB } from '../../media/Bunny_03_zombie.glb.js';
 // import { unwrapMP3 } from '../../media/unwrap.mp3.js';
 // import {Howl, Howler} from 'howler';
 
+// import Ammo from '../ammo/ammo.js';
+import CANNON from 'cannon';
+
+
 export class Game {
     constructor({config, parent}) {
 
@@ -80,6 +84,47 @@ export class Game {
         //     testSfx.play();
         //     console.log("play sfx", testSfx);
         // });
+
+        // Setup our world
+        var world = new CANNON.World();
+        world.gravity.set(0, -1, 0); // m/s²
+        // world.gravity.set(0, 0, -9.82); // m/s²
+
+        // Create a sphere
+        var radius = 1; // m
+        var sphereBody = new CANNON.Body({
+        mass: 5, // kg
+        position: new CANNON.Vec3(0, 0, 0), // m
+        shape: new CANNON.Sphere(radius)
+        });
+        world.addBody(sphereBody);
+
+        var fixedTimeStep = 1.0 / 60.0; // seconds
+        var maxSubSteps = 3;
+
+        const mesh = this.cube
+
+        // Start the simulation loop
+        var lastTime;
+        (function simloop(time){
+        requestAnimationFrame(simloop);
+        if(lastTime !== undefined){
+            var dt = (time - lastTime) / 1000;
+            world.step(fixedTimeStep, dt, maxSubSteps);
+        }
+
+        mesh.position.x = sphereBody.position.x;
+        mesh.position.y = sphereBody.position.y;
+        mesh.position.z = sphereBody.position.z;
+        // mesh.quaternion.x = sphereBody.quaternion.x;
+        // mesh.quaternion.y = sphereBody.quaternion.y;
+        // mesh.quaternion.z = sphereBody.quaternion.z;
+        // mesh.quaternion.w = sphereBody.quaternion.w;
+
+        // console.log("Sphere z position: " + sphereBody.position.z);
+        lastTime = time;
+        })();
+
     }
 
     update() {
