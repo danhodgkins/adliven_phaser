@@ -154,6 +154,10 @@ export default class SceneSunshineIslandMain extends BaseScene {
             const mei_camille_sad = new Mesh(geometry, material);
             mei_camille_sad.position.y = 0.2;
             scene.add(mei_camille_sad);
+
+            const target = this.camera.position.clone();
+            target.y = mei_camille_sad.position.y; // keep vertical alignment
+            mei_camille_sad.lookAt(target);
         });
 
         this.setState( this.STATE_INTRO );
