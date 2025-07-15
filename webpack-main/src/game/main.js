@@ -29,9 +29,24 @@ import CANNON from 'cannon';
 import SceneManager from '../scene/scenemanager.js';
 import SceneSunshineIslandMain from '../scene/si_main_scene.js';
 import SceneThreeEditor from '../scene/three_editor_scene.js';
+import { logoPNG } from '../../media/logo.png.js';
 
 export class Application {
     constructor({ parent }) {
+
+        // logo 
+        const img = document.createElement('img');
+
+        // 2. Set the source (can be a URL or base64)
+        img.src = logoPNG;
+        img.alt = 'Example Image';
+        //img.width = 300;
+        // img.classList.add('headerRowItem');
+
+        // 3. Add it to a DOM element (e.g., <div id="container">)
+        const container = document.getElementById('logoCont');
+        container.appendChild(img);
+
         
         this.sceneManager = new SceneManager([
             // new SceneThreeEditor({config: {id: 'main', parent: parent}})

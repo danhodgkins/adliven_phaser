@@ -34,6 +34,7 @@
     "dependencies": {
         "cannon": "^0.6.2",
         "howler": "^2.2.4",
+        "http-server": "^14.1.1",
         "three": "^0.178.0"
     }
 }

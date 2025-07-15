@@ -36,13 +36,29 @@ h1 {
 }
 
 #ctaButton {
-    background-color: #6200ea;
+    background-color: #76ff37;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px;
     font-size: 16px;
-    border-radius: 5px;
+    border-radius: 10px;
     cursor: pointer;
     pointer-events: auto; /* Allow clicks on the button */
-    margin: 1em;
+    margin: 1.5em;
+}
+
+#headerRow{
+    display: flex;
+}
+
+.headerRowItem{
+    max-height: 100px;    
+}
+
+.headerRowItem img{
+    max-height: 100px;    
+}
+
+.spacer{
+    flex-grow: 1;
 }

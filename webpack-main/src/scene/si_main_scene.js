@@ -2,6 +2,7 @@ import { AmbientLight, BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, ObjectL
 import BaseScene from "./basescene";
 import { islandGbWEBP } from '../../media/island_gb.webp.js';
 import { meiCamilleSadPNG } from '../../media/mei_camille_sad.png.js';
+import { logoPNG } from '../../media/logo.png.js';
 
 export default class SceneSunshineIslandMain extends BaseScene {
 
@@ -20,7 +21,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
     setState( newState )
     {
-        let el;
+        let el = document.getElementById( "gameOutput" );
         switch( newState )
         {
             case this.STATE_INTRO:
@@ -31,7 +32,6 @@ export default class SceneSunshineIslandMain extends BaseScene {
                 this.camera.zoom = 5; // higher = closer
                 this.camera.updateProjectionMatrix();
 
-                el = document.getElementById( "ui-overlay" );
                 el.innerHTML = `<h1>STATE_INTRO</h1>`;
 
                 break;
@@ -40,23 +40,19 @@ export default class SceneSunshineIslandMain extends BaseScene {
                 this.camera.zoom = 3; // higher = closer
                 this.camera.updateProjectionMatrix();
 
-                el = document.getElementById( "ui-overlay" );
                 el.innerHTML = `<h1>STATE_REVEAL_MAZE</h1>`;
 
                 break;
 
             case this.STATE_GAMEPLAY:
-                el = document.getElementById( "ui-overlay" );
                 el.innerHTML = `<h1>STATE_GAMEPLAY</h1>`;
                 break;
 
             case this.STATE_SUCCESS:
-                el = document.getElementById( "ui-overlay" );
                 el.innerHTML = `<h1>STATE_SUCCESS</h1>`;
                 break;
 
             case this.STATE_FAIL:
-                el = document.getElementById( "ui-overlay" );
                 el.innerHTML = `<h1>STATE_SUCCESS</h1>`;
                 break;
         }
