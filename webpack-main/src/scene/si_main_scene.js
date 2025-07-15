@@ -1,4 +1,4 @@
-import { AmbientLight, BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, ObjectLoader, OrthographicCamera, PerspectiveCamera, PlaneGeometry, Scene, TextureLoader, WebGLRenderer } from "three";
+import { AmbientLight, BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, ObjectLoader, OrthographicCamera, PerspectiveCamera, PlaneGeometry, Scene, SRGBColorSpace, TextureLoader, WebGLRenderer } from "three";
 import BaseScene from "./basescene";
 import { islandGbWEBP } from '../../media/island_gb.webp.js';
 import { meiCamilleSadPNG } from '../../media/mei_camille_sad.png.js';
@@ -26,9 +26,9 @@ export default class SceneSunshineIslandMain extends BaseScene {
         switch( newState )
         {
             case this.STATE_INTRO:
-                this.camera.position.x = 3;
-                this.camera.position.y = 1;
-                this.camera.position.z = 3;
+                this.camera.position.x = 5;
+                this.camera.position.y = 3;
+                this.camera.position.z = 5;
 
                 this.camera.zoom = 8; // higher = closer
                 this.camera.updateProjectionMatrix();
@@ -39,7 +39,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
             case this.STATE_REVEAL_MAZE:
                 const tween = new Tween(this.camera);
-                tween.to({zoom: 5}, 2000)
+                tween.to({zoom: 2}, 2000)
                 tween.onUpdate(function (object) {
                     // this needs setting each frame or the zoom tween will not render
                     object.updateProjectionMatrix();
@@ -87,6 +87,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
         // const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         const renderer = new WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.outputEncoding = SRGBColorSpace;
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
 
@@ -114,10 +115,10 @@ export default class SceneSunshineIslandMain extends BaseScene {
             this.setState(nextState);
         })
 
-        const color = 0xFFFFFF;
-        const intensity = 5;
-        const light = new AmbientLight(color, intensity);
-        scene.add(light);
+        // const color = 0xFFFFFF;
+        // const intensity = 5;
+        // const light = new AmbientLight(color, intensity);
+        // scene.add(light);
         
         // camera.position.x = -7;
         // camera.position.y = 1;
@@ -135,34 +136,27 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
         const textureLoader = new TextureLoader();
         textureLoader.load(islandGbWEBP, (texture) => {
-            // 4. Create material using the texture
+            // to stop textures looking washed out
+            texture.colorSpace = SRGBColorSpace;
             const material = new MeshBasicMaterial({ map: texture, side: DoubleSide });
-
-            // 5. Create plane and apply material
-            const geometry = new PlaneGeometry(5,5);
+            const geometry = new PlaneGeometry(10,10);
             const plane = new Mesh(geometry, material);
             plane.rotateX(degToRad(270))
             scene.add(plane);
-
             camera.lookAt(plane.position);
         });
 
         textureLoader.load( meiCamilleSadPNG , (texture) => {
-            // 4. Create material using the texture
+            // to stop textures looking washed out
+            texture.colorSpace = SRGBColorSpace;
             const material = new MeshBasicMaterial({ map: texture, side: DoubleSide });
-
-            // 5. Create plane and apply material
             const geometry = new PlaneGeometry(0.5,0.5);
             const mei_camille_sad = new Mesh(geometry, material);
-            // plane.rotateX(degToRad(270))
+            mei_camille_sad.position.y = 0.2;
             scene.add(mei_camille_sad);
-
         });
 
-
-
         this.setState( this.STATE_INTRO );
-
     }
 
     update() {
