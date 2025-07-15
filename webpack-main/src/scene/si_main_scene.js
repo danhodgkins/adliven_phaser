@@ -21,7 +21,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
     setState( newState )
     {
-        let el = document.getElementById( "gameOutput" );
+        let el = document.getElementById( "ui-overlay" );
         switch( newState )
         {
             case this.STATE_INTRO:
@@ -32,7 +32,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
                 this.camera.zoom = 5; // higher = closer
                 this.camera.updateProjectionMatrix();
 
-                el.innerHTML = `<h1>STATE_INTRO</h1>`;
+                el.innerHTML = this.getUIString( newState );
 
                 break;
 
@@ -40,20 +40,20 @@ export default class SceneSunshineIslandMain extends BaseScene {
                 this.camera.zoom = 3; // higher = closer
                 this.camera.updateProjectionMatrix();
 
-                el.innerHTML = `<h1>STATE_REVEAL_MAZE</h1>`;
+                el.innerHTML = this.getUIString( newState );
 
                 break;
 
             case this.STATE_GAMEPLAY:
-                el.innerHTML = `<h1>STATE_GAMEPLAY</h1>`;
+                el.innerHTML = this.getUIString( newState );
                 break;
 
             case this.STATE_SUCCESS:
-                el.innerHTML = `<h1>STATE_SUCCESS</h1>`;
+                el.innerHTML = this.getUIString( newState );
                 break;
 
             case this.STATE_FAIL:
-                el.innerHTML = `<h1>STATE_SUCCESS</h1>`;
+                el.innerHTML = this.getUIString( newState );
                 break;
         }
 
@@ -161,8 +161,63 @@ export default class SceneSunshineIslandMain extends BaseScene {
         // this.cube.rotation.x += 0.01;
         this.cube.rotation.y += 0.01;
     }
+
+    getUIString( stateRef )
+    {
+        let str;
+        switch( stateRef )
+        {
+            case this.STATE_INTRO:            
+                str = inGameUIString("HELP THEM SURVIVE!")
+                break;
+
+            case this.STATE_REVEAL_MAZE:
+                str = inGameUIString("DO THE MAZE!")
+                break;
+
+            case this.STATE_GAMEPLAY:
+                str = inGameUIString("KEEP GOING!")
+                break;
+
+            case this.STATE_SUCCESS:
+                str = successUIString();
+                break;
+
+            case this.STATE_FAIL:
+                break;
+        }
+
+        return str;
+
+    }
+
 }
 
 function degToRad(degrees) {
   return degrees * (Math.PI / 180);
+}
+
+function inGameUIString( stringToInject )
+{
+    return `
+        <div id="headerRow">
+        <div id="logoCont" class="headerRowItem">
+        <img src = ${ logoPNG } />
+        </div>
+        <div class="spacer"></div>
+        <button id="ctaButton">PLAY NOW</button>
+        </div>
+        <div class="spacer"></div>
+        <div id="gameOutput"><h1>${stringToInject}</h1></div>
+    `;
+}
+
+function successUIString()
+{
+    return `
+        <img src = ${ logoPNG } />        
+        <h1>YOU SAVED THEM!</h1>
+        <button id="ctaButton">PLAY NOW</button>
+       
+    `;
 }

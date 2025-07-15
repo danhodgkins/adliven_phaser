@@ -34,19 +34,11 @@ import { logoPNG } from '../../media/logo.png.js';
 export class Application {
     constructor({ parent }) {
 
-        // logo 
-        const img = document.createElement('img');
-
-        // 2. Set the source (can be a URL or base64)
-        img.src = logoPNG;
-        img.alt = 'Example Image';
-        //img.width = 300;
-        // img.classList.add('headerRowItem');
-
-        // 3. Add it to a DOM element (e.g., <div id="container">)
-        const container = document.getElementById('logoCont');
-        container.appendChild(img);
-
+        // const img = document.createElement('img');
+        // img.src = logoPNG;
+        // img.alt = 'Example Image';
+        // const container = document.getElementById('logoCont');
+        // container.appendChild(img);
         
         this.sceneManager = new SceneManager([
             // new SceneThreeEditor({config: {id: 'main', parent: parent}})
