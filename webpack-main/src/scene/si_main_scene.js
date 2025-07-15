@@ -3,6 +3,7 @@ import BaseScene from "./basescene";
 import { islandGbWEBP } from '../../media/island_gb.webp.js';
 import { meiCamilleSadPNG } from '../../media/mei_camille_sad.png.js';
 import { logoPNG } from '../../media/logo.png.js';
+import {Easing, Tween} from '@tweenjs/tween.js'
 
 export default class SceneSunshineIslandMain extends BaseScene {
 
@@ -29,7 +30,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
                 this.camera.position.y = 1;
                 this.camera.position.z = 3;
 
-                this.camera.zoom = 5; // higher = closer
+                this.camera.zoom = 8; // higher = closer
                 this.camera.updateProjectionMatrix();
 
                 el.innerHTML = this.getUIString( newState );
@@ -37,8 +38,17 @@ export default class SceneSunshineIslandMain extends BaseScene {
                 break;
 
             case this.STATE_REVEAL_MAZE:
-                this.camera.zoom = 3; // higher = closer
-                this.camera.updateProjectionMatrix();
+                // Create a tween for position first
+                const tween = new Tween(this.camera);
+                // Then tell the tween we want to animate the x property over 1000 milliseconds
+                tween.to({zoom: 5}, 2000)
+                tween.onUpdate(function (object) {
+                    object.updateProjectionMatrix();
+                })
+                tween.onComplete( ()=>{ this.tween = null; });
+                tween.easing( Easing.Sinusoidal.InOut)
+                tween.start();
+                this.tween = tween;
 
                 el.innerHTML = this.getUIString( newState );
 
@@ -160,6 +170,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
         this.renderer.render( this.scene, this.camera );
         // this.cube.rotation.x += 0.01;
         this.cube.rotation.y += 0.01;
+        if( this.tween ) this.tween.update();
     }
 
     getUIString( stateRef )

@@ -32,6 +32,7 @@
         "webpack-merge": "^6.0.0"
     },
     "dependencies": {
+        "@tweenjs/tween.js": "^25.0.0",
         "cannon": "^0.6.2",
         "howler": "^2.2.4",
         "http-server": "^14.1.1",
