@@ -2,6 +2,7 @@ import { Bunny01ThumbGLB } from '../../media/Bunny_01_thumb.glb.js';
 import { Bunny02EyePopGLB } from '../../media/Bunny_02_eyePop.glb.js';
 import { Bunny03ZombieGLB } from '../../media/Bunny_03_zombie.glb.js';
 import { islandGbWEBP } from '../../media/island_gb.webp.js';
+import { meiCamilleSadPNG } from '../../media/mei_camille_sad.png.js';
 import { rattleMP3 } from '../../media/rattle.mp3.js';
 import { revealMP3 } from '../../media/reveal.mp3.js';
 import { unwrapMP3 } from '../../media/unwrap.mp3.js';

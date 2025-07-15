@@ -17,8 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    const ctaButton = document.getElementById('ctaButton');
-    ctaButton.addEventListener('click', () => {
-        testSfx.play();
-    });
+    // const ctaButton = document.getElementById('ctaButton');
+    // ctaButton.addEventListener('click', () => {
+    //     testSfx.play();
+    // });
 });

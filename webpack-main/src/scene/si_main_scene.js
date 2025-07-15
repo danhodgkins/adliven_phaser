@@ -1,13 +1,67 @@
-import { AmbientLight, BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, ObjectLoader, PerspectiveCamera, PlaneGeometry, Scene, TextureLoader, WebGLRenderer } from "three";
+import { AmbientLight, BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, ObjectLoader, OrthographicCamera, PerspectiveCamera, PlaneGeometry, Scene, TextureLoader, WebGLRenderer } from "three";
 import BaseScene from "./basescene";
 import { islandGbWEBP } from '../../media/island_gb.webp.js';
+import { meiCamilleSadPNG } from '../../media/mei_camille_sad.png.js';
 
 export default class SceneSunshineIslandMain extends BaseScene {
+
+    STATE_INTRO = "STATE_INTRO";
+    STATE_REVEAL_MAZE = "STATE_REVEAL_MAZE";
+    STATE_GAMEPLAY = "STATE_GAMEPLAY";
+    STATE_SUCCESS = "STATE_SUCCESS";
+    STATE_FAIL = "STATE_SUCCESS";
+    currentState = null;
+
     constructor({config}) {
         super({config});
         this.config = config;
-        console.log("SceneSunshineIslandMain");
         
+    }
+
+    setState( newState )
+    {
+        let el;
+        switch( newState )
+        {
+            case this.STATE_INTRO:
+                this.camera.position.x = 3;
+                this.camera.position.y = 1;
+                this.camera.position.z = 3;
+
+                this.camera.zoom = 5; // higher = closer
+                this.camera.updateProjectionMatrix();
+
+                el = document.getElementById( "ui-overlay" );
+                el.innerHTML = `<h1>STATE_INTRO</h1>`;
+
+                break;
+
+            case this.STATE_REVEAL_MAZE:
+                this.camera.zoom = 3; // higher = closer
+                this.camera.updateProjectionMatrix();
+
+                el = document.getElementById( "ui-overlay" );
+                el.innerHTML = `<h1>STATE_REVEAL_MAZE</h1>`;
+
+                break;
+
+            case this.STATE_GAMEPLAY:
+                el = document.getElementById( "ui-overlay" );
+                el.innerHTML = `<h1>STATE_GAMEPLAY</h1>`;
+                break;
+
+            case this.STATE_SUCCESS:
+                el = document.getElementById( "ui-overlay" );
+                el.innerHTML = `<h1>STATE_SUCCESS</h1>`;
+                break;
+
+            case this.STATE_FAIL:
+                el = document.getElementById( "ui-overlay" );
+                el.innerHTML = `<h1>STATE_SUCCESS</h1>`;
+                break;
+        }
+
+        this.currentState = newState;
     }
 
 
@@ -15,11 +69,45 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
         const scene = new Scene();
         this.scene = scene;
-        const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+        const aspect = window.innerWidth / window.innerHeight;
+        const frustumHeight = 10;
+        const frustumWidth = frustumHeight * aspect;
+
+        const camera = new OrthographicCamera(
+            -frustumWidth / 2, frustumWidth / 2,
+            frustumHeight / 2, -frustumHeight / 2,
+            0.1, 1000 
+        );
+        // const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         const renderer = new WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
+
+        el.addEventListener( "pointerup" , (e)=>{
+            let nextState;
+            switch( this.currentState )
+            {
+                case this.STATE_INTRO:
+                nextState = this.STATE_REVEAL_MAZE;
+                break;
+
+                case this.STATE_REVEAL_MAZE:
+                nextState = this.STATE_GAMEPLAY;
+                break;
+
+                case this.STATE_GAMEPLAY:
+                nextState = this.STATE_SUCCESS;
+                break;
+
+                case this.STATE_SUCCESS:
+                nextState = this.STATE_INTRO;
+                break;
+            }
+
+            this.setState(nextState);
+        })
 
         const color = 0xFFFFFF;
         const intensity = 5;
@@ -27,13 +115,8 @@ export default class SceneSunshineIslandMain extends BaseScene {
         scene.add(light);
         
         // camera.position.x = -7;
-        camera.position.y = 1;
-        camera.position.z = 3;
-
-        // camera.rotation.x = -10;
-        // camera.rotation.x = -40;
-        // camera.rotation.y = -26.5;
-        // camera.rotation.z = -26.5;
+        // camera.position.y = 1;
+        // camera.position.z = 3;
         
         this.renderer = renderer;
         this.camera = camera;
@@ -41,7 +124,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
         const geometry = new BoxGeometry( 1, 1, 1 );
         const material = new MeshBasicMaterial( { color: 0x00ff00 } );
         const cube = new Mesh( geometry, material );
-        cube.position.y = 0;
+        cube.position.y = -10;
         scene.add( cube );
         this.cube = cube;
 
@@ -58,6 +141,22 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
             camera.lookAt(plane.position);
         });
+
+        textureLoader.load( meiCamilleSadPNG , (texture) => {
+            // 4. Create material using the texture
+            const material = new MeshBasicMaterial({ map: texture, side: DoubleSide });
+
+            // 5. Create plane and apply material
+            const geometry = new PlaneGeometry(0.5,0.5);
+            const mei_camille_sad = new Mesh(geometry, material);
+            // plane.rotateX(degToRad(270))
+            scene.add(mei_camille_sad);
+
+        });
+
+
+
+        this.setState( this.STATE_INTRO );
 
     }
 
