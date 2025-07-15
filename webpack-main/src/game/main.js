@@ -11,34 +11,16 @@ const StartGame = (parent) => {
 
     return new Application({ parent });
     // return new Game({ ...config, parent });
-
 }
 
 export default StartGame;
 
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { AmbientLight, BoxGeometry, Color, DirectionalLight, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Scene, Vector3, WebGLRenderer } from 'three';
-import { Bunny02EyePopGLB } from '../../media/Bunny_02_eyePop.glb.js';
-import { Bunny03ZombieGLB } from '../../media/Bunny_03_zombie.glb.js';
-// import { unwrapMP3 } from '../../media/unwrap.mp3.js';
-// import {Howl, Howler} from 'howler';
-
-// import Ammo from '../ammo/ammo.js';
 import CANNON from 'cannon';
 import SceneManager from '../scene/scenemanager.js';
 import SceneSunshineIslandMain from '../scene/si_main_scene.js';
-import SceneThreeEditor from '../scene/three_editor_scene.js';
-import { logoPNG } from '../../media/logo.png.js';
 
 export class Application {
     constructor({ parent }) {
-
-        // const img = document.createElement('img');
-        // img.src = logoPNG;
-        // img.alt = 'Example Image';
-        // const container = document.getElementById('logoCont');
-        // container.appendChild(img);
         
         this.sceneManager = new SceneManager([
             // new SceneThreeEditor({config: {id: 'main', parent: parent}})

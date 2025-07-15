@@ -38,11 +38,10 @@ export default class SceneSunshineIslandMain extends BaseScene {
                 break;
 
             case this.STATE_REVEAL_MAZE:
-                // Create a tween for position first
                 const tween = new Tween(this.camera);
-                // Then tell the tween we want to animate the x property over 1000 milliseconds
                 tween.to({zoom: 5}, 2000)
                 tween.onUpdate(function (object) {
+                    // this needs setting each frame or the zoom tween will not render
                     object.updateProjectionMatrix();
                 })
                 tween.onComplete( ()=>{ this.tween = null; });

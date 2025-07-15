@@ -13,12 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
         src: [ unwrapMP3 ],
         onload : ()=>{
             console.log("testSfx loaded", testSfx);
-            //testSfx.play();
         }
     });
-
-    // const ctaButton = document.getElementById('ctaButton');
-    // ctaButton.addEventListener('click', () => {
-    //     testSfx.play();
-    // });
 });
