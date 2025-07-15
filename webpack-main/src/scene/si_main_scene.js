@@ -1,4 +1,4 @@
-import { AmbientLight, BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, PerspectiveCamera, PlaneGeometry, Scene, TextureLoader, WebGLRenderer } from "three";
+import { AmbientLight, BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, ObjectLoader, PerspectiveCamera, PlaneGeometry, Scene, TextureLoader, WebGLRenderer } from "three";
 import BaseScene from "./basescene";
 import { islandGbWEBP } from '../../media/island_gb.webp.js';
 
@@ -10,9 +10,9 @@ export default class SceneSunshineIslandMain extends BaseScene {
         
     }
 
+
     init() {
 
-        console.log("init");
         const scene = new Scene();
         this.scene = scene;
         const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
@@ -26,11 +26,14 @@ export default class SceneSunshineIslandMain extends BaseScene {
         const light = new AmbientLight(color, intensity);
         scene.add(light);
         
+        // camera.position.x = -7;
         camera.position.y = 1;
-        camera.position.z = 30;
+        camera.position.z = 3;
 
         // camera.rotation.x = -10;
-        camera.rotation.x = -26.5;
+        // camera.rotation.x = -40;
+        // camera.rotation.y = -26.5;
+        // camera.rotation.z = -26.5;
         
         this.renderer = renderer;
         this.camera = camera;
@@ -38,6 +41,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
         const geometry = new BoxGeometry( 1, 1, 1 );
         const material = new MeshBasicMaterial( { color: 0x00ff00 } );
         const cube = new Mesh( geometry, material );
+        cube.position.y = 0;
         scene.add( cube );
         this.cube = cube;
 
@@ -47,8 +51,9 @@ export default class SceneSunshineIslandMain extends BaseScene {
             const material = new MeshBasicMaterial({ map: texture, side: DoubleSide });
 
             // 5. Create plane and apply material
-            const geometry = new PlaneGeometry(25,25);
+            const geometry = new PlaneGeometry(5,5);
             const plane = new Mesh(geometry, material);
+            plane.rotateX(degToRad(270))
             scene.add(plane);
 
             camera.lookAt(plane.position);
@@ -58,5 +63,11 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
     update() {
         this.renderer.render( this.scene, this.camera );
+        // this.cube.rotation.x += 0.01;
+        this.cube.rotation.y += 0.01;
     }
+}
+
+function degToRad(degrees) {
+  return degrees * (Math.PI / 180);
 }

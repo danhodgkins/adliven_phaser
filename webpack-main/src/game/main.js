@@ -28,11 +28,13 @@ import { Bunny03ZombieGLB } from '../../media/Bunny_03_zombie.glb.js';
 import CANNON from 'cannon';
 import SceneManager from '../scene/scenemanager.js';
 import SceneSunshineIslandMain from '../scene/si_main_scene.js';
+import SceneThreeEditor from '../scene/three_editor_scene.js';
 
 export class Application {
     constructor({ parent }) {
         
         this.sceneManager = new SceneManager([
+            // new SceneThreeEditor({config: {id: 'main', parent: parent}})
             new SceneSunshineIslandMain({config: {id: 'main', parent: parent}})
         ]); 
 
