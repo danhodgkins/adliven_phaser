@@ -1,21 +1,11 @@
-import * as Phaser from '../phaser/phaser-3.87.0-core.js';
+// import * as Phaser from '../phaser/phaser-3.87.0-core.js';
 // import * as Phaser from '../phaser/phaser-3.87.0-full.js';
 
 import { Base64Manager } from '../utils/Base64Manager.js';
 import { LoadBase64Audio } from '../utils/LoadBase64Audio.js';
 import { LoadBase64BitmapFont } from '../utils/LoadBase64BitmapFont.js';
 import { adReady } from '../networkPlugin';
-import { iceicebabyPNG } from '../../media/fonts_iceicebaby.png.js';
-import { iceicebabyXML } from '../../media/fonts_iceicebaby.xml.js';
-import { soundFxMP3 } from '../../media/audio_sound_fx.mp3.js';
-import { spaceyJPG } from '../../media/images_spacey.jpg.js';
-import { sukasukaPNG } from '../../media/images_sukasuka.png.js';
 
-// spine
-import { LoadBase64SpineFile } from '../utils/LoadBase64SpineFile.js';
-import { OperatorSlothATLAS } from '../../media/spine_Operator_Sloth.atlas.js';
-import { OperatorSlothJSON } from '../../media/spine_Operator_Sloth.json.js';
-import { OperatorSlothPNG } from '../../media/spine_Operator_Sloth.png.js';
 import { Scene3D } from '@enable3d/phaser-extension';
 
 // export class Preloader extends Scene3D

@@ -37,7 +37,7 @@ export class Game3D extends Scene3D {
 
         this.input.on('pointerdown', () => {
 
-            this.sound.play('sound_fx');
+            //this.sound.play('sound_fx');
 
             onCtaPressed();
 

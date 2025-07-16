@@ -1,7 +1,7 @@
-import * as Phaser from './phaser/phaser-3.87.0-full.js';
-// import * as Phaser from './phaser/phaser-3.87.0-core.js';
+// import * as Phaser from './phaser/phaser-3.87.0-full.js';
+import * as Phaser from './phaser/phaser-3.87.0-core.js';
 // import * as Phaser from './phaser/phaser-3.80.1.js';
-import * as SpinePlugin from './spine/SpinePlugin';
+// import * as SpinePlugin from './spine/SpinePlugin';
 
 import { mraidAdNetworks, networkPlugin } from './networkPlugin.js';
 
