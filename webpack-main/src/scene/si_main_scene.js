@@ -240,7 +240,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
 
 
-function degToRad(degrees) {
+export function degToRad(degrees) {
   return degrees * (Math.PI / 180);
 }
 

@@ -27,8 +27,8 @@ export class Application {
         this.sceneManager = new SceneManager([
             // new SceneThreeEditor({config: {id: 'main', parent: parent}})
             // new SceneSunshineIslandMain({config: {id: 'main', parent: parent}})
-            // new PhysicsScene({config: {id: 'main', parent: parent}})
-            new TobyScene({config: {id: 'main', parent: parent}})
+            new PhysicsScene({config: {id: 'main', parent: parent}})
+            // new TobyScene({config: {id: 'main', parent: parent}})
         ]); 
 
         this.boundUpdate = this.update.bind(this);
