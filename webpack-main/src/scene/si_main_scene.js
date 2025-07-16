@@ -5,6 +5,7 @@ import { meiCamilleSadPNG } from '../../media/mei_camille_sad.png.js';
 import { logoPNG } from '../../media/logo.png.js';
 import {Easing, Tween} from '@tweenjs/tween.js'
 import { Application, Assets, Container, Sprite } from 'pixi.js';
+import '@pixi/layout';
 
 export default class SceneSunshineIslandMain extends BaseScene {
 
@@ -63,56 +64,12 @@ export default class SceneSunshineIslandMain extends BaseScene {
         el.innerHTML = this.getUIString();
     }
 
-    async initPixi(){
-        // Create a new application
-        const app = new Application();
-
-        let el = document.getElementById( "pixi-container" );
-        // Initialize the application
-        
-        let overflowPreventHackMultiplier = 0.996;
-        await app.init({ backgroundAlpha:0, width:window.innerWidth *overflowPreventHackMultiplier, height:window.innerHeight *overflowPreventHackMultiplier});
-
-        // Append the application canvas to the document body
-        el.appendChild(app.canvas);
-
-        // Create and add a container to the stage
-        const container = new Container();
-
-        app.stage.addChild(container);
-
-        // Load the bunny texture
-        const texture = await Assets.load('https://pixijs.com/assets/bunny.png');
-
-        // Create a 5x5 grid of bunnies in the container
-        for (let i = 0; i < 25; i++) {
-            const bunny = new Sprite(texture);
-
-            bunny.x = (i % 5) * 40;
-            bunny.y = Math.floor(i / 5) * 40;
-            container.addChild(bunny);
-        }
-
-        // Move the container to the center
-        container.x = app.screen.width / 2;
-        container.y = app.screen.height / 2;
-
-        // Center the bunny sprites in local container coordinates
-        container.pivot.x = container.width / 2;
-        container.pivot.y = container.height / 2;
-
-        // Listen for animate update
-        app.ticker.add((time) => {
-            // Continuously rotate the container!
-            // * use delta to create frame-independent transform *
-            container.rotation -= 0.01 * time.deltaTime;
-        });
-    }
+    
 
     // initialise the three scene, set INTRO state
     init() {
 
-        this.initPixi();
+        //this.initPixi();
 
         const scene = new Scene();
         this.scene = scene;
@@ -207,6 +164,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
     {
         let stateRef = this.currentState;
         let str;
+
         switch( stateRef )
         {
             case this.STATE_INTRO:            
@@ -233,7 +191,54 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
     }
 
+    async initPixi(){
+        // Create a new application
+        const app = new Application();
+
+        let el = document.getElementById( "pixi-container" );
+        // Initialize the application
+        
+        let overflowPreventHackMultiplier = 1;
+        // let overflowPreventHackMultiplier = 0.996;
+        await app.init({ backgroundAlpha:0.0, width:window.innerWidth *overflowPreventHackMultiplier, height:window.innerHeight *overflowPreventHackMultiplier});
+
+        // Append the application canvas to the document body
+        el.appendChild(app.canvas);
+
+        app.stage.layout = {
+            width: app.screen.width,
+            height: app.screen.height,
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            // alignItems: 'center',
+        };
+
+        // Create and add a container to the stage
+        const container = new Container({
+            layout: {
+                width: '100%',
+                height: '20%',
+                justifyContent: 'flex-start',
+                alignContent: 'flex-start',
+            },
+        });
+
+        app.stage.addChild(container);
+
+        const texture = await Assets.load(logoPNG);
+        const sprite = new Sprite({ texture, layout: true });
+        sprite.layout = {
+            width: 100,
+            height: 100,
+            margin:10
+        };
+
+        container.addChild(sprite);
+    }
+
 }
+
+
 
 function degToRad(degrees) {
   return degrees * (Math.PI / 180);
