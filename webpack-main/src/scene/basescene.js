@@ -6,4 +6,9 @@ export default class BaseScene {
     update() {
         // Override in subclasses
     }
+
+    init()
+    {
+        
+    }
 } 

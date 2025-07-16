@@ -18,13 +18,17 @@ export default StartGame;
 import CANNON from 'cannon';
 import SceneManager from '../scene/scenemanager.js';
 import SceneSunshineIslandMain from '../scene/si_main_scene.js';
+import PhysicsScene from '../scene/physics_scene.js';
+import TobyScene from '../scene/tobyscene.js';
 
 export class Application {
     constructor({ parent }) {
         
         this.sceneManager = new SceneManager([
             // new SceneThreeEditor({config: {id: 'main', parent: parent}})
-            new SceneSunshineIslandMain({config: {id: 'main', parent: parent}})
+            // new SceneSunshineIslandMain({config: {id: 'main', parent: parent}})
+            // new PhysicsScene({config: {id: 'main', parent: parent}})
+            new TobyScene({config: {id: 'main', parent: parent}})
         ]); 
 
         this.boundUpdate = this.update.bind(this);
