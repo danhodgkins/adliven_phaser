@@ -20,6 +20,7 @@ export default class SceneSunshineIslandMain extends BaseScene {
         
     }
 
+    // update the UI as per current state, and reposition camera to reflect zoom states for game play
     setState( newState )
     {
         let el = document.getElementById( "ui-overlay" );
@@ -32,9 +33,6 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
                 this.camera.zoom = 8; // higher = closer
                 this.camera.updateProjectionMatrix();
-
-                el.innerHTML = this.getUIString( newState );
-
                 break;
 
             case this.STATE_REVEAL_MAZE:
@@ -48,28 +46,23 @@ export default class SceneSunshineIslandMain extends BaseScene {
                 tween.easing( Easing.Sinusoidal.InOut)
                 tween.start();
                 this.tween = tween;
-
-                el.innerHTML = this.getUIString( newState );
-
                 break;
 
             case this.STATE_GAMEPLAY:
-                el.innerHTML = this.getUIString( newState );
                 break;
 
             case this.STATE_SUCCESS:
-                el.innerHTML = this.getUIString( newState );
                 break;
 
             case this.STATE_FAIL:
-                el.innerHTML = this.getUIString( newState );
                 break;
         }
 
         this.currentState = newState;
+        el.innerHTML = this.getUIString();
     }
 
-
+    // initialise the three scene, set INTRO state
     init() {
 
         const scene = new Scene();
@@ -114,15 +107,6 @@ export default class SceneSunshineIslandMain extends BaseScene {
 
             this.setState(nextState);
         })
-
-        // const color = 0xFFFFFF;
-        // const intensity = 5;
-        // const light = new AmbientLight(color, intensity);
-        // scene.add(light);
-        
-        // camera.position.x = -7;
-        // camera.position.y = 1;
-        // camera.position.z = 3;
         
         this.renderer = renderer;
         this.camera = camera;
@@ -170,8 +154,9 @@ export default class SceneSunshineIslandMain extends BaseScene {
         if( this.tween ) this.tween.update();
     }
 
-    getUIString( stateRef )
+    getUIString()
     {
+        let stateRef = this.currentState;
         let str;
         switch( stateRef )
         {
