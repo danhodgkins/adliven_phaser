@@ -1,7 +1,6 @@
 import { BoxGeometry, Clock, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Scene, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
 import BaseScene from "./basescene";
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
-import { degToRad } from "./si_main_scene";
 import CANNON from 'cannon';
 
 export default class PhysicsScene extends BaseScene{
