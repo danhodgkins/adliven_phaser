@@ -16,6 +16,7 @@ module.exports = {
   mode: "production",
   entry: "./src/main.js",
   output: {
+    publicPath: '',
     path: path.resolve(process.cwd(), "dist"),
     filename: "./bundle.min.js",
     assetModuleFilename: "assets/[name][ext]",
