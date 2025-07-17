@@ -1,9 +1,11 @@
-import { AmbientLight, BoxGeometry, Clock, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Scene, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
+import { AmbientLight, BoxGeometry, Clock, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
 import BaseScene from "./basescene";
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import CANNON from 'cannon';
-import { GLTFLoader } from "three/examples/jsm/Addons.js";
+import { GLTFLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import { Bunny01ThumbGLB } from '../../media/Bunny_01_thumb.glb.js';
+import { time } from "three/tsl";
+import { degToRad } from "./si_main_scene.js";
 
 export default class PhysicsScene extends BaseScene{
     constructor({config}){
@@ -20,27 +22,18 @@ export default class PhysicsScene extends BaseScene{
         const light = new AmbientLight(color, intensity);
         scene.add(light);
 
-        const loader = new GLTFLoader();
-        loader.load(
-            Bunny01ThumbGLB, 
-            (e) => { 
-                console.log("loaded", e); 
-                scene.add(e.scene); 
-            }, 
-            undefined, 
-            (e) => { console.error("error loading model", e); }
-        );
+        
 
         const aspect = window.innerWidth / window.innerHeight;
         const frustumHeight = 10;
         const frustumWidth = frustumHeight * aspect;
 
-        const camera = new OrthographicCamera(
-            -frustumWidth / 2, frustumWidth / 2,
-            frustumHeight / 2, -frustumHeight / 2,
-            0.1, 1000 
-        );
-        // const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        // const camera = new OrthographicCamera(
+        //     -frustumWidth / 2, frustumWidth / 2,
+        //     frustumHeight / 2, -frustumHeight / 2,
+        //     0.1, 1000 
+        // );
+        const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         const renderer = new WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.outputEncoding = SRGBColorSpace;
@@ -65,15 +58,8 @@ export default class PhysicsScene extends BaseScene{
         const material = new MeshBasicMaterial({ color: 0x00ff00 , side: DoubleSide});
         const geometry = new PlaneGeometry(10,10);
         const plane = new Mesh(geometry, material);
-        plane.rotateX(-Math.PI / 2)
-        // plane.rotateX(degToRad(270))
+        plane.rotateX(degToRad(270))
         scene.add(plane);
-
-        // const planeGeometry = new THREE.PlaneGeometry(25, 25)
-        // const planeMesh = new THREE.Mesh(planeGeometry, phongMaterial)
-        // planeMesh.rotateX(-Math.PI / 2)
-        // planeMesh.receiveShadow = true
-        // scene.add(planeMesh)
         
         const planeShape = new CANNON.Plane()
         const planeBody = new CANNON.Body({ mass: 0 })
@@ -86,11 +72,11 @@ export default class PhysicsScene extends BaseScene{
         const cubematerial = new MeshBasicMaterial( { color: 0x0000ff } );
         const cubeMesh = new Mesh( cubegeometry, cubematerial );
         scene.add( cubeMesh );
-        cubeMesh.position.set(0, 14, 0);
+        cubeMesh.position.set(0, 10, 0);
         // cubeMesh.quaternion.set(1, 0, 0.5, 1);
 
         const axis = new Vector3(1, 0, 0); // X-axis
-        const angle = Math.PI / 8; // 90 degrees in radians
+        const angle = Math.PI / 3; // 90 degrees in radians
         const quaternion = new Quaternion().setFromAxisAngle(axis, angle);
         cubeMesh.quaternion.multiplyQuaternions(quaternion, cubeMesh.quaternion);
 
@@ -104,79 +90,154 @@ export default class PhysicsScene extends BaseScene{
                 cubeMesh.quaternion.w) 
             })
         cubeBody.addShape(cubeShape)
-
-        console.log("cubeBody: " + cubeBody.quaternion);
-
         
         cubeBody.position.x = cubeMesh.position.x
         cubeBody.position.y = cubeMesh.position.y
         cubeBody.position.z = cubeMesh.position.z
-        
-
-        // cubeBody.quaternion.x = cubeMesh.position.z
-        // cubeBody.quaternion.y = cubeMesh.position.z
-        // cubeBody.quaternion.z = cubeMesh.position.z
         world.addBody(cubeBody)
 
-
+        const loader = new GLTFLoader();
+        loader.load(
+            Bunny01ThumbGLB, 
+            (e) => {                 
+                scene.add(e.scene); 
+                const sphereShape = new CANNON.Sphere(1)
+                const sphereBody = new CANNON.Body({ 
+                    position: new CANNON.Vec3(0,1.5, 0),
+                    mass:0
+                })
+                sphereBody.addShape(sphereShape)
+                world.addBody(sphereBody)
+            }, 
+            undefined, 
+            (e) => { console.error("error loading model", e); }
+        );
+        
         this.cube = cubeMesh;
 
-        camera.lookAt(plane.position);
+        // orbit controls
+        const controls = new OrbitControls( camera, renderer.domElement );
+        controls.target.set( 0, 2, 0 );
+        controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+        controls.dampingFactor = 0.1;
+        this.orbitControls = controls;
+        controls.update();
 
+        // input
+        this.initInput();
+        this.raycaster = new Raycaster();
+        this.mouseCoords = new Vector3();
+        this.ballsToUpdate = [];
+        let dateNow;
 
-
-        // Create a sphere
-        // var radius = 1; // m
-        // var sphereBody = new CANNON.Body({
-        //     mass: 5, // kg
-        //     position: new CANNON.Vec3(0, 5, 0), // m
-        //     shape: new CANNON.Sphere(radius)
-        // });
-        // world.addBody(sphereBody);
-
-
+        this.world = world;
         var fixedTimeStep = 1.0 / 60.0; // seconds
         var maxSubSteps = 3;
-
-        const mesh = this.cube;
 
         // Start the simulation loop
         var lastTime;
 
-        const clock = new Clock()
-        let delta;
+        this.simLoop = (time) => {
+            requestAnimationFrame(this.simLoop);    
+            if(lastTime !== undefined){
+                var dt = (time - lastTime) / 1000;
+                world.step(fixedTimeStep, dt, maxSubSteps);
+            }
 
-        (function simloop(time){
-        requestAnimationFrame(simloop);
-        if(lastTime !== undefined){
-            var dt = (time - lastTime) / 1000;
-            world.step(fixedTimeStep, dt, maxSubSteps);
-        }
-
-        // delta = Math.min(clock.getDelta(), 0.1)
-        // world.step(delta)
-
-        
-
-        cubeMesh.position.set(cubeBody.position.x, cubeBody.position.y, cubeBody.position.z)
-        cubeMesh.quaternion.set(cubeBody.quaternion.x, cubeBody.quaternion.y, cubeBody.quaternion.z, cubeBody.quaternion.w)
-
-        // mesh.position.x = cubeBody.position.x;
-        // mesh.position.y = cubeBody.position.y;
-        // mesh.position.z = cubeBody.position.z;
-        // mesh.quaternion.x = sphereBody.quaternion.x;
-        // mesh.quaternion.y = sphereBody.quaternion.y;
-        // mesh.quaternion.z = sphereBody.quaternion.z;
-        // mesh.quaternion.w = sphereBody.quaternion.w;
-
-        // console.log("Sphere z position: " + sphereBody.position.z);
-        lastTime = time;
-        })();
+            cubeMesh.position.set(cubeBody.position.x, cubeBody.position.y, cubeBody.position.z)
+            cubeMesh.quaternion.set(cubeBody.quaternion.x, cubeBody.quaternion.y, cubeBody.quaternion.z, cubeBody.quaternion.w)
 
 
+            this.ballsToUpdate.forEach(element => {
+                element.mesh.position.set(
+                    element.body.position.x, 
+                    element.body.position.y, 
+                    element.body.position.z
+                );
+                element.mesh.quaternion.set(
+                    element.body.quaternion.x, 
+                    element.body.quaternion.y, 
+                    element.body.quaternion.z, 
+                    element.body.quaternion.w
+                );               
+                
+                dateNow = Date.now();
+                if( dateNow - element.birthTime > 5000 ){
+                    this.scene.remove(element.mesh);
+                    this.world.removeBody(element.body);
+                    this.ballsToUpdate.splice(this.ballsToUpdate.indexOf(element), 1);
+                }
+            });
+
+
+            lastTime = time;
+        };
+        requestAnimationFrame(this.simLoop);
     }
 
     update() {
         this.renderer.render( this.scene, this.camera );
+        this.orbitControls.update();
+    }
+
+    initInput() {
+        window.addEventListener( 'pointerdown', ( event )=> {
+
+            const raycaster = this.raycaster;
+            const mouseCoords = this.mouseCoords;
+
+            mouseCoords.set(
+                ( event.clientX / window.innerWidth ) * 2 - 1,
+                - ( event.clientY / window.innerHeight ) * 2 + 1
+            );
+
+            raycaster.setFromCamera( mouseCoords, this.camera );
+
+             // init sphere
+            const geometry = new SphereGeometry( 0.5 );
+            const material = new MeshBasicMaterial( { color: 0xff00ff } );
+            const mesh = new Mesh( geometry, material );
+            this.scene.add( mesh );
+
+            // const pos = new Vector3();
+            // pos.copy( raycaster.ray.direction );
+            // pos.add( raycaster.ray.origin );
+            // pos.copy( raycaster.ray.direction );
+            // // pos.multiplyScalar( 24 );
+
+            // Position at ray origin (camera near plane)
+            const origin = raycaster.ray.origin.clone();
+            mesh.position.copy(origin);
+
+            const sphereShape = new CANNON.Sphere(0.5)
+            const sphereBody = new CANNON.Body({ 
+                // position: new CANNON.Vec3(pos.x,pos.y,pos.z),
+                mass:1
+            })
+            sphereBody.addShape(sphereShape)
+            sphereBody.position.set(origin.x, origin.y, origin.z); // correctly set Cannon body position
+            this.world.addBody(sphereBody)
+
+            // sphereBody.position.x = mesh.position.x = raycaster.ray.origin.x;
+            // sphereBody.position.y = mesh.position.y = raycaster.ray.origin.x;
+            // sphereBody.position.z = mesh.position.z = raycaster.ray.origin.x;
+
+            const direction = raycaster.ray.direction.clone().normalize();
+
+            // sphereBody.applyImpulse(
+            //     new CANNON.Vec3(direction.x,direction.y,direction.z),
+            //     new CANNON.Vec3(0, 0, 0)
+            // );
+
+            // Apply impulse in ray direction
+            const impulse = new CANNON.Vec3(direction.x, direction.y, direction.z).scale(50);
+            sphereBody.applyImpulse(impulse, sphereBody.position);
+
+            this.ballsToUpdate.push({
+                mesh: mesh,
+                body: sphereBody,
+                birthTime: Date.now()
+            });
+        } );
     }
 }
