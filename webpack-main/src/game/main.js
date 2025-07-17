@@ -60,13 +60,13 @@ export class Application {
 
         
 //         const controls = new OrbitControls( camera, renderer.domElement );
-//         const loader = new GLTFLoader();
-//         loader.load(
-//             Bunny03ZombieGLB, 
-//             (e) => { console.log("loaded", e); scene.add(e.scene); }, 
-//             undefined, 
-//             (e) => { console.error("error loading model", e); }
-//         );
+        // const loader = new GLTFLoader();
+        // loader.load(
+        //     Bunny03ZombieGLB, 
+        //     (e) => { console.log("loaded", e); scene.add(e.scene); }, 
+        //     undefined, 
+        //     (e) => { console.error("error loading model", e); }
+        // );
 
 //         console.log("new game", controls, loader);
 

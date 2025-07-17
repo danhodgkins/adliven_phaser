@@ -1,7 +1,9 @@
-import { BoxGeometry, Clock, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Scene, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
+import { AmbientLight, BoxGeometry, Clock, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Scene, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
 import BaseScene from "./basescene";
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import CANNON from 'cannon';
+import { GLTFLoader } from "three/examples/jsm/Addons.js";
+import { Bunny01ThumbGLB } from '../../media/Bunny_01_thumb.glb.js';
 
 export default class PhysicsScene extends BaseScene{
     constructor({config}){
@@ -12,6 +14,22 @@ export default class PhysicsScene extends BaseScene{
     init(){
         const scene = new Scene();
         this.scene = scene;
+
+        const color = 0xFFFFFF;
+        const intensity = 5;
+        const light = new AmbientLight(color, intensity);
+        scene.add(light);
+
+        const loader = new GLTFLoader();
+        loader.load(
+            Bunny01ThumbGLB, 
+            (e) => { 
+                console.log("loaded", e); 
+                scene.add(e.scene); 
+            }, 
+            undefined, 
+            (e) => { console.error("error loading model", e); }
+        );
 
         const aspect = window.innerWidth / window.innerHeight;
         const frustumHeight = 10;
