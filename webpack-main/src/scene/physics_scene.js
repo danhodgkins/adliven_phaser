@@ -43,9 +43,9 @@ export default class PhysicsScene extends BaseScene{
         this.renderer = renderer;
         this.camera = camera;
 
-        this.camera.position.x = 5;
-        this.camera.position.y = 3;
-        this.camera.position.z = 5;
+        this.camera.position.x = 0;
+        this.camera.position.y = 5;
+        this.camera.position.z = 10;
 
         // this.camera.zoom = 2; // higher = closer
         this.camera.updateProjectionMatrix();
@@ -56,45 +56,46 @@ export default class PhysicsScene extends BaseScene{
 
         //init plane
         const material = new MeshBasicMaterial({ color: 0x00ff00 , side: DoubleSide});
-        const geometry = new PlaneGeometry(10,10);
+        const geometry = new PlaneGeometry(100,100);
         const plane = new Mesh(geometry, material);
         plane.rotateX(degToRad(270))
         scene.add(plane);
         
+        // cannon planes are INFINTE so use a box if you want a floor
         const planeShape = new CANNON.Plane()
         const planeBody = new CANNON.Body({ mass: 0 })
         planeBody.addShape(planeShape)
         planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
         world.addBody(planeBody)
 
-        // init cube
-        const cubegeometry = new BoxGeometry( 1, 1, 1 );
-        const cubematerial = new MeshBasicMaterial( { color: 0x0000ff } );
-        const cubeMesh = new Mesh( cubegeometry, cubematerial );
-        scene.add( cubeMesh );
-        cubeMesh.position.set(0, 10, 0);
-        // cubeMesh.quaternion.set(1, 0, 0.5, 1);
+        // // init cube
+        // const cubegeometry = new BoxGeometry( 1, 1, 1 );
+        // const cubematerial = new MeshBasicMaterial( { color: 0x0000ff } );
+        // const cubeMesh = new Mesh( cubegeometry, cubematerial );
+        // scene.add( cubeMesh );
+        // cubeMesh.position.set(0, 10, 0);
+        // // cubeMesh.quaternion.set(1, 0, 0.5, 1);
 
-        const axis = new Vector3(1, 0, 0); // X-axis
-        const angle = Math.PI / 3; // 90 degrees in radians
-        const quaternion = new Quaternion().setFromAxisAngle(axis, angle);
-        cubeMesh.quaternion.multiplyQuaternions(quaternion, cubeMesh.quaternion);
+        // const axis = new Vector3(1, 0, 0); // X-axis
+        // const angle = Math.PI / 3; // 90 degrees in radians
+        // const quaternion = new Quaternion().setFromAxisAngle(axis, angle);
+        // cubeMesh.quaternion.multiplyQuaternions(quaternion, cubeMesh.quaternion);
 
-        const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5))
-        const cubeBody = new CANNON.Body({ 
-            mass: 1, 
-            quaternion: new CANNON.Quaternion(
-                cubeMesh.quaternion.x, 
-                cubeMesh.quaternion.y, 
-                cubeMesh.quaternion.z, 
-                cubeMesh.quaternion.w) 
-            })
-        cubeBody.addShape(cubeShape)
+        // const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5))
+        // const cubeBody = new CANNON.Body({ 
+        //     mass: 1, 
+        //     quaternion: new CANNON.Quaternion(
+        //         cubeMesh.quaternion.x, 
+        //         cubeMesh.quaternion.y, 
+        //         cubeMesh.quaternion.z, 
+        //         cubeMesh.quaternion.w) 
+        //     })
+        // cubeBody.addShape(cubeShape)
         
-        cubeBody.position.x = cubeMesh.position.x
-        cubeBody.position.y = cubeMesh.position.y
-        cubeBody.position.z = cubeMesh.position.z
-        world.addBody(cubeBody)
+        // cubeBody.position.x = cubeMesh.position.x
+        // cubeBody.position.y = cubeMesh.position.y
+        // cubeBody.position.z = cubeMesh.position.z
+        // world.addBody(cubeBody)
 
         const loader = new GLTFLoader();
         loader.load(
@@ -113,7 +114,7 @@ export default class PhysicsScene extends BaseScene{
             (e) => { console.error("error loading model", e); }
         );
         
-        this.cube = cubeMesh;
+        // this.cube = cubeMesh;
 
         // orbit controls
         const controls = new OrbitControls( camera, renderer.domElement );
@@ -123,14 +124,24 @@ export default class PhysicsScene extends BaseScene{
         this.orbitControls = controls;
         controls.update();
 
+        this.world = world;
+        this.ballsToUpdate = [];
+
+        let i=10;
+        let id = setInterval(() => {
+            this.initCube();
+            i--;
+            if(i <= 0) clearInterval(id);
+        }, 500);
+
+        
+
         // input
         this.initInput();
         this.raycaster = new Raycaster();
         this.mouseCoords = new Vector3();
-        this.ballsToUpdate = [];
         let dateNow;
 
-        this.world = world;
         var fixedTimeStep = 1.0 / 60.0; // seconds
         var maxSubSteps = 3;
 
@@ -144,8 +155,8 @@ export default class PhysicsScene extends BaseScene{
                 world.step(fixedTimeStep, dt, maxSubSteps);
             }
 
-            cubeMesh.position.set(cubeBody.position.x, cubeBody.position.y, cubeBody.position.z)
-            cubeMesh.quaternion.set(cubeBody.quaternion.x, cubeBody.quaternion.y, cubeBody.quaternion.z, cubeBody.quaternion.w)
+            //cubeMesh.position.set(cubeBody.position.x, cubeBody.position.y, cubeBody.position.z)
+            //cubeMesh.quaternion.set(cubeBody.quaternion.x, cubeBody.quaternion.y, cubeBody.quaternion.z, cubeBody.quaternion.w)
 
 
             this.ballsToUpdate.forEach(element => {
@@ -162,7 +173,7 @@ export default class PhysicsScene extends BaseScene{
                 );               
                 
                 dateNow = Date.now();
-                if( dateNow - element.birthTime > 5000 ){
+                if( element.birthTime && dateNow - element.birthTime > 5000 ){
                     this.scene.remove(element.mesh);
                     this.world.removeBody(element.body);
                     this.ballsToUpdate.splice(this.ballsToUpdate.indexOf(element), 1);
@@ -178,6 +189,42 @@ export default class PhysicsScene extends BaseScene{
     update() {
         this.renderer.render( this.scene, this.camera );
         this.orbitControls.update();
+    }
+
+    initCube() {
+     // init cube
+        const cubegeometry = new BoxGeometry( 1, 1, 1 );
+        const cubematerial = new MeshBasicMaterial( { color: 0x0000ff } );
+        const cubeMesh = new Mesh( cubegeometry, cubematerial );
+        this.scene.add( cubeMesh );
+        cubeMesh.position.set(0, 10, 0);
+        // cubeMesh.quaternion.set(1, 0, 0.5, 1);
+
+        const axis = new Vector3(1, 1, 0); // X-axis
+        const angle = Math.PI / 3; // 90 degrees in radians
+        const quaternion = new Quaternion().setFromAxisAngle(axis, angle);
+        cubeMesh.quaternion.multiplyQuaternions(quaternion, cubeMesh.quaternion);
+
+        const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5))
+        const cubeBody = new CANNON.Body({ 
+            mass: 1, 
+            quaternion: new CANNON.Quaternion(
+                cubeMesh.quaternion.x, 
+                cubeMesh.quaternion.y, 
+                cubeMesh.quaternion.z, 
+                cubeMesh.quaternion.w) 
+            })
+        cubeBody.addShape(cubeShape)
+        
+        cubeBody.position.x = cubeMesh.position.x
+        cubeBody.position.y = cubeMesh.position.y
+        cubeBody.position.z = cubeMesh.position.z
+        this.world.addBody(cubeBody)
+
+        this.ballsToUpdate.push({
+                mesh: cubeMesh,
+                body: cubeBody
+            });
     }
 
     initInput() {
