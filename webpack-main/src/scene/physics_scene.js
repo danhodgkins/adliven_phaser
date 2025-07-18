@@ -55,7 +55,7 @@ export default class PhysicsScene extends BaseScene{
         world.gravity.set(0, -10, 0); // m/s²
 
         //init plane
-        const material = new MeshBasicMaterial({ color: 0x00ff00 , side: DoubleSide});
+        const material = new MeshBasicMaterial({ color: tuneableGameParams.floorColour , side: DoubleSide});
         const geometry = new PlaneGeometry(100,100);
         const plane = new Mesh(geometry, material);
         plane.rotateX(degToRad(270))
@@ -68,35 +68,8 @@ export default class PhysicsScene extends BaseScene{
         planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
         world.addBody(planeBody)
 
-        // // init cube
-        // const cubegeometry = new BoxGeometry( 1, 1, 1 );
-        // const cubematerial = new MeshBasicMaterial( { color: 0x0000ff } );
-        // const cubeMesh = new Mesh( cubegeometry, cubematerial );
-        // scene.add( cubeMesh );
-        // cubeMesh.position.set(0, 10, 0);
-        // // cubeMesh.quaternion.set(1, 0, 0.5, 1);
 
-        // const axis = new Vector3(1, 0, 0); // X-axis
-        // const angle = Math.PI / 3; // 90 degrees in radians
-        // const quaternion = new Quaternion().setFromAxisAngle(axis, angle);
-        // cubeMesh.quaternion.multiplyQuaternions(quaternion, cubeMesh.quaternion);
-
-        // const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5))
-        // const cubeBody = new CANNON.Body({ 
-        //     mass: 1, 
-        //     quaternion: new CANNON.Quaternion(
-        //         cubeMesh.quaternion.x, 
-        //         cubeMesh.quaternion.y, 
-        //         cubeMesh.quaternion.z, 
-        //         cubeMesh.quaternion.w) 
-        //     })
-        // cubeBody.addShape(cubeShape)
-        
-        // cubeBody.position.x = cubeMesh.position.x
-        // cubeBody.position.y = cubeMesh.position.y
-        // cubeBody.position.z = cubeMesh.position.z
-        // world.addBody(cubeBody)
-
+        // load zombunny
         const loader = new GLTFLoader();
         loader.load(
             Bunny01ThumbGLB, 
@@ -114,8 +87,6 @@ export default class PhysicsScene extends BaseScene{
             (e) => { console.error("error loading model", e); }
         );
         
-        // this.cube = cubeMesh;
-
         // orbit controls
         const controls = new OrbitControls( camera, renderer.domElement );
         controls.target.set( 0, 2, 0 );
@@ -127,12 +98,12 @@ export default class PhysicsScene extends BaseScene{
         this.world = world;
         this.ballsToUpdate = [];
 
-        let i=10;
+        let i=tuneableGameParams.numBoxesBoxes;
         let id = setInterval(() => {
             this.initCube();
             i--;
             if(i <= 0) clearInterval(id);
-        }, 500);
+        }, tuneableGameParams.boxSpawnInterval );
 
         
 
@@ -194,7 +165,7 @@ export default class PhysicsScene extends BaseScene{
     initCube() {
      // init cube
         const cubegeometry = new BoxGeometry( 1, 1, 1 );
-        const cubematerial = new MeshBasicMaterial( { color: 0x0000ff } );
+        const cubematerial = new MeshBasicMaterial( { color: tuneableGameParams.boxColour } );
         const cubeMesh = new Mesh( cubegeometry, cubematerial );
         this.scene.add( cubeMesh );
         cubeMesh.position.set(0, 10, 0);
@@ -242,7 +213,7 @@ export default class PhysicsScene extends BaseScene{
 
              // init sphere
             const geometry = new SphereGeometry( 0.5 );
-            const material = new MeshBasicMaterial( { color: 0xff00ff } );
+            const material = new MeshBasicMaterial( { color: tuneableGameParams.bulletColour } );
             const mesh = new Mesh( geometry, material );
             this.scene.add( mesh );
 
@@ -256,10 +227,10 @@ export default class PhysicsScene extends BaseScene{
             const origin = raycaster.ray.origin.clone();
             mesh.position.copy(origin);
 
-            const sphereShape = new CANNON.Sphere(0.5)
+            const sphereShape = new CANNON.Sphere(0.8)
             const sphereBody = new CANNON.Body({ 
                 // position: new CANNON.Vec3(pos.x,pos.y,pos.z),
-                mass:1
+                mass:tuneableGameParams.bulletMass
             })
             sphereBody.addShape(sphereShape)
             sphereBody.position.set(origin.x, origin.y, origin.z); // correctly set Cannon body position

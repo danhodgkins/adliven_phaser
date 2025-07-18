@@ -5,7 +5,17 @@
     <!-- <link rel="icon" type="image/png" href="./favicon.png" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- <link rel="stylesheet" href="./style.css"> -->
-    <title>YO!</title>
+    <title>three js playable ad framework</title>
+    <script>
+        const tuneableGameParams = {
+            floorColour : 0x336633,
+            boxColour : 0x663366,
+            bulletColour : 0xf9cb9d,
+            numBoxesBoxes : 1,
+            boxSpawnInterval : 100,
+            bulletMass : 1
+        }
+    </script>
 </head>
 
 <body>
@@ -13,13 +23,6 @@
         <div id="game-container"></div>
     </div>
     <div id="ui-overlay">
-        <!-- <div id="headerRow">
-            <div id="logoCont" class="headerRowItem"></div>
-            <div class="spacer"></div>
-            <button id="ctaButton">PLAY NOW</button>
-        </div>
-        <div class="spacer"></div>
-        <div id="gameOutput"></div> -->
     </div>
     <div id="pixi-container"></div>
 </body>
