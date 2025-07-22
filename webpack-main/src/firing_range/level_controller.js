@@ -1,5 +1,8 @@
 import { Mesh, MeshBasicMaterial, Raycaster, SphereGeometry, Vector3 } from "three";
 import CANNON from 'cannon';
+import { GLTFLoader } from "three/examples/jsm/Addons.js";
+import { Bunny01ThumbGLB } from '../../media/Bunny_01_thumb.glb.js';
+import { MovingTarget } from "./moving_target.js";
 
 export class FRLevelController {
     
@@ -11,6 +14,7 @@ export class FRLevelController {
     scene;
     world;
     ballsToUpdate;
+    score = 0;
 
     constructor({ config, physicsWorld, camera, threeScene }) {
         this.config = config;
@@ -23,9 +27,55 @@ export class FRLevelController {
         this.boundOnInput = this.onInput.bind(this);
         this.ballsToUpdate = [];
         window.addEventListener( 'pointerdown', this.boundOnInput );
+
+        this.mt = new MovingTarget({ threeScene: this.scene, physicsWorld: this.world });
+
+        // load zombunny
+        // const loader = new GLTFLoader();
+        // loader.load(
+        //     Bunny01ThumbGLB, 
+        //     (e) => {                 
+        //         this.scene.add(e.scene); 
+        //         const sphereShape = new CANNON.Sphere(1)
+        //         const sphereBody = new CANNON.Body({ 
+        //             position: new CANNON.Vec3(0,1.5, 0),
+        //             mass:0
+        //         })
+        //         sphereBody.addShape(sphereShape)
+        //         this.world.addBody(sphereBody)
+
+        //         // Listen for collision events on bodyA
+        //         sphereBody.addEventListener("collide", (event)=>{
+        //             // if (event.body === bodyB) {
+        //             //     console.log("bodyA collided with bodyB!");
+        //             // } else {
+        //             //     console.log("bodyA collided with another body.");
+        //             // }
+        //             this.score++;
+        //             console.log("collided.", this.score, this.config.targetPoints);
+        //             if( this.score >= this.config.targetPoints) {
+        //                 this.eventDispatcher.dispatchEvent(new CustomEvent('levelComplete', { detail: { score: this.score } }));
+        //             }
+        //         });
+
+        //     }, 
+        //     undefined, 
+        //     (e) => { console.error("error loading model", e); }
+        // );
+
+    }
+
+    spawnTarget() {
+
     }
 
     destroy() {
+
+        this.ballsToUpdate.forEach(element => {
+            this.scene.remove(element.mesh);
+            this.world.removeBody(element.body);
+        });
+
         window.removeEventListener( 'pointerdown', this.boundOnInput );
         this.eventDispatcher= null;
         this.raycaster= null;
@@ -38,6 +88,10 @@ export class FRLevelController {
     }
 
     update( dt ) {
+        if( this.mt ) {
+            this.mt.update(dt); 
+        }
+
         this.ballsToUpdate.forEach(element => {
             element.mesh.position.set(
                 element.body.position.x, 
@@ -92,6 +146,9 @@ export class FRLevelController {
             // position: new CANNON.Vec3(pos.x,pos.y,pos.z),
             mass:tuneableGameParams.bulletMass
         })
+
+        sphereBody.userData = { type: 'projectile' };
+
         sphereBody.addShape(sphereShape)
         sphereBody.position.set(origin.x, origin.y, origin.z); // correctly set Cannon body position
         this.world.addBody(sphereBody)

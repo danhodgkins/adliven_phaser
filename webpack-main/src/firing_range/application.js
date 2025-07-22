@@ -40,6 +40,8 @@ export class FiringRangeApplication extends BaseScene{
 
         // Setup our world
         var world = new CANNON.World();
+        world.broadphase = new CANNON.NaiveBroadphase();
+        world.solver.iterations = 10;
         world.gravity.set(0, -10, 0); // m/s²
 
         //init plane
@@ -64,7 +66,7 @@ export class FiringRangeApplication extends BaseScene{
     currentLevelController = null;
 
     nextLevel() {
-        this.currentLevel++;
+        
         const levelConfig = frLevels[this.currentLevel];
 
         const levelController = new FRLevelController({ 
@@ -73,27 +75,50 @@ export class FiringRangeApplication extends BaseScene{
             camera: this.camera,
             threeScene: this.scene
         });
+        console.log("new level !", this.currentLevel, levelConfig);
 
         this.currentLevelController = levelController;
         this.currentLevelController.eventDispatcher.addEventListener('levelComplete', this.onLevelComplete.bind(this));
     }
 
     onLevelComplete() {
-        if( this.currentLevel +1 >= frLevels.length ) {
-            console.log("All levels complete!");
-            return;
-        } else {
-            this.nextLevel();
-        }
+        console.log("level complete!");
+        this.destroyLevelAfterStep = true;
+        // this.currentLevelController.destroy();
+        // this.currentLevel++;
+        // if( this.currentLevel >= frLevels.length ) {
+        //     this.currentLevelController = null
+        //     console.log("All levels complete!");
+        //     return;
+        // } else {
+        //     this.nextLevel();
+        // }
     }
 
+    destroyLevelAfterStep = false;
     fixedTimeStep = 1.0 / 60.0; // seconds
     maxSubSteps = 3;
     update( dt ) {
         this.renderer.render( this.scene, this.camera );
         if( this.currentLevelController ) {
-            this.currentLevelController.update( dt );
             if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
+            this.currentLevelController.update( dt );
+            ///console.log("update ",  this.physicsWorld);
+        }
+
+        if( this.destroyLevelAfterStep ) {
+            this.currentLevelController.destroy();
+            this.currentLevelController = null;
+            this.destroyLevelAfterStep = false;
+            this.currentLevel++;
+            
+            if( this.currentLevel >= frLevels.length ) {
+                this.currentLevelController = null
+                console.log("All levels complete!");
+                return;
+            } else {
+                this.nextLevel();
+            }
         }
     }
 }
