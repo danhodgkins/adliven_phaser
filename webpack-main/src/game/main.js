@@ -20,6 +20,7 @@ import SceneManager from '../scene/scenemanager.js';
 import SceneSunshineIslandMain from '../scene/si_main_scene.js';
 import PhysicsScene from '../scene/physics_scene.js';
 import TobyScene from '../scene/tobyscene.js';
+import { FiringRangeApplication } from '../firing_range/application.js';
 
 export class Application {
     constructor({ parent }) {
@@ -27,8 +28,9 @@ export class Application {
         this.sceneManager = new SceneManager([
             // new SceneThreeEditor({config: {id: 'main', parent: parent}})
             // new SceneSunshineIslandMain({config: {id: 'main', parent: parent}})
-            new PhysicsScene({config: {id: 'main', parent: parent}})
+            // new PhysicsScene({config: {id: 'main', parent: parent}})
             // new TobyScene({config: {id: 'main', parent: parent}})
+            new FiringRangeApplication({config: {id: 'main', parent: parent}})
         ]); 
 
         this.boundUpdate = this.update.bind(this);
@@ -37,8 +39,19 @@ export class Application {
         this.sceneManager.setScene( 'main' )
     }
 
-    update() {
-        this.sceneManager.update();
+
+    lastTime;
+    
+    update()  {
+        const time = Date.now();
+        let dt = 0;
+        if( this.lastTime !== undefined){
+            dt = (time - this.lastTime) / 1000;
+            //world.step(fixedTimeStep, dt, maxSubSteps);
+        }
+
+        this.sceneManager.update( dt);
+        this.lastTime = time;
         requestAnimationFrame(this.boundUpdate);
     }
 }

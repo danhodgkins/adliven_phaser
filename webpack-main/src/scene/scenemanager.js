@@ -9,9 +9,9 @@ export default class SceneManager {
         this.currentScene.init();
     }
 
-    update() {
+    update( dt ) {
         if( this.currentScene ) {
-            this.currentScene.update();
+            this.currentScene.update( dt );
         }
     }
     

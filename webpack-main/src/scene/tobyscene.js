@@ -176,57 +176,57 @@ export default class TobyScene extends BaseScene{
         this.renderer.render(this.scene, this.camera);
     }
 
-    document.addEventListener('touchstart', (e) => {
-  if (e.touches.length === 1) {
+//     document.addEventListener('touchstart', (e) => {
+//   if (e.touches.length === 1) {
     
-    isDragging = true;
-    lastTouch.x = e.touches[0].clientX;
-    lastTouch.y = e.touches[0].clientY;
-  }
-});
+//     isDragging = true;
+//     lastTouch.x = e.touches[0].clientX;
+//     lastTouch.y = e.touches[0].clientY;
+//   }
+// });
 
-document.addEventListener('touchmove', (e) => {
-  if (isDragging && e.touches.length === 1) {
-    const touch = e.touches[0];
-    const delta = getNormalizedDelta(touch - lastTouch);
-    tryMoveCube(delta);
-    //lastTouch.x = touch.clientX;
-    //lastTouch.y = touch.clientY;
-  }
-});
+// document.addEventListener('touchmove', (e) => {
+//   if (isDragging && e.touches.length === 1) {
+//     const touch = e.touches[0];
+//     const delta = getNormalizedDelta(touch - lastTouch);
+//     tryMoveCube(delta);
+//     //lastTouch.x = touch.clientX;
+//     //lastTouch.y = touch.clientY;
+//   }
+// });
 
-document.addEventListener('touchend', () => {
-  isDragging = false;
-});
+// document.addEventListener('touchend', () => {
+//   isDragging = false;
+// });
 
-let isMouseDragging = false;
-let lastMouse = { x: 0, y: 0 };
+// let isMouseDragging = false;
+// let lastMouse = { x: 0, y: 0 };
 
-function getNormalizedMouseDelta(event) {
-  return {
-    x: (event.clientX - lastMouse.x) / window.innerWidth * 10,
-    z: (event.clientY - lastMouse.y) / window.innerHeight * 10
-  };
-}
+// function getNormalizedMouseDelta(event) {
+//   return {
+//     x: (event.clientX - lastMouse.x) / window.innerWidth * 10,
+//     z: (event.clientY - lastMouse.y) / window.innerHeight * 10
+//   };
+// }
 
-document.addEventListener('mousedown', (e) => {
-  isMouseDragging = true;
-  lastMouse.x = e.clientX;
-  lastMouse.y = e.clientY;
-});
+// document.addEventListener('mousedown', (e) => {
+//   isMouseDragging = true;
+//   lastMouse.x = e.clientX;
+//   lastMouse.y = e.clientY;
+// });
 
-document.addEventListener('mousemove', (e) => {
-  if (isMouseDragging) {
-    const delta = getNormalizedMouseDelta(e);
-    tryMoveCube(delta);
-    lastMouse.x = e.clientX;
-    lastMouse.y = e.clientY;
-  }
-});
+// document.addEventListener('mousemove', (e) => {
+//   if (isMouseDragging) {
+//     const delta = getNormalizedMouseDelta(e);
+//     tryMoveCube(delta);
+//     lastMouse.x = e.clientX;
+//     lastMouse.y = e.clientY;
+//   }
+// });
 
-document.addEventListener('mouseup', () => {
-  isMouseDragging = false;
-});
+// document.addEventListener('mouseup', () => {
+//   isMouseDragging = false;
+// });
 
     
 }
