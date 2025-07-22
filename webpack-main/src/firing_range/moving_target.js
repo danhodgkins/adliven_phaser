@@ -2,11 +2,26 @@ import { BoxGeometry, Mesh, MeshBasicMaterial, Quaternion, Vector3 } from "three
 import CANNON from 'cannon';
 
 export class MovingTarget {
-    constructor({ threeScene, physicsWorld }) {
+    constructor({ threeScene, physicsWorld, col }) {
         this.scene = threeScene;
         this.world = physicsWorld;
+        this.col = col;
         this.boundOnCollision = this.onCollision.bind(this);
+        this.eventDispatcher = new EventTarget();
         this.initCube();
+    }
+
+    destroy() {
+        if( this.mesh && this.body ) {
+            this.scene.remove(this.mesh);
+            this.world.removeBody(this.body);
+            this.mesh = null;
+            this.body = null;
+            this.scene = null;
+            this.world = null;
+            this.boundOnCollision = null;
+            this.eventDispatcher = null;
+        }
     }
 
     update(dt) {
@@ -29,33 +44,33 @@ export class MovingTarget {
     onCollision( e ) {
         if (e.body.userData?.type === 'projectile')
         {
-            console.log("Target hit!");
+            this.eventDispatcher.dispatchEvent(new CustomEvent('targetHit', { detail: { target: this } }));
         }
     }
 
     initCube() {
         // init cube
         const cubegeometry = new BoxGeometry( 1, 1, 1 );
-        const cubematerial = new MeshBasicMaterial( { color: tuneableGameParams.boxColour } );
+        const cubematerial = new MeshBasicMaterial( { color: this.col } );
         const cubeMesh = new Mesh( cubegeometry, cubematerial );
         this.scene.add( cubeMesh );
         cubeMesh.position.set(0, 5, 0);
         // cubeMesh.quaternion.set(1, 0, 0.5, 1);
 
-        //const axis = new Vector3(1, 1, 0); // X-axis
-        //const angle = Math.PI / 3; // 90 degrees in radians
-        //const quaternion = new Quaternion().setFromAxisAngle(axis, angle);
-        //cubeMesh.quaternion.multiplyQuaternions(quaternion, cubeMesh.quaternion);
+        const axis = new Vector3(1, 1, 0); // X-axis
+        const angle = Math.PI / 3; // 90 degrees in radians
+        const quaternion = new Quaternion().setFromAxisAngle(axis, angle);
+        cubeMesh.quaternion.multiplyQuaternions(quaternion, cubeMesh.quaternion);
 
         const cubeShape = new CANNON.Box(new CANNON.Vec3(0.5, 0.5, 0.5))
         const cubeBody = new CANNON.Body({ 
             mass: 10, 
-            // quaternion: new CANNON.Quaternion(
-            //     cubeMesh.quaternion.x, 
-            //     cubeMesh.quaternion.y, 
-            //     cubeMesh.quaternion.z, 
-            //     cubeMesh.quaternion.w) 
-            // 
+            quaternion: new CANNON.Quaternion(
+                cubeMesh.quaternion.x, 
+                cubeMesh.quaternion.y, 
+                cubeMesh.quaternion.z, 
+                cubeMesh.quaternion.w) 
+            
             })
         cubeBody.addShape(cubeShape)
         cubeBody.addEventListener("collide", this.boundOnCollision);
@@ -67,7 +82,5 @@ export class MovingTarget {
 
         this.mesh = cubeMesh;
         this.body = cubeBody;
-
-
     }
 }

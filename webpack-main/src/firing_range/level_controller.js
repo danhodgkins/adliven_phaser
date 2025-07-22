@@ -15,6 +15,7 @@ export class FRLevelController {
     world;
     ballsToUpdate;
     score = 0;
+    movingTargets;
 
     constructor({ config, physicsWorld, camera, threeScene }) {
         this.config = config;
@@ -24,12 +25,13 @@ export class FRLevelController {
         this.eventDispatcher = new EventTarget();
         this.raycaster = new Raycaster();
         this.mouseCoords = new Vector3();
+        this.boundOnTargetHit = this.onTargetHit.bind(this);
         this.boundOnInput = this.onInput.bind(this);
         this.ballsToUpdate = [];
+        this.movingTargets = [];
         window.addEventListener( 'pointerdown', this.boundOnInput );
 
-        this.mt = new MovingTarget({ threeScene: this.scene, physicsWorld: this.world });
-
+        this.spawnTarget();
         // load zombunny
         // const loader = new GLTFLoader();
         // loader.load(
@@ -66,10 +68,23 @@ export class FRLevelController {
     }
 
     spawnTarget() {
+        const mt = new MovingTarget({ threeScene: this.scene, physicsWorld: this.world, col: this.config.boxColour });
+        mt.eventDispatcher.addEventListener('targetHit', this.boundOnTargetHit );
+        this.movingTargets.push( mt );
+    }
 
+    onTargetHit(e) {
+        this.score++;
+        if( this.score >= this.config.targetPoints) {
+            this.eventDispatcher.dispatchEvent(new CustomEvent('levelComplete', { detail: { score: this.score } }));
+        }
     }
 
     destroy() {
+
+        this.movingTargets.forEach(element => {
+            element.destroy();
+        });
 
         this.ballsToUpdate.forEach(element => {
             this.scene.remove(element.mesh);
@@ -88,8 +103,10 @@ export class FRLevelController {
     }
 
     update( dt ) {
-        if( this.mt ) {
-            this.mt.update(dt); 
+        if( this.movingTargets && this.movingTargets.length > 0 ) {
+            this.movingTargets.forEach(mt => {
+                mt.update(dt);
+            });
         }
 
         this.ballsToUpdate.forEach(element => {
@@ -131,19 +148,12 @@ export class FRLevelController {
         const mesh = new Mesh( geometry, material );
         this.scene.add( mesh );
 
-        // const pos = new Vector3();
-        // pos.copy( raycaster.ray.direction );
-        // pos.add( raycaster.ray.origin );
-        // pos.copy( raycaster.ray.direction );
-        // // pos.multiplyScalar( 24 );
-
         // Position at ray origin (camera near plane)
         const origin = raycaster.ray.origin.clone();
         mesh.position.copy(origin);
 
         const sphereShape = new CANNON.Sphere(0.8)
         const sphereBody = new CANNON.Body({ 
-            // position: new CANNON.Vec3(pos.x,pos.y,pos.z),
             mass:tuneableGameParams.bulletMass
         })
 
@@ -153,16 +163,7 @@ export class FRLevelController {
         sphereBody.position.set(origin.x, origin.y, origin.z); // correctly set Cannon body position
         this.world.addBody(sphereBody)
 
-        // sphereBody.position.x = mesh.position.x = raycaster.ray.origin.x;
-        // sphereBody.position.y = mesh.position.y = raycaster.ray.origin.x;
-        // sphereBody.position.z = mesh.position.z = raycaster.ray.origin.x;
-
         const direction = raycaster.ray.direction.clone().normalize();
-
-        // sphereBody.applyImpulse(
-        //     new CANNON.Vec3(direction.x,direction.y,direction.z),
-        //     new CANNON.Vec3(0, 0, 0)
-        // );
 
         // Apply impulse in ray direction
         const impulse = new CANNON.Vec3(direction.x, direction.y, direction.z).scale(50);

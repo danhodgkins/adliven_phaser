@@ -66,16 +66,13 @@ export class FiringRangeApplication extends BaseScene{
     currentLevelController = null;
 
     nextLevel() {
-        
         const levelConfig = frLevels[this.currentLevel];
-
         const levelController = new FRLevelController({ 
             config: levelConfig, 
             physicsWorld: this.physicsWorld,
             camera: this.camera,
             threeScene: this.scene
         });
-        console.log("new level !", this.currentLevel, levelConfig);
 
         this.currentLevelController = levelController;
         this.currentLevelController.eventDispatcher.addEventListener('levelComplete', this.onLevelComplete.bind(this));
@@ -84,15 +81,6 @@ export class FiringRangeApplication extends BaseScene{
     onLevelComplete() {
         console.log("level complete!");
         this.destroyLevelAfterStep = true;
-        // this.currentLevelController.destroy();
-        // this.currentLevel++;
-        // if( this.currentLevel >= frLevels.length ) {
-        //     this.currentLevelController = null
-        //     console.log("All levels complete!");
-        //     return;
-        // } else {
-        //     this.nextLevel();
-        // }
     }
 
     destroyLevelAfterStep = false;
@@ -103,7 +91,6 @@ export class FiringRangeApplication extends BaseScene{
         if( this.currentLevelController ) {
             if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
             this.currentLevelController.update( dt );
-            ///console.log("update ",  this.physicsWorld);
         }
 
         if( this.destroyLevelAfterStep ) {
@@ -113,8 +100,10 @@ export class FiringRangeApplication extends BaseScene{
             this.currentLevel++;
             
             if( this.currentLevel >= frLevels.length ) {
-                this.currentLevelController = null
+                // this.currentLevelController = null
+                this.currentLevel = 0; // reset to first level
                 console.log("All levels complete!");
+                this.nextLevel();
                 return;
             } else {
                 this.nextLevel();
