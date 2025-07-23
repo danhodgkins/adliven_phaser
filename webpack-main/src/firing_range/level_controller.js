@@ -17,8 +17,10 @@ export class FRLevelController {
     score = 0;
     movingTargets;
     movingTargetsToDestroy;
+    uiController;
 
-    constructor({ config, physicsWorld, camera, threeScene }) {
+    constructor({ config, physicsWorld, camera, threeScene,  uiController }) {
+        this.uiController = uiController;
         this.config = config;
         this.world = physicsWorld;
         this.camera = camera;
@@ -33,6 +35,7 @@ export class FRLevelController {
         this.movingTargetsToDestroy = [];
         window.addEventListener( 'pointerdown', this.boundOnInput );
 
+        this.uiController.onScoreUpdate( this.score );
         this.spawnTarget();
         // load zombunny
         // const loader = new GLTFLoader();
@@ -89,8 +92,9 @@ export class FRLevelController {
         const mv = e.detail.target;
         mv.eventDispatcher.removeEventListener('targetHit', this.boundOnTargetHit );
         this.movingTargetsToDestroy.push(mv);
-        
+
         this.score++;
+        this.uiController.onScoreUpdate( this.score );
         if( this.score >= this.config.targetPoints) {
             this.eventDispatcher.dispatchEvent(new CustomEvent('levelComplete', { detail: { score: this.score } }));
         } else {

@@ -5,11 +5,14 @@ import CANNON from 'cannon';
 import { degToRad } from "../scene/si_main_scene";
 import { FRLevelController } from "./level_controller";
 import { If } from "three/tsl";
+import { UIController } from "./ui_controller";
 
 export class FiringRangeApplication extends BaseScene{
     constructor({ config }) {
         super({config});
         console.log("Application initialized with parent:", config);
+        this.uiController = new UIController( document.getElementById("ui-overlay") );
+        this.uiController.showIntro();
     }
 
     init(){
@@ -71,15 +74,20 @@ export class FiringRangeApplication extends BaseScene{
             config: levelConfig, 
             physicsWorld: this.physicsWorld,
             camera: this.camera,
-            threeScene: this.scene
+            threeScene: this.scene,
+            uiController : this.uiController
         });
 
         this.currentLevelController = levelController;
         this.currentLevelController.eventDispatcher.addEventListener('levelComplete', this.onLevelComplete.bind(this));
+
+        
+        this.uiController.onLevelUpdate( this.currentLevel );
     }
 
     onLevelComplete() {
         console.log("level complete!");
+        this.uiController.onLevelUp( this.currentLevel );
         this.destroyLevelAfterStep = true;
     }
 
@@ -103,6 +111,7 @@ export class FiringRangeApplication extends BaseScene{
                 // this.currentLevelController = null
                 this.currentLevel = 0; // reset to first level
                 console.log("All levels complete!");
+                this.uiController.onGameOver();
                 this.nextLevel();
                 return;
             } else {
