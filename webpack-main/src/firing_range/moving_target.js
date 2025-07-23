@@ -2,6 +2,7 @@ import { BoxGeometry, Mesh, MeshBasicMaterial, Quaternion, Vector3 } from "three
 import CANNON from 'cannon';
 
 export class MovingTarget {
+
     constructor({ threeScene, physicsWorld, col }) {
         this.scene = threeScene;
         this.world = physicsWorld;
@@ -11,17 +12,17 @@ export class MovingTarget {
         this.initCube();
     }
 
+
     destroy() {
-        if( this.mesh && this.body ) {
-            this.scene.remove(this.mesh);
-            this.world.removeBody(this.body);
-            this.mesh = null;
-            this.body = null;
-            this.scene = null;
-            this.world = null;
-            this.boundOnCollision = null;
-            this.eventDispatcher = null;
-        }
+        this.scene.remove(this.mesh);
+        this.mesh = null;
+        this.world.removeBody(this.body);
+        this.body = null;     
+
+        this.scene = null;
+        this.world = null;
+        this.boundOnCollision = null;
+        this.eventDispatcher = null;
     }
 
     update(dt) {
@@ -54,7 +55,7 @@ export class MovingTarget {
         const cubematerial = new MeshBasicMaterial( { color: this.col } );
         const cubeMesh = new Mesh( cubegeometry, cubematerial );
         this.scene.add( cubeMesh );
-        cubeMesh.position.set(0, 5, 0);
+        cubeMesh.position.set(randomValBetween( -5, 5 ), 20, randomValBetween( -3, -25 ));
         // cubeMesh.quaternion.set(1, 0, 0.5, 1);
 
         const axis = new Vector3(1, 1, 0); // X-axis
@@ -83,4 +84,8 @@ export class MovingTarget {
         this.mesh = cubeMesh;
         this.body = cubeBody;
     }
+}
+
+function randomValBetween(min, max) {
+    return Math.random() * (max - min) + min;
 }

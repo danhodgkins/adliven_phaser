@@ -16,6 +16,7 @@ export class FRLevelController {
     ballsToUpdate;
     score = 0;
     movingTargets;
+    movingTargetsToDestroy;
 
     constructor({ config, physicsWorld, camera, threeScene }) {
         this.config = config;
@@ -29,6 +30,7 @@ export class FRLevelController {
         this.boundOnInput = this.onInput.bind(this);
         this.ballsToUpdate = [];
         this.movingTargets = [];
+        this.movingTargetsToDestroy = [];
         window.addEventListener( 'pointerdown', this.boundOnInput );
 
         this.spawnTarget();
@@ -67,20 +69,39 @@ export class FRLevelController {
 
     }
 
+
     spawnTarget() {
         const mt = new MovingTarget({ threeScene: this.scene, physicsWorld: this.world, col: this.config.boxColour });
         mt.eventDispatcher.addEventListener('targetHit', this.boundOnTargetHit );
         this.movingTargets.push( mt );
     }
 
+    postStepDestroy() {
+        this.movingTargetsToDestroy.forEach(element => {
+            element.destroy();
+            this.movingTargets.splice(this.movingTargets.indexOf(element), 1);
+            this.movingTargetsToDestroy.splice(this.movingTargetsToDestroy.indexOf(element), 1);
+        });
+    }
+
     onTargetHit(e) {
+        // add mt to list of targets to destroy
+        const mv = e.detail.target;
+        mv.eventDispatcher.removeEventListener('targetHit', this.boundOnTargetHit );
+        this.movingTargetsToDestroy.push(mv);
+        
         this.score++;
         if( this.score >= this.config.targetPoints) {
             this.eventDispatcher.dispatchEvent(new CustomEvent('levelComplete', { detail: { score: this.score } }));
+        } else {
+            this.spawnTarget(); // spawn a new target
         }
     }
 
     destroy() {
+
+        // destroty any targets that are set to be destroyed
+        this.postStepDestroy();
 
         this.movingTargets.forEach(element => {
             element.destroy();
@@ -128,6 +149,8 @@ export class FRLevelController {
                 this.ballsToUpdate.splice(this.ballsToUpdate.indexOf(element), 1);
             }
         });
+
+        this.postStepDestroy();
     }
 
     
@@ -166,7 +189,7 @@ export class FRLevelController {
         const direction = raycaster.ray.direction.clone().normalize();
 
         // Apply impulse in ray direction
-        const impulse = new CANNON.Vec3(direction.x, direction.y, direction.z).scale(50);
+        const impulse = new CANNON.Vec3(direction.x, direction.y, direction.z).scale(150);
         sphereBody.applyImpulse(impulse, sphereBody.position);
 
         this.ballsToUpdate.push({
