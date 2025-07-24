@@ -9,6 +9,20 @@ export class UIController{
         this.boundTempOutputTimeout = this.onTempOutputTimeout.bind(this);
     }
 
+    displayTime( remaining )
+    {
+        const el = document.getElementById("timerOutput");
+        el.innerHTML = remaining ;
+    }
+
+    // displayTime( time, duration )
+    // {
+    //     const el = document.getElementById("timerOutput");
+    //     // const secs = time["s"] < 10 ? "0" + time["s"] : time["s"]; 
+    //     const secs = time["s"] < 10 ? "0" + time["s"] : time["s"]; 
+    //     el.innerHTML = secs ;
+    // }
+
     showIntro()
     {
         const el = document.getElementById("gameOutput");
@@ -44,6 +58,14 @@ export class UIController{
         this.onLevelUpdate( currentLevel );
         const el = document.getElementById("gameOutput");
         el.innerHTML = `Level ${currentLevel} complete!`;
+
+        if( this.timeoutID > -1  ) clearTimeout( this.timeoutID );
+        this.timeoutID = setTimeout( this.boundTempOutputTimeout, 2000 );
+    }
+
+    onLevelFailed( currentLevel ){
+        const el = document.getElementById("gameOutput");
+        el.innerHTML = `Level ${currentLevel} FAILED!`;
 
         if( this.timeoutID > -1  ) clearTimeout( this.timeoutID );
         this.timeoutID = setTimeout( this.boundTempOutputTimeout, 2000 );
@@ -87,6 +109,8 @@ function inGameUIString()
 
         <div id="inGameUIContainer" >
             <div id="scoreOutput"></div>
+            <div class="spacer"></div>
+            <div id="timerOutput"></div>            
             <div class="spacer"></div>
             <div id="levelOutput"></div>            
         </div>

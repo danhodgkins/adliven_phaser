@@ -14,6 +14,7 @@ export class MovingTarget {
 
 
     destroy() {
+
         this.scene.remove(this.mesh);
         this.mesh = null;
         this.world.removeBody(this.body);

@@ -18,8 +18,9 @@ export class FRLevelController {
     movingTargets;
     movingTargetsToDestroy;
     uiController;
+    timer;
 
-    constructor({ config, physicsWorld, camera, threeScene,  uiController }) {
+    constructor({ config, physicsWorld, camera, threeScene,  uiController,timer }) {
         this.uiController = uiController;
         this.config = config;
         this.world = physicsWorld;
@@ -30,6 +31,7 @@ export class FRLevelController {
         this.mouseCoords = new Vector3();
         this.boundOnTargetHit = this.onTargetHit.bind(this);
         this.boundOnInput = this.onInput.bind(this);
+        this.timer = timer;
         this.ballsToUpdate = [];
         this.movingTargets = [];
         this.movingTargetsToDestroy = [];
@@ -103,11 +105,11 @@ export class FRLevelController {
     }
 
     destroy() {
-
         // destroty any targets that are set to be destroyed
         this.postStepDestroy();
 
         this.movingTargets.forEach(element => {
+            element.eventDispatcher.removeEventListener('targetHit', this.boundOnTargetHit );
             element.destroy();
         });
 
@@ -155,6 +157,13 @@ export class FRLevelController {
         });
 
         this.postStepDestroy();
+
+        const remaining = this.config.duration - this.timer.ms();
+        this.uiController.displayTime( remaining );
+        if( remaining <= 0 )
+        {
+            this.eventDispatcher.dispatchEvent(new CustomEvent('levelFailed', { detail: { score: this.score } }));
+        }
     }
 
     
