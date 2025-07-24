@@ -7,6 +7,7 @@ import { FRLevelController } from "./level_controller";
 import { If } from "three/tsl";
 import { UIController } from "./ui_controller";
 import { Timer } from "timer-node";
+import { PixiProgressBar } from "../pixi/progress_bar";
 
 export class FiringRangeApplication extends BaseScene{
     constructor({ config }) {
@@ -15,9 +16,15 @@ export class FiringRangeApplication extends BaseScene{
         this.uiController = new UIController( document.getElementById("ui-overlay") );
         this.uiController.showIntro();
         this.timer = new Timer({ label: 'timer' });
+        // this.timerDisplay();
 
         this.boundOnLevelFailed = this.onLevelFailed.bind( this );
         this.boundOnLevelComplete = this.onLevelComplete.bind( this );
+
+        const parent = document.getElementById("timerOutput");
+        console.log("Pixi Application initialized with parent:", parent);
+        const progressBar = new PixiProgressBar( { parentEl : parent });
+        this.progressBar = progressBar;
     }
 
     init(){
@@ -94,7 +101,8 @@ export class FiringRangeApplication extends BaseScene{
             camera: this.camera,
             threeScene: this.scene,
             uiController : this.uiController,
-            timer:this.timer
+            timer:this.timer,
+            progressBar:this.progressBar
         });
 
         this.currentLevelController = levelController;

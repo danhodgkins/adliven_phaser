@@ -11,17 +11,9 @@ export class UIController{
 
     displayTime( remaining )
     {
-        const el = document.getElementById("timerOutput");
-        el.innerHTML = remaining ;
+        // const el = document.getElementById("timerOutput");
+        // el.innerHTML = remaining ;
     }
-
-    // displayTime( time, duration )
-    // {
-    //     const el = document.getElementById("timerOutput");
-    //     // const secs = time["s"] < 10 ? "0" + time["s"] : time["s"]; 
-    //     const secs = time["s"] < 10 ? "0" + time["s"] : time["s"]; 
-    //     el.innerHTML = secs ;
-    // }
 
     showIntro()
     {
