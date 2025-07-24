@@ -63,6 +63,18 @@ export class FiringRangeApplication extends BaseScene{
 
         this.physicsWorld = world
         this.nextLevel();
+
+        // Handle window resize or rotation
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(width, height);
+        });
+
     }
 
     currentLevel=0;

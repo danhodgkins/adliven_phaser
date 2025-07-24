@@ -147,7 +147,7 @@ export class FRLevelController {
                 element.body.quaternion.w
             );               
             
-            if( element.birthTime && Date.now() - element.birthTime > 5000 ){
+            if( element.birthTime && Date.now() - element.birthTime > 2000 ){
                 this.scene.remove(element.mesh);
                 this.world.removeBody(element.body);
                 this.ballsToUpdate.splice(this.ballsToUpdate.indexOf(element), 1);
@@ -193,7 +193,7 @@ export class FRLevelController {
         const direction = raycaster.ray.direction.clone().normalize();
 
         // Apply impulse in ray direction
-        const impulse = new CANNON.Vec3(direction.x, direction.y, direction.z).scale(150);
+        const impulse = new CANNON.Vec3(direction.x, direction.y, direction.z).scale(100);
         sphereBody.applyImpulse(impulse, sphereBody.position);
 
         this.ballsToUpdate.push({
