@@ -9,9 +9,14 @@ export class MistlandLumberjackUIController {
 
     updateUI() {
         // Update UI elements based on application model state
-        const gameOutput = this.uiLayerElement.querySelector("#gameOutput");
-        if (gameOutput) {
-            gameOutput.textContent = `Logs: ${this.applicationModel.logCount}`;
+        const logCountOutput = this.uiLayerElement.querySelector("#logCountOutput");
+        if (logCountOutput) {
+            logCountOutput.textContent = `Logs: ${this.applicationModel.logCount}`;
+        }
+                
+        const gemCountOutput = this.uiLayerElement.querySelector("#gemCountOutput");
+        if (logCountOutput) {
+            gemCountOutput.textContent = `Gems: ${this.applicationModel.gemCount}`;
         }
     }
 

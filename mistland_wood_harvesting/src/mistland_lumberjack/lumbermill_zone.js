@@ -1,6 +1,6 @@
 import { SensorZone } from "./sensor";
 
-export default class TreeZone {
+export default class LumberMillZone {
     constructor({ world, scene, position, radius = 1.5, playerBody }) {
         this.world = world;
         this.scene = scene;
@@ -13,7 +13,7 @@ export default class TreeZone {
             position: position || new Vec3(0, 0, 0),
             radius: this.radius,
             playerBody: playerBody, 
-            color: 0xff00ff,
+            color: 0xfff,
         });
 
         this.sensor = sensor;
