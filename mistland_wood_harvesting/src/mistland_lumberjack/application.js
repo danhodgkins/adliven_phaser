@@ -6,6 +6,7 @@ import { degToRad } from "three/src/math/MathUtils.js";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
 import { PhysicsBounds } from "./physics_bounds";
+import { FollowCamera } from "./follow_cam";
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
@@ -23,7 +24,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         const light = new AmbientLight(color, intensity);
         scene.add(light);
 
-        const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        //const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         const renderer = new WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.outputEncoding = SRGBColorSpace;
@@ -31,14 +32,14 @@ export class MistlandLumberjackApplication extends BaseScene{
         el.appendChild( renderer.domElement );
 
         this.renderer = renderer;
-        this.camera = camera;
+        // this.camera = camera;
 
-        this.camera.position.x = 0;
-        this.camera.position.y = 5;
-        this.camera.position.z = 10;
+        // this.camera.position.x = 0;
+        // this.camera.position.y = 5;
+        // this.camera.position.z = 10;
 
-        // this.camera.zoom = 2; // higher = closer
-        this.camera.updateProjectionMatrix();
+        // // this.camera.zoom = 2; // higher = closer
+        // this.camera.updateProjectionMatrix();
 
         // Setup our world
         var world = new World();
@@ -73,15 +74,31 @@ export class MistlandLumberjackApplication extends BaseScene{
                 size: { x: 1, y: 1, z: 3 } ,
                 rotationY: 0, // no rotation
             },
+            { 
+                position: { x:-3, y:0, z: -10 }, 
+                size: { x: 1, y: 1, z: 3 } ,
+                rotationY: -Math.PI / 4, // no rotation
+            }
         ];        
         const bounds = new PhysicsBounds({ boxes, world, scene });
 
         // player
         this.player = new Player({
             world: world,
-            scene: scene,
-            camera: camera
+            scene: scene
         });
+
+        const followCam = new FollowCamera({
+            target: this.player.sphereMesh,
+            renderer,
+            scene,
+            zoom: 10,
+            lerpFactor: 0.05,
+            offset: new Vector3(0, 5, 5), // 20 units above the player
+        });
+
+        this.camera = followCam.getCamera();
+        this.followCam = followCam;
     }
 
     destroyLevelAfterStep = false;
@@ -90,6 +107,7 @@ export class MistlandLumberjackApplication extends BaseScene{
     update( dt ) {
         this.player.setInput(this.joystickInput.x, this.joystickInput.y);
         this.player.update(dt);
+        this.followCam.update();
         if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
         this.renderer.render( this.scene, this.camera );
     }

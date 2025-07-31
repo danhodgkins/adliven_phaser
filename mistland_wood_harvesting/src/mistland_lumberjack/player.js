@@ -2,10 +2,9 @@ import { Body, Material, Sphere, Vec3 } from "cannon-es";
 import { SphereGeometry, Mesh, MeshStandardMaterial } from "three";
 
 export class Player {
-    constructor({ world, scene, camera }) {
+    constructor({ world, scene }) {
         this.world = world;
         this.scene = scene;
-        this.camera = camera;
 
         this.joystickInput = { x: 0, y: 0 };
 
