@@ -1,9 +1,11 @@
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import BaseScene from "../scene/basescene";
 import { AmbientLight, BoxGeometry, Clock, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
-import CANNON from 'cannon';
 import { MistlandLumberjackUIController } from "./ui_controller";
 import { degToRad } from "three/src/math/MathUtils.js";
+import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
+import { Player } from "./player";
+import { PhysicsBounds } from "./physics_bounds";
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
@@ -39,33 +41,56 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.camera.updateProjectionMatrix();
 
         // Setup our world
-        var world = new CANNON.World();
-        world.broadphase = new CANNON.NaiveBroadphase();
+        var world = new World();
         world.solver.iterations = 10;
         world.gravity.set(0, -10, 0); // m/s²
-
-        //init plane
-        const material = new MeshBasicMaterial({ color: tuneableGameParams.floorColour , side: DoubleSide});
-        const geometry = new PlaneGeometry(100,100);
-        const plane = new Mesh(geometry, material);
-        plane.rotateX(degToRad(270))
-        scene.add(plane);
-        
-        // cannon planes are INFINTE so use a box if you want a floor
-        const planeShape = new CANNON.Plane()
-        const planeBody = new CANNON.Body({ mass: 0 })
-        planeBody.addShape(planeShape)
-        planeBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
-        world.addBody(planeBody)
-
         this.physicsWorld = world;
+        
+        // input 
+        // User input
+        this.joystickInput = { x: 0, y: 0 }
+        
+        // Simulated joystick (you can replace this with nipplejs)
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') this.joystickInput.y = -1
+            if (e.key === 'ArrowDown') this.joystickInput.y = 1
+            if (e.key === 'ArrowLeft') this.joystickInput.x = -1
+            if (e.key === 'ArrowRight') this.joystickInput.x = 1
+        })
+        window.addEventListener('keyup', () => {
+            console.log("keyup")
+            this.joystickInput = { x: 0, y: 0 }
+        })
+        
+        const boxes = [
+            { 
+                position: { x: 0, y: 0, z: -5 }, 
+                size: { x: 1, y: 1, z: 3 },
+                rotationY: Math.PI / 4, // 45 degrees 
+            },
+            { 
+                position: { x: 3, y:0, z: -2 }, 
+                size: { x: 1, y: 1, z: 3 } ,
+                rotationY: 0, // no rotation
+            },
+        ];        
+        const bounds = new PhysicsBounds({ boxes, world, scene });
+
+        // player
+        this.player = new Player({
+            world: world,
+            scene: scene,
+            camera: camera
+        });
     }
 
     destroyLevelAfterStep = false;
     fixedTimeStep = 1.0 / 60.0; // seconds
     maxSubSteps = 3;
     update( dt ) {
-        this.renderer.render( this.scene, this.camera );
+        this.player.setInput(this.joystickInput.x, this.joystickInput.y);
+        this.player.update(dt);
         if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
+        this.renderer.render( this.scene, this.camera );
     }
 }

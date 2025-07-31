@@ -34,7 +34,7 @@
     "dependencies": {
         "@pixi/layout": "^3.0.2",
         "@tweenjs/tween.js": "^25.0.0",
-        "cannon": "^0.6.2",
+        "cannon-es": "^0.20.0",
         "howler": "^2.2.4",
         "http-server": "^14.1.1",
         "pixi.js": "^8.11.0",
