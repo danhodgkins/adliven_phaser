@@ -37,6 +37,7 @@
         "cannon-es": "^0.20.0",
         "howler": "^2.2.4",
         "http-server": "^14.1.1",
+        "nipplejs": "^0.10.2",
         "pixi.js": "^8.11.0",
         "three": "^0.178.0"
     }

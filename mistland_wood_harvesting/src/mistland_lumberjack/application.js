@@ -8,6 +8,7 @@ import { PhysicsBounds } from "./physics_bounds";
 import { FollowCamera } from "./follow_cam";
 import TreeZone from "./tree_zone";
 import LumberMillZone from "./lumbermill_zone";
+import nipplejs from 'nipplejs';
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
@@ -38,15 +39,56 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.joystickInput = { x: 0, y: 0 }
         
         // Simulated joystick (you can replace this with nipplejs)
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowUp') this.joystickInput.y = -1
-            if (e.key === 'ArrowDown') this.joystickInput.y = 1
-            if (e.key === 'ArrowLeft') this.joystickInput.x = -1
-            if (e.key === 'ArrowRight') this.joystickInput.x = 1
-        })
-        window.addEventListener('keyup', () => {
-            this.joystickInput = { x: 0, y: 0 }
-        })
+        // window.addEventListener('keydown', (e) => {
+        //     if (e.key === 'ArrowUp') this.joystickInput.y = -1
+        //     if (e.key === 'ArrowDown') this.joystickInput.y = 1
+        //     if (e.key === 'ArrowLeft') this.joystickInput.x = -1
+        //     if (e.key === 'ArrowRight') this.joystickInput.x = 1
+        // })
+        // window.addEventListener('keyup', () => {
+        //     this.joystickInput = { x: 0, y: 0 }
+        // })
+
+        var options = {
+            // zone: document.getElementById('zone_joystick'),
+            //  position: {       // preset position for 'static' mode
+            // top: '40%',
+            // left: '50%'
+            // },
+            mode: "dynamic",   // 'dynamic', 'static' or 'semi'
+            color: "blue"
+        };
+        var manager = nipplejs.create(options);
+        manager.on('move dir start', (evt, data)=> {            
+            if (data.direction){
+                switch(  data.direction.angle )
+                {
+                    case 'up':
+                        this.joystickInput.y = -1;
+                        this.joystickInput.x = 0;
+                        break;
+                    case 'down':
+                        this.joystickInput.y = 1;
+                        this.joystickInput.x = 0;
+                        break;
+                    case 'left':
+                        this.joystickInput.x = -1;
+                        this.joystickInput.y = 0;
+                        break;
+                    case 'right':
+                        this.joystickInput.x = 1;
+                        this.joystickInput.y = 0;
+                        break;
+                    default:
+                        this.joystickInput.x = 0;
+                        this.joystickInput.y = 0;
+                }
+            }
+        });
+        manager.on('end', (evt, data)=> {            
+            this.joystickInput.x = 0;
+            this.joystickInput.y = 0;
+        });
 
         // Setup physics world
         var world = new World();
