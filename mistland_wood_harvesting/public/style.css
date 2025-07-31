@@ -1,0 +1,89 @@
+body {
+    margin: 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #000000;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+h1 {
+    margin: 0;
+    padding: 0.5em;
+    text-align: center;
+}
+
+#app {
+    width: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#ui-overlay{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    /* align-items: end; */
+    pointer-events: none; /* Allow clicks to pass through */
+}
+
+#pixi-container{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Allow clicks to pass through */
+}
+
+#ctaButton {
+    background-color: #76ff37;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    pointer-events: auto; /* Allow clicks on the button */
+    margin: 1.5em;
+}
+
+#headerRow{
+    display: flex;
+}
+
+.headerRowItem{
+    max-height: 100px;    
+}
+
+.headerRowItem img{
+    max-height: 100px;    
+}
+
+.spacer{
+    flex-grow: 1;
+}
+
+#inGameUIContainer{
+    display: flex;
+}
+
+#scoreOutput{
+    max-width: 200px;
+    padding: 10px;
+    font-size: 2em;
+}
+
+#levelOutput{
+    max-width: 200px;
+    padding: 10px;
+    font-size: 2em;
+}
