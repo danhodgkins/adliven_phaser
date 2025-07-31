@@ -129,14 +129,13 @@ export class MistlandLumberjackApplication extends BaseScene{
 
 
     // respond to tree zone events
+    intervalDuraion = 150;
     intervalID = -1;
     boundOnChopWoodHandler = this.onChopWoodHandler.bind(this);
     onTreeZoneEnter( e ) {
-        //console.log("Player entered tree zone!" , e.body);
-        this.intervalID = setInterval(this.boundOnChopWoodHandler, 300); // Chop wood every second
+        this.intervalID = setInterval(this.boundOnChopWoodHandler, this.intervalDuraion); // Chop wood every second
     }
     onTreeZoneExit( e ) {
-        console.log("Player exited tree zone!" , this.intervalID );
         if( this.intervalID !== -1) {
             clearInterval(this.intervalID);
             this.intervalID = -1;
@@ -144,7 +143,6 @@ export class MistlandLumberjackApplication extends BaseScene{
     }
 
     onChopWoodHandler() {
-        console.log("Chopping wood...", Date.now());
         this.applicationModel.logCount++;
         this.uiController.updateUI();
     }
@@ -152,12 +150,10 @@ export class MistlandLumberjackApplication extends BaseScene{
     // respond to lumbermill zone events
     boundOnLumbermillTickHandler = this.onLumbermillTickHandler.bind(this);
     onLumbermillZoneEnter( e ) {
-        //console.log("Player entered lumbermill zone!" , e.body);
-        this.intervalID = setInterval(this.boundOnLumbermillTickHandler, 300); // Chop wood every second
+        this.intervalID = setInterval(this.boundOnLumbermillTickHandler, this.intervalDuraion); // Chop wood every second
     }
 
     onLumbermillZoneExit( e ) {
-        //console.log("Player exited lumbermill zone!" , e.body);
         if( this.intervalID !== -1) {
             clearInterval(this.intervalID);
             this.intervalID = -1;
@@ -165,11 +161,9 @@ export class MistlandLumberjackApplication extends BaseScene{
     }
 
     onLumbermillTickHandler() {
-        console.log("depositing wood...", Date.now());
         if( this.applicationModel.logCount  > 0 ) {
             this.applicationModel.logCount--;
             this.applicationModel.gemCount++;
-
         }
         this.uiController.updateUI();
     }
