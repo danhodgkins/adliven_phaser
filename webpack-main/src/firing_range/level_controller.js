@@ -18,8 +18,10 @@ export class FRLevelController {
     movingTargets;
     movingTargetsToDestroy;
     uiController;
+    timer;
+    progressBar;
 
-    constructor({ config, physicsWorld, camera, threeScene,  uiController }) {
+    constructor({ config, physicsWorld, camera, threeScene,  uiController, timer, progressBar }) {
         this.uiController = uiController;
         this.config = config;
         this.world = physicsWorld;
@@ -30,6 +32,8 @@ export class FRLevelController {
         this.mouseCoords = new Vector3();
         this.boundOnTargetHit = this.onTargetHit.bind(this);
         this.boundOnInput = this.onInput.bind(this);
+        this.timer = timer;
+        this.progressBar = progressBar;
         this.ballsToUpdate = [];
         this.movingTargets = [];
         this.movingTargetsToDestroy = [];
@@ -103,11 +107,11 @@ export class FRLevelController {
     }
 
     destroy() {
-
         // destroty any targets that are set to be destroyed
         this.postStepDestroy();
 
         this.movingTargets.forEach(element => {
+            element.eventDispatcher.removeEventListener('targetHit', this.boundOnTargetHit );
             element.destroy();
         });
 
@@ -147,7 +151,7 @@ export class FRLevelController {
                 element.body.quaternion.w
             );               
             
-            if( element.birthTime && Date.now() - element.birthTime > 5000 ){
+            if( element.birthTime && Date.now() - element.birthTime > 2000 ){
                 this.scene.remove(element.mesh);
                 this.world.removeBody(element.body);
                 this.ballsToUpdate.splice(this.ballsToUpdate.indexOf(element), 1);
@@ -155,6 +159,15 @@ export class FRLevelController {
         });
 
         this.postStepDestroy();
+
+        const remaining = this.config.duration - this.timer.ms();
+        // console.log("" , this.timer.ms() / this.config.duration)
+        this.uiController.displayTime( remaining );
+        this.progressBar.updateBar( this.timer.ms() / this.config.duration );
+        if( remaining <= 0 )
+        {
+            this.eventDispatcher.dispatchEvent(new CustomEvent('levelFailed', { detail: { score: this.score } }));
+        }
     }
 
     
@@ -193,7 +206,7 @@ export class FRLevelController {
         const direction = raycaster.ray.direction.clone().normalize();
 
         // Apply impulse in ray direction
-        const impulse = new CANNON.Vec3(direction.x, direction.y, direction.z).scale(150);
+        const impulse = new CANNON.Vec3(direction.x, direction.y, direction.z).scale(100);
         sphereBody.applyImpulse(impulse, sphereBody.position);
 
         this.ballsToUpdate.push({

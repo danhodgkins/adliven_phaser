@@ -6,6 +6,8 @@ import { degToRad } from "../scene/si_main_scene";
 import { FRLevelController } from "./level_controller";
 import { If } from "three/tsl";
 import { UIController } from "./ui_controller";
+import { Timer } from "timer-node";
+import { PixiProgressBar } from "../pixi/progress_bar";
 
 export class FiringRangeApplication extends BaseScene{
     constructor({ config }) {
@@ -13,6 +15,16 @@ export class FiringRangeApplication extends BaseScene{
         console.log("Application initialized with parent:", config);
         this.uiController = new UIController( document.getElementById("ui-overlay") );
         this.uiController.showIntro();
+        this.timer = new Timer({ label: 'timer' });
+        // this.timerDisplay();
+
+        this.boundOnLevelFailed = this.onLevelFailed.bind( this );
+        this.boundOnLevelComplete = this.onLevelComplete.bind( this );
+
+        const parent = document.getElementById("timerOutput");
+        console.log("Pixi Application initialized with parent:", parent);
+        const progressBar = new PixiProgressBar( { parentEl : parent });
+        this.progressBar = progressBar;
     }
 
     init(){
@@ -63,10 +75,23 @@ export class FiringRangeApplication extends BaseScene{
 
         this.physicsWorld = world
         this.nextLevel();
+
+        // Handle window resize or rotation
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(width, height);
+        });
+
     }
 
     currentLevel=0;
     currentLevelController = null;
+    levelWon = false;
 
     nextLevel() {
         const levelConfig = frLevels[this.currentLevel];
@@ -75,20 +100,36 @@ export class FiringRangeApplication extends BaseScene{
             physicsWorld: this.physicsWorld,
             camera: this.camera,
             threeScene: this.scene,
-            uiController : this.uiController
+            uiController : this.uiController,
+            timer:this.timer,
+            progressBar:this.progressBar
         });
 
         this.currentLevelController = levelController;
-        this.currentLevelController.eventDispatcher.addEventListener('levelComplete', this.onLevelComplete.bind(this));
+        this.currentLevelController.eventDispatcher.addEventListener('levelComplete', this.boundOnLevelComplete );
+        this.currentLevelController.eventDispatcher.addEventListener('levelFailed', this.boundOnLevelFailed );
 
-        
         this.uiController.onLevelUpdate( this.currentLevel );
+        this.timer.clear();
+        this.timer.start();
+    }
+
+    onLevelFailed(){
+        console.log("level failed!");
+        this.uiController.onLevelFailed( this.currentLevel );
+        this.destroyLevelAfterStep = true;
+        this.timer.stop();
+        this.levelWon = false;
+
+        // replay same level ( no incrment currentLevel value)
     }
 
     onLevelComplete() {
         console.log("level complete!");
         this.uiController.onLevelUp( this.currentLevel );
         this.destroyLevelAfterStep = true;
+        this.timer.stop();
+        this.levelWon = true;
     }
 
     destroyLevelAfterStep = false;
@@ -102,10 +143,15 @@ export class FiringRangeApplication extends BaseScene{
         }
 
         if( this.destroyLevelAfterStep ) {
+            this.destroyLevelAfterStep = false;
+            
+            this.currentLevelController.eventDispatcher.removeEventListener('levelComplete', this.boundOnLevelComplete );
+            this.currentLevelController.eventDispatcher.removeEventListener('levelFailed', this.boundOnLevelFailed );
+            
             this.currentLevelController.destroy();
             this.currentLevelController = null;
-            this.destroyLevelAfterStep = false;
-            this.currentLevel++;
+
+            if( this.levelWon ) this.currentLevel++;
             
             if( this.currentLevel >= frLevels.length ) {
                 // this.currentLevelController = null
