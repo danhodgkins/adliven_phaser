@@ -20,6 +20,9 @@ export class Player {
             position: new Vec3(0, radius, 0), // start above ground
         });
         sphereBody.addShape(sphereShape);
+        sphereBody.collisionFilterGroup = 4;     // Player group
+        sphereBody.collisionFilterMask = 1 | 2 | 8;       // Collidable group
+
         world.addBody(sphereBody);
         this.sphereBody = sphereBody;
 
@@ -39,7 +42,7 @@ export class Player {
     update(dt) {
         const { sphereBody, sphereMesh, joystickInput } = this;
 
-        const speed = 5;
+        const speed = 9;
         sphereBody.velocity.x = joystickInput.x * speed;
         sphereBody.velocity.z = joystickInput.y * speed;
 

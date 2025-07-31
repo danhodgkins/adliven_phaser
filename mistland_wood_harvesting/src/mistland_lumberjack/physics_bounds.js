@@ -10,7 +10,11 @@ export class PhysicsBounds {
 
         // cannon planes are INFINTE so use a box if you want a floor
         const planeShape = new Plane()
-        const planeBody = new Body({ mass: 0 })
+        const planeBody = new Body({ 
+            mass: 0,
+            collisionFilterGroup: 1, // This is the "plane" group
+            collisionFilterMask: 4 | 2 //Collide with player (4) and collidables (2)
+        })
         planeBody.addShape(planeShape)
         planeBody.quaternion.setFromAxisAngle(new Vec3(1, 0, 0), -Math.PI / 2);
         planeBody.position.set(0, -0.5, 0)

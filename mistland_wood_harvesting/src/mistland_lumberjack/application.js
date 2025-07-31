@@ -2,17 +2,18 @@ import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import BaseScene from "../scene/basescene";
 import { AmbientLight, BoxGeometry, Clock, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
 import { MistlandLumberjackUIController } from "./ui_controller";
-import { degToRad } from "three/src/math/MathUtils.js";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
 import { PhysicsBounds } from "./physics_bounds";
 import { FollowCamera } from "./follow_cam";
+import TreeZone from "./tree_zone";
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
         super({config});
         console.log("Application initialized with parent:", config);
-        this.uiController = new MistlandLumberjackUIController( document.getElementById("ui-overlay") );
+        this.applicationModel = new ApplicationModel();
+        this.uiController = new MistlandLumberjackUIController( document.getElementById("ui-overlay"),this.applicationModel );
     }
 
     init(){
@@ -24,31 +25,15 @@ export class MistlandLumberjackApplication extends BaseScene{
         const light = new AmbientLight(color, intensity);
         scene.add(light);
 
-        //const camera = new PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        // renderer
         const renderer = new WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.outputEncoding = SRGBColorSpace;
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
-
         this.renderer = renderer;
-        // this.camera = camera;
 
-        // this.camera.position.x = 0;
-        // this.camera.position.y = 5;
-        // this.camera.position.z = 10;
-
-        // // this.camera.zoom = 2; // higher = closer
-        // this.camera.updateProjectionMatrix();
-
-        // Setup our world
-        var world = new World();
-        world.solver.iterations = 10;
-        world.gravity.set(0, -10, 0); // m/s²
-        this.physicsWorld = world;
-        
         // input 
-        // User input
         this.joystickInput = { x: 0, y: 0 }
         
         // Simulated joystick (you can replace this with nipplejs)
@@ -59,9 +44,14 @@ export class MistlandLumberjackApplication extends BaseScene{
             if (e.key === 'ArrowRight') this.joystickInput.x = 1
         })
         window.addEventListener('keyup', () => {
-            console.log("keyup")
             this.joystickInput = { x: 0, y: 0 }
         })
+
+        // Setup physics world
+        var world = new World();
+        world.solver.iterations = 10;
+        world.gravity.set(0, -10, 0); // m/s²
+        this.physicsWorld = world;        
         
         const boxes = [
             { 
@@ -92,13 +82,35 @@ export class MistlandLumberjackApplication extends BaseScene{
             target: this.player.sphereMesh,
             renderer,
             scene,
-            zoom: 10,
+            zoom: 15,
             lerpFactor: 0.05,
-            offset: new Vector3(0, 5, 5), // 20 units above the player
+            offset: new Vector3(0, 25, 25), // 20 units above the player
         });
 
         this.camera = followCam.getCamera();
         this.followCam = followCam;
+
+        // trees 
+        this.trees = [];
+        const treeConfigs = [
+            { position: new Vec3(5, 0.5, 5) },
+            { position: new Vec3(5, 0.5, -5) },
+            { position: new Vec3(5, 0.5, -10) },
+            { position: new Vec3(5, 0.5, -15) },
+        ];
+
+        treeConfigs.forEach(element => {
+            const tz = new TreeZone( {
+            world,
+            scene,
+            position: element.position,
+            radius: 1.5,
+            playerBody: this.player.sphereBody,
+            });
+            tz.sensor.addEventListener('enter', this.onTreeZoneEnter.bind(this));
+            tz.sensor.addEventListener('exit', this.onTreeZoneExit.bind(this));
+            this.trees.push( tz );
+        });
     }
 
     destroyLevelAfterStep = false;
@@ -107,8 +119,39 @@ export class MistlandLumberjackApplication extends BaseScene{
     update( dt ) {
         this.player.setInput(this.joystickInput.x, this.joystickInput.y);
         this.player.update(dt);
+
+        this.trees.forEach(element => {
+            element.update();            
+        });
+
         this.followCam.update();
         if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
         this.renderer.render( this.scene, this.camera );
     }
+
+    // respond to tree zone events
+    chopWoodIntervalID = -1;
+    boundOnChopWoodInterval = this.onChopWoodInterval.bind(this);
+    onTreeZoneEnter( e ) {
+        //console.log("Player entered tree zone!" , e.body);
+        this.chopWoodIntervalID = setInterval(this.boundOnChopWoodInterval, 300); // Chop wood every second
+    }
+    onTreeZoneExit( e ) {
+        //console.log("Player exited tree zone!" , e.body);
+        if( this.chopWoodIntervalID !== -1) {
+            clearInterval(this.chopWoodIntervalID);
+            this.chopWoodIntervalID = -1;
+        }
+    }
+
+    onChopWoodInterval() {
+        console.log("Chopping wood...", Date.now());
+        this.applicationModel.logCount++;
+        this.uiController.updateUI();
+    }
+
+}
+
+class ApplicationModel{
+    logCount = 0;
 }
