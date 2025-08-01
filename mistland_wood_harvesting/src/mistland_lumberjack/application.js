@@ -11,6 +11,7 @@ import LumberMillZone from "./lumbermill_zone";
 import nipplejs from 'nipplejs';
 import SensorsController from "./sensors_controller";
 import { ApplicationModel } from "./application_model";
+import WorkshopController from "./workshop_controller";
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
@@ -104,7 +105,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             target: this.player.sphereMesh,
             renderer,
             scene,
-            zoom: 15,
+            zoom: 12,
             lerpFactor: 0.05,
             offset: new Vector3(0, 25, 25), // 20 units above the player
         });
@@ -152,6 +153,9 @@ export class MistlandLumberjackApplication extends BaseScene{
         })
 
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
+
+        // workshop
+        this.workshop = new WorkshopController({ scene , world })
     }
 
     destroyLevelAfterStep = false;
@@ -187,5 +191,14 @@ export class MistlandLumberjackApplication extends BaseScene{
     onModelEvent( e )
     {
         console.log("on model event ", e  );
+        switch( e.detail )
+        {
+            case "unlock_axe":
+                console.log("unlock axe");
+                break;
+
+            case "unlock_workshop":
+                this.workshop.unlock();
+        }
     }
 }
