@@ -41,15 +41,12 @@ export default class SensorsController{
     }
 
     onChopWoodTick() {
-        this.applicationModel.logCount++;
+        this.applicationModel.onLogCollected();
         this.uiController.updateUI();
     }
 
     onLumbermillTick() {
-        if( this.applicationModel.logCount  > 0 ) {
-            this.applicationModel.logCount--;
-            this.applicationModel.gemCount++;
-        }
+        this.applicationModel.handleLumbermillTick();
         this.uiController.updateUI();
     }
 }

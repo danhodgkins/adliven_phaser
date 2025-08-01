@@ -1,6 +1,6 @@
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import BaseScene from "../scene/basescene";
-import { AmbientLight, BoxGeometry, Clock, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
+import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
 import { MistlandLumberjackUIController } from "./ui_controller";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
@@ -10,12 +10,17 @@ import TreeZone from "./tree_zone";
 import LumberMillZone from "./lumbermill_zone";
 import nipplejs from 'nipplejs';
 import SensorsController from "./sensors_controller";
+import { ApplicationModel } from "./application_model";
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
         super({config});
         console.log("Application initialized with parent:", config);
         this.applicationModel = new ApplicationModel();
+        this.applicationModel.addEventListener('model_event', (e)=>{
+            console.log("model_event ", e);
+        });
+
         this.uiController = new MistlandLumberjackUIController( document.getElementById("ui-overlay"),this.applicationModel );
     }
 
@@ -57,7 +62,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             this.joystickInput.y = 0;
         });
         // end input 
-        
+
         // Setup physics world
         var world = new World();
         world.solver.iterations = 10;
@@ -158,9 +163,4 @@ export class MistlandLumberjackApplication extends BaseScene{
         if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
         this.renderer.render( this.scene, this.camera );
     }
-}
-
-class ApplicationModel{
-    logCount = 0;
-    gemCount = 0;
 }
