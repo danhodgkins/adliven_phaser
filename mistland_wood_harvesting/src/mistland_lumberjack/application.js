@@ -58,34 +58,16 @@ export class MistlandLumberjackApplication extends BaseScene{
             mode: "dynamic",   // 'dynamic', 'static' or 'semi'
             color: "blue"
         };
-        var manager = nipplejs.create(options);
-        manager.on('move dir start', (evt, data)=> {            
-            if (data.direction){
-                switch(  data.direction.angle )
-                {
-                    case 'up':
-                        this.joystickInput.y = -1;
-                        this.joystickInput.x = 0;
-                        break;
-                    case 'down':
-                        this.joystickInput.y = 1;
-                        this.joystickInput.x = 0;
-                        break;
-                    case 'left':
-                        this.joystickInput.x = -1;
-                        this.joystickInput.y = 0;
-                        break;
-                    case 'right':
-                        this.joystickInput.x = 1;
-                        this.joystickInput.y = 0;
-                        break;
-                    default:
-                        this.joystickInput.x = 0;
-                        this.joystickInput.y = 0;
-                }
-            }
+
+        var joystick = nipplejs.create(options);
+        joystick.on('move', (evt, data) => {
+            const rad = data.angle.radian;
+            const dist = Math.min(data.distance / 50, 1); // Normalize to max speed
+            this.joystickInput.x = Math.cos(rad) * dist;
+            this.joystickInput.y = Math.sin(rad) * dist;
         });
-        manager.on('end', (evt, data)=> {            
+
+        joystick.on('end', (evt, data)=> {            
             this.joystickInput.x = 0;
             this.joystickInput.y = 0;
         });

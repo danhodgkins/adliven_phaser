@@ -42,9 +42,9 @@ export class Player {
     update(dt) {
         const { sphereBody, sphereMesh, joystickInput } = this;
 
-        const speed = 9;
+        const speed = 6;
         sphereBody.velocity.x = joystickInput.x * speed;
-        sphereBody.velocity.z = joystickInput.y * speed;
+        sphereBody.velocity.z = -joystickInput.y * speed;
 
         // Sync mesh with physics body
         sphereMesh.position.copy(sphereBody.position);
