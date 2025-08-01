@@ -1,10 +1,14 @@
-export default class SensorsController{
+import { EventDispatcher } from "three";
+
+export default class SensorsController extends EventDispatcher{
 
     intervalDuraion = 150;
     intervalID = -1;
 
     constructor( { uiController, applicationModel, trees, lumbermill })
     {
+        super();
+
         this.uiController = uiController;
         this.applicationModel = applicationModel;
         trees.forEach(element => {
@@ -31,6 +35,12 @@ export default class SensorsController{
                 this.intervalID = setInterval(this.boundOnLumbermillTick, this.intervalDuraion); // Chop wood every second
                 break;
         }
+
+        this.dispatchEvent({ 
+            type:"sensor_event" , 
+            sensorType : e.sensor.sensorType,
+            enter: true
+        });
     }
 
     onZoneExit( e ) {
@@ -38,6 +48,12 @@ export default class SensorsController{
             clearInterval(this.intervalID);
             this.intervalID = -1;
         }
+
+        this.dispatchEvent({ 
+            type:"sensor_event" , 
+            sensorType : e.sensor.sensorType,
+            enter: false
+        });
     }
 
     onChopWoodTick() {

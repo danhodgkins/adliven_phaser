@@ -67,7 +67,7 @@ export class SensorZone extends EventDispatcher {
 
             if (!touching) {
                 this.hasCollided = false;
-                this.dispatchEvent({ type: 'exit', body: this });
+                this.dispatchEvent({ type: 'exit', sensor: this });
             }
         });
     }

@@ -38,7 +38,7 @@ export class FollowCamera {
     }
 
     update() {
-        if (!this.target) return;
+        if (!this.target || !this.target.position ) return;
 
         const desiredPos = new Vector3().addVectors(this.target.position, this.offset);
         this.camera.position.lerp(desiredPos, this.lerpFactor);

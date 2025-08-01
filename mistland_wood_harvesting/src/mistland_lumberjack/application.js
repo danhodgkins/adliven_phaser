@@ -16,10 +16,12 @@ export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
         super({config});
         console.log("Application initialized with parent:", config);
+        
+        this.boundOnSensorEvent = this.onSensorEvent.bind( this );
+        this.boundOnModelEvent = this.onModelEvent.bind( this );
+
         this.applicationModel = new ApplicationModel();
-        this.applicationModel.addEventListener('model_event', (e)=>{
-            console.log("model_event ", e);
-        });
+        this.applicationModel.addEventListener('model_event', this.boundOnModelEvent );
 
         this.uiController = new MistlandLumberjackUIController( document.getElementById("ui-overlay"),this.applicationModel );
     }
@@ -42,19 +44,23 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.renderer = renderer;
 
         // input 
-        this.joystickInput = { x: 0, y: 0 }        
-
+        
         var options = {           
             mode: "dynamic",   // 'dynamic', 'static' or 'semi'
             color: "blue"
         };
-
+        
+        this.joystickInput = { x: 0, y: 0, rotation: 0 };  
+             
         var joystick = nipplejs.create(options);
         joystick.on('move', (evt, data) => {
             const rad = data.angle.radian;
             const dist = Math.min(data.distance / 50, 1); // Normalize to max speed
             this.joystickInput.x = Math.cos(rad) * dist;
             this.joystickInput.y = Math.sin(rad) * dist;
+
+            // Inverted Y for correct travel direction if needed
+            this.joystickInput.rotation = Math.atan2(this.joystickInput.x, -this.joystickInput.y);
         });
 
         joystick.on('end', (evt, data)=> {            
@@ -144,13 +150,15 @@ export class MistlandLumberjackApplication extends BaseScene{
             trees : this.trees,
             lumbermill : lumberMillZone
         })
+
+        this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
     }
 
     destroyLevelAfterStep = false;
     fixedTimeStep = 1.0 / 60.0; // seconds
     maxSubSteps = 3;
     update( dt ) {
-        this.player.setInput(this.joystickInput.x, this.joystickInput.y);
+        this.player.setInput(this.joystickInput.x, this.joystickInput.y, this.joystickInput.rotation);
         this.player.update(dt);
 
         this.trees.forEach(element => {
@@ -162,5 +170,22 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.followCam.update();
         if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
         this.renderer.render( this.scene, this.camera );
+    }
+
+    onSensorEvent( e )
+    {
+        // tree or lumbermill
+        const sensorType = e.sensorType;
+        const enter = e.enter;
+        if( sensorType == "tree")
+        {
+            if( enter ) this.player.startChopping();
+            else this.player.stopChopping();
+        }
+    }
+
+    onModelEvent( e )
+    {
+        console.log("on model event ", e  );
     }
 }
