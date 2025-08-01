@@ -6,10 +6,10 @@ import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
 import { PhysicsBounds } from "./physics_bounds";
 import { FollowCamera } from "./follow_cam";
-import TreeZone from "./tree_zone";
-import LumberMillZone from "./lumbermill_zone";
+import TreeZone from "./sensors/tree_zone";
+import LumberMillZone from "./sensors/lumbermill_zone";
 import nipplejs from 'nipplejs';
-import SensorsController from "./sensors_controller";
+import SensorsController from "./sensors/sensors_controller";
 import { ApplicationModel } from "./application_model";
 import WorkshopController from "./workshop_controller";
 
