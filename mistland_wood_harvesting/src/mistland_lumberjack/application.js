@@ -9,6 +9,7 @@ import { FollowCamera } from "./follow_cam";
 import TreeZone from "./tree_zone";
 import LumberMillZone from "./lumbermill_zone";
 import nipplejs from 'nipplejs';
+import SensorsController from "./sensors_controller";
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
@@ -36,25 +37,9 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.renderer = renderer;
 
         // input 
-        this.joystickInput = { x: 0, y: 0 }
-        
-        // Simulated joystick (you can replace this with nipplejs)
-        // window.addEventListener('keydown', (e) => {
-        //     if (e.key === 'ArrowUp') this.joystickInput.y = -1
-        //     if (e.key === 'ArrowDown') this.joystickInput.y = 1
-        //     if (e.key === 'ArrowLeft') this.joystickInput.x = -1
-        //     if (e.key === 'ArrowRight') this.joystickInput.x = 1
-        // })
-        // window.addEventListener('keyup', () => {
-        //     this.joystickInput = { x: 0, y: 0 }
-        // })
+        this.joystickInput = { x: 0, y: 0 }        
 
-        var options = {
-            // zone: document.getElementById('zone_joystick'),
-            //  position: {       // preset position for 'static' mode
-            // top: '40%',
-            // left: '50%'
-            // },
+        var options = {           
             mode: "dynamic",   // 'dynamic', 'static' or 'semi'
             color: "blue"
         };
@@ -71,7 +56,8 @@ export class MistlandLumberjackApplication extends BaseScene{
             this.joystickInput.x = 0;
             this.joystickInput.y = 0;
         });
-
+        // end input 
+        
         // Setup physics world
         var world = new World();
         world.solver.iterations = 10;
@@ -126,14 +112,13 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         treeConfigs.forEach(element => {
             const tz = new TreeZone( {
-            world,
-            scene,
-            position: element.position,
-            radius: 1.5,
-            playerBody: this.player.sphereBody,
-            });
-            tz.sensor.addEventListener('enter', this.onTreeZoneEnter.bind(this));
-            tz.sensor.addEventListener('exit', this.onTreeZoneExit.bind(this));
+                world,
+                scene,
+                position: element.position,
+                radius: 1.5,
+                playerBody: this.player.sphereBody,
+                sensorType: "tree"
+            });            
             this.trees.push( tz );
         });
 
@@ -144,55 +129,17 @@ export class MistlandLumberjackApplication extends BaseScene{
             position: new Vec3(-5, 0.5, 5),
             radius: 1.5,
             playerBody: this.player.sphereBody,
+            sensorType: "lumbermill"
         });
-        lumberMillZone.sensor.addEventListener('enter', this.onLumbermillZoneEnter.bind(this));
-        lumberMillZone.sensor.addEventListener('exit', this.onLumbermillZoneExit.bind(this));
         this.lumberMillZone = lumberMillZone;
+
+        this.sensorsController = new SensorsController({ 
+            uiController : this.uiController,
+            applicationModel : this.applicationModel,
+            trees : this.trees,
+            lumbermill : lumberMillZone
+        })
     }
-
-
-
-    // respond to tree zone events
-    intervalDuraion = 150;
-    intervalID = -1;
-    boundOnChopWoodHandler = this.onChopWoodHandler.bind(this);
-    onTreeZoneEnter( e ) {
-        this.intervalID = setInterval(this.boundOnChopWoodHandler, this.intervalDuraion); // Chop wood every second
-    }
-    onTreeZoneExit( e ) {
-        if( this.intervalID !== -1) {
-            clearInterval(this.intervalID);
-            this.intervalID = -1;
-        }
-    }
-
-    onChopWoodHandler() {
-        this.applicationModel.logCount++;
-        this.uiController.updateUI();
-    }
-
-    // respond to lumbermill zone events
-    boundOnLumbermillTickHandler = this.onLumbermillTickHandler.bind(this);
-    onLumbermillZoneEnter( e ) {
-        this.intervalID = setInterval(this.boundOnLumbermillTickHandler, this.intervalDuraion); // Chop wood every second
-    }
-
-    onLumbermillZoneExit( e ) {
-        if( this.intervalID !== -1) {
-            clearInterval(this.intervalID);
-            this.intervalID = -1;
-        }
-    }
-
-    onLumbermillTickHandler() {
-        if( this.applicationModel.logCount  > 0 ) {
-            this.applicationModel.logCount--;
-            this.applicationModel.gemCount++;
-        }
-        this.uiController.updateUI();
-    }
-
-    /// end sensors stuff
 
     destroyLevelAfterStep = false;
     fixedTimeStep = 1.0 / 60.0; // seconds

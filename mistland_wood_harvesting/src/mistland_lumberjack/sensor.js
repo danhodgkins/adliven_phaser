@@ -11,7 +11,8 @@ export class SensorZone extends EventDispatcher {
         playerBody,
         sensorGroup = 8,
         playerGroup = 4,
-        visible = true
+        visible = true, 
+        sensorType 
     }) {
         super();
 
@@ -20,7 +21,8 @@ export class SensorZone extends EventDispatcher {
         this.radius = radius;
         this.active = true;
         this.hasCollided = false;
-
+        this.sensorType = sensorType; 
+        
         // Create sensor body
         this.body = new Body({
             mass: 0,
@@ -50,7 +52,7 @@ export class SensorZone extends EventDispatcher {
             if (!this.active || this.hasCollided) return;
             if (e.body === this.playerBody) {
                 this.hasCollided = true;
-                this.dispatchEvent({ type: 'enter', body: this });
+                this.dispatchEvent({ type: 'enter', sensor: this });
             }
         });
 

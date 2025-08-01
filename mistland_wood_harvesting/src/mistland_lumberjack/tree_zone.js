@@ -1,11 +1,11 @@
 import { SensorZone } from "./sensor";
 
 export default class TreeZone {
-    constructor({ world, scene, position, radius = 1.5, playerBody }) {
+    constructor({ world, scene, position, radius = 1.5, playerBody, sensorType }) {
         this.world = world;
         this.scene = scene;
         this.radius = radius;
-        
+        // this.sensorType = sensorType;
 
         const sensor = new SensorZone({
             world, 
@@ -14,6 +14,7 @@ export default class TreeZone {
             radius: this.radius,
             playerBody: playerBody, 
             color: 0xff00ff,
+            sensorType : sensorType
         });
 
         this.sensor = sensor;
