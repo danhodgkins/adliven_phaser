@@ -26,3 +26,8 @@ import { unwrapMP3 } from '../../media/unwrap.mp3.js';
 import { WallGLB } from '../../media/Wall.glb.js';
 import { WallV2GLB } from '../../media/Wall_V2.glb.js';
 import { WindmillGLB } from '../../media/Windmill.glb.js';
+
+export function layoutSceneHelper( { data, scene } )
+{
+    console.log("data ", data );
+}

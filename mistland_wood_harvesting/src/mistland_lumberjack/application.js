@@ -12,6 +12,8 @@ import nipplejs from 'nipplejs';
 import SensorsController from "./sensors/sensors_controller";
 import { ApplicationModel } from "./application_model";
 import WorkshopController from "./workshop_controller";
+import layoutData from "./data/layout.json"
+import { layoutSceneHelper } from "../utils/layout";
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
@@ -43,6 +45,9 @@ export class MistlandLumberjackApplication extends BaseScene{
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
         this.renderer = renderer;
+
+        // layout scene 
+        layoutSceneHelper( { data:layoutData , scene })
 
         // input 
         
