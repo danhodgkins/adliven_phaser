@@ -28,6 +28,10 @@ export class FollowCamera {
         this.handleResize();
     }
 
+    setNewTarget( targetMesh ){
+        this.target = targetMesh;
+    }
+
     handleResize() {
         const aspect = window.innerWidth / window.innerHeight;
         this.camera.left = -aspect * this.zoom;

@@ -101,17 +101,24 @@ export class MistlandLumberjackApplication extends BaseScene{
             scene: scene
         });
 
+        
+        // workshop
+        this.workshop = new WorkshopController({ scene , world })
+
         const followCam = new FollowCamera({
-            target: this.player.sphereMesh,
+            target: this.workshop.mesh,
+            // target: this.player.sphereMesh,
             renderer,
             scene,
             zoom: 12,
-            lerpFactor: 0.05,
+            lerpFactor: 0.1,
             offset: new Vector3(0, 25, 25), // 20 units above the player
         });
 
         this.camera = followCam.getCamera();
         this.followCam = followCam;
+
+        setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh ) } , 2000 );
 
         // trees 
         this.trees = [];
@@ -154,8 +161,6 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
 
-        // workshop
-        this.workshop = new WorkshopController({ scene , world })
     }
 
     destroyLevelAfterStep = false;
@@ -199,6 +204,8 @@ export class MistlandLumberjackApplication extends BaseScene{
 
             case "unlock_workshop":
                 this.workshop.unlock();
+                this.followCam.setNewTarget( this.workshop.mesh );
+                break;
         }
     }
 }

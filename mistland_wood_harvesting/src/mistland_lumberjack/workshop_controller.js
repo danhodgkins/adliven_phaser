@@ -33,6 +33,8 @@ export default class WorkshopController{
         boxMesh.position.set(position.x, position.y, position.z);
         boxMesh.rotation.y = rotationY; // Three.js uses Euler angles
         this.scene.add(boxMesh);
+
+        this.mesh = boxMesh;
         
     }
 
