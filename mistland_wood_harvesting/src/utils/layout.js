@@ -1,3 +1,4 @@
+import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 import { BarrellGLB } from '../../media/Barrell.glb.js';
 import { BenchGLB } from '../../media/Bench.glb.js';
 import { BucketGLB } from '../../media/Bucket.glb.js';
@@ -26,8 +27,53 @@ import { unwrapMP3 } from '../../media/unwrap.mp3.js';
 import { WallGLB } from '../../media/Wall.glb.js';
 import { WallV2GLB } from '../../media/Wall_V2.glb.js';
 import { WindmillGLB } from '../../media/Windmill.glb.js';
+import { MathUtils } from 'three';
 
 export function layoutSceneHelper( { data, scene } )
 {
-    console.log("data ", data );
+    const loader = new GLTFLoader();
+
+    data.Meshes.forEach(element => {
+        console.log("element ", element );
+
+        let classToLoad;
+        switch( element.Name )
+        {
+            case "Wall":
+                classToLoad = WallGLB;                
+                break;
+            case "House_blue":
+                classToLoad = HouseBlueGLB;         
+                break;
+            case "House_red":
+                classToLoad = HouseRedGLB;         
+                break;
+        }
+
+        if( !classToLoad ) return;
+
+        loader.load(
+            classToLoad, 
+            ( e )=>{
+                onLoad( e , scene, element );
+            },                   
+            undefined, 
+            (e) => { console.error("error loading model", e); }
+        ); 
+
+    });
+}
+
+function onLoad( e, scene, element  )
+{
+    element.instances.forEach( instance => {
+        const clone = e.scene.clone();
+        clone.position.set( instance.position[0] , instance.position[1], instance.position[2])
+        clone.rotation.set( 
+            MathUtils.degToRad(instance.rotation[0]), 
+            MathUtils.degToRad(instance.rotation[1]), 
+            MathUtils.degToRad(instance.rotation[2])
+        )
+        scene.add( clone );            
+    });
 }
