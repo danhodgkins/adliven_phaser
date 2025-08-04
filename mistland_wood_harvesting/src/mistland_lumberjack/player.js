@@ -148,4 +148,10 @@ export class Player extends EventDispatcher {
                     break;
             }
         }
+
+        playLogCollectionAnim( triggeringBody )
+        {
+            // will be called on each log collected, and receives sensors wolrd body position
+            console.log("triggeringBody", triggeringBody.position );
+        }
 }
