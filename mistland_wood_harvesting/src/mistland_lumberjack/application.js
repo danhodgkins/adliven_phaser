@@ -229,7 +229,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "axe_chop_complete":
                 this.applicationModel.onLogCollected();
                 this.uiController.updateUI();
-                this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
+                if(  this.sensorsController.currentTreeSensor ) this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
                 break;
         }
     }
