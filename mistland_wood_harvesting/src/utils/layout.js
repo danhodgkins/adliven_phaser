@@ -144,6 +144,77 @@ function onLoad( e, scene, layoutParent,  element  )
         clone.scale.copy(worldScale);
 
         clone.updateMatrixWorld(true);
-
     });
+}
+
+export function getWorldFromLocalPhysicsTransforms( { data , scene } )
+{
+    const transforms = [];
+    const layoutParent = new Object3D();
+    layoutParent.scale.set( 1, 1, -1 );
+    layoutParent.rotation.set(
+            MathUtils.degToRad(0), 
+            MathUtils.degToRad(90), 
+            MathUtils.degToRad(0)
+        );
+    scene.add( layoutParent );
+
+    layoutParent.updateMatrixWorld(true);
+
+    data.Meshes.forEach(element => { 
+        if( element.Name == "PhysicsBarrier" )
+        {
+            element.instances.forEach( instance => {
+
+                const clone = new Object3D();
+                clone.position.set( instance.position[0] , instance.position[1], instance.position[2])
+                clone.rotation.set( 
+                    MathUtils.degToRad(instance.rotation[0]), 
+                    MathUtils.degToRad(instance.rotation[1]), 
+                    MathUtils.degToRad(instance.rotation[2])
+                )
+                if (instance.scale) {
+                    clone.scale.set(
+                        instance.scale[0],
+                        instance.scale[1],
+                        instance.scale[2]
+                    );
+                }
+                
+                layoutParent.add( clone );
+
+                // Step 2: Force world matrix update
+                clone.updateMatrixWorld(true);
+
+                // Step 3: Capture world transform
+                const worldPos = new Vector3();
+                const worldQuat = new Quaternion();
+                const worldScale = new Vector3();
+
+                clone.matrixWorld.decompose(worldPos, worldQuat, worldScale);
+
+                // Step 4: Remove from current parent
+                layoutParent.remove(clone);
+
+                // Step 5: Reparent to grandparent (scene)
+                scene.add(clone);
+
+                // Step 6: Apply world transform back
+                clone.position.copy(worldPos);
+                clone.quaternion.copy(worldQuat);
+                clone.scale.copy(worldScale);
+
+                clone.updateMatrixWorld(true);
+
+                transforms.push({
+                    position: worldPos.clone(),
+                    rotation: worldQuat.clone(),
+                    scale: worldScale.clone()
+                });
+            });
+        }
+    });
+
+    return transforms;
+       
 }

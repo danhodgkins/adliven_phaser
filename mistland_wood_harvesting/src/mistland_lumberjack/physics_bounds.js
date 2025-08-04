@@ -1,9 +1,10 @@
 import { Box, Body, Vec3, Quaternion, Plane } from "cannon-es";
 import { BoxGeometry, Mesh, MeshStandardMaterial, Euler, MeshBasicMaterial, DoubleSide, PlaneGeometry } from "three";
 import { degToRad } from "three/src/math/MathUtils.js";
+import { getWorldFromLocalPhysicsTransforms } from "../utils/layout";
 
 export class PhysicsBounds {
-    constructor({ boxes, world, scene }) {
+    constructor({ world, scene, layoutData }) {
         this.world = world;
         this.scene = scene;
         this.boxMeshes = [];
@@ -29,35 +30,52 @@ export class PhysicsBounds {
         plane.position.copy(planeBody.position)
         scene.add(plane);
 
-        boxes.forEach(({ position, size, rotationY = 0 }) => {
-            const halfExtents = new Vec3(size.x / 2, size.y / 2, size.z / 2);
+        const convertedPhysicsTranforms = getWorldFromLocalPhysicsTransforms({ data: layoutData, scene });
+        
+        convertedPhysicsTranforms.forEach(({ position, scale, rotation = 0 }) => {
+            
+            const m = 7;
+            // const halfExtents = new Vec3( m,  m, m);
+            const halfExtents = new Vec3( ( -scale.x / 2 ) * m, ( scale.y / 2 ) * m, (scale.z / 2)*m);
             const boxShape = new Box(halfExtents);
 
+            const cannonQuat = new Quaternion(
+                rotation.x,
+                rotation.y,
+                rotation.z,
+                rotation.w
+            );
+            
             // Create static body with rotation
             const boxBody = new Body({
                 mass: 0,
                 position: new Vec3(position.x, position.y, position.z),
+                collisionFilterGroup: 2, // This is the "collidable" group
+                collisionFilterMask: 4 | 1, // Collide with player (4) and planes (1)
+                quaternion : cannonQuat
             });
 
             // Apply Y-axis rotation
             const quat = new Quaternion();
-            quat.setFromEuler(0, rotationY, 0); // rotation in radians
-            boxBody.quaternion.copy(quat);
+            //quat.setFromEuler(new Euler(rotation.x, rotation.y, rotation.z)); // rotation in radians
+            // boxBody.quaternion.copy(rotation);
 
             boxBody.addShape(boxShape);
             this.world.addBody(boxBody);
 
+            // no need to create visual mesh here, as the debugger shows them
             // Create visual mesh
-            const boxGeometry = new BoxGeometry(size.x, size.y, size.z);
-            const boxMaterial = new MeshStandardMaterial({ color: 0xff0000 });
-            const boxMesh = new Mesh(boxGeometry, boxMaterial);
+            // const boxGeometry = new BoxGeometry(5, 5, 5);
+            // const boxGeometry = new BoxGeometry(-scale.x * m, scale.y* m, scale.z* m);
+            // const boxMaterial = new MeshStandardMaterial({ color: 0xff0000 });
+            // const boxMesh = new Mesh(boxGeometry, boxMaterial);
 
-            boxMesh.position.set(position.x, position.y, position.z);
-            boxMesh.rotation.y = rotationY; // Three.js uses Euler angles
-            this.scene.add(boxMesh);
+            // boxMesh.position.set(position.x, position.y, position.z);
+            // //boxMesh.rotation.set(new Euler(rotation.x, rotation.y, rotation.z));
+            // this.scene.add(boxMesh);
 
-            this.boxMeshes.push(boxMesh);
-        });
+            // this.boxMeshes.push(boxMesh);
+         });
     }
 
     /**

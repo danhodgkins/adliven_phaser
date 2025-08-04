@@ -11,13 +11,16 @@ export default class SensorsController extends EventDispatcher{
 
         this.uiController = uiController;
         this.applicationModel = applicationModel;
+
+        this.boundOnZoneEnter = this.onZoneEnter.bind(this);
+        this.boundOnZoneExit = this.onZoneExit.bind(this);
         trees.forEach(element => {
-            element.sensor.addEventListener('enter', this.onZoneEnter.bind(this));
-            element.sensor.addEventListener('exit', this.onZoneExit.bind(this));
+            element.sensor.addEventListener('enter', this.boundOnZoneEnter );
+            element.sensor.addEventListener('exit', this.boundOnZoneExit );
         });
 
-        lumbermill.sensor.addEventListener('enter', this.onZoneEnter.bind(this));
-        lumbermill.sensor.addEventListener('exit', this.onZoneExit.bind(this));
+        lumbermill.sensor.addEventListener('enter',  this.boundOnZoneEnter);
+        lumbermill.sensor.addEventListener('exit',  this.boundOnZoneExit);
 
         this.boundOnChopWoodTick = this.onChopWoodTick.bind(this);
         this.boundOnLumbermillTick = this.onLumbermillTick.bind(this);

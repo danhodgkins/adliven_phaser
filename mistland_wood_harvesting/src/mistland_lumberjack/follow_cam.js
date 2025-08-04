@@ -24,7 +24,8 @@ export class FollowCamera {
         //this.camera.lookAt(initialPos.clone().sub(this.offset)); // Look straight down or toward fixed point
         this.camera.lookAt(this.target.position); // always face the player
 
-        window.addEventListener('resize', this.handleResize.bind(this));
+        this.boundHandleResize = this.handleResize.bind(this);
+        window.addEventListener('resize', this.boundHandleResize );
         this.handleResize();
     }
 

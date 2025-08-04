@@ -14,6 +14,7 @@ import { ApplicationModel } from "./application_model";
 import WorkshopController from "./workshop_controller";
 import layoutData from "./data/layout.json"
 import { layoutSceneHelper } from "../utils/layout";
+import CannonDebugger from "cannon-es-debugger";
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
@@ -21,11 +22,10 @@ export class MistlandLumberjackApplication extends BaseScene{
         console.log("Application initialized with parent:", config);
         
         this.boundOnSensorEvent = this.onSensorEvent.bind( this );
-        this.boundOnModelEvent = this.onModelEvent.bind( this );
-
+        
         this.applicationModel = new ApplicationModel();
+        this.boundOnModelEvent = this.onModelEvent.bind( this );
         this.applicationModel.addEventListener('model_event', this.boundOnModelEvent );
-
         this.uiController = new MistlandLumberjackUIController( document.getElementById("ui-overlay"),this.applicationModel );
     }
 
@@ -79,26 +79,16 @@ export class MistlandLumberjackApplication extends BaseScene{
         var world = new World();
         world.solver.iterations = 10;
         world.gravity.set(0, -10, 0); // m/s²
-        this.physicsWorld = world;        
+        this.physicsWorld = world;     
         
-        const boxes = [
-            { 
-                position: { x: 0, y: 0, z: -5 }, 
-                size: { x: 1, y: 1, z: 3 },
-                rotationY: Math.PI / 4, // 45 degrees 
-            },
-            { 
-                position: { x: 3, y:0, z: -2 }, 
-                size: { x: 1, y: 1, z: 3 } ,
-                rotationY: 0, // no rotation
-            },
-            { 
-                position: { x:-3, y:0, z: -10 }, 
-                size: { x: 1, y: 1, z: 3 } ,
-                rotationY: -Math.PI / 4, // no rotation
-            }
-        ];        
-        const bounds = new PhysicsBounds({ boxes, world, scene });
+        // Set up debug visualization
+        const cannonDebugRenderer = CannonDebugger(scene, world, {
+            color: 0x00ff00, // optional
+        });
+        this.cannonDebugRenderer = cannonDebugRenderer;
+        
+        // physics barriers
+        const bounds = new PhysicsBounds({ world, scene, layoutData });
 
         // player
         this.player = new Player({
@@ -115,7 +105,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             // target: this.player.sphereMesh,
             renderer,
             scene,
-            zoom: 15,
+            zoom: 20,
             lerpFactor: 0.1,
             offset: new Vector3(0, 25, 25), // 20 units above the player
         });
@@ -166,6 +156,16 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
 
+        // Handle window resize or rotation
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            followCam.camera.aspect = width / height;
+            followCam.camera.updateProjectionMatrix();
+
+            renderer.setSize(width, height);
+        });
     }
 
     destroyLevelAfterStep = false;
@@ -183,6 +183,8 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.followCam.update();
         if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
+        // Update debug visualization
+        //this.cannonDebugRenderer.update();
         this.renderer.render( this.scene, this.camera );
     }
 
