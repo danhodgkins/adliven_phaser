@@ -115,7 +115,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             // target: this.player.sphereMesh,
             renderer,
             scene,
-            zoom: 50,
+            zoom: 15,
             lerpFactor: 0.1,
             offset: new Vector3(0, 25, 25), // 20 units above the player
         });

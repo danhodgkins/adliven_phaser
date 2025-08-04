@@ -1,61 +1,99 @@
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
-import { BarrellGLB } from '../../media/Barrell.glb.js';
-import { BenchGLB } from '../../media/Bench.glb.js';
-import { BucketGLB } from '../../media/Bucket.glb.js';
-import { BushGLB } from '../../media/Bush.glb.js';
-import { CrateGLB } from '../../media/Crate.glb.js';
-import { CrateV2GLB } from '../../media/Crate_V2.glb.js';
-import { GateGLB } from '../../media/Gate.glb.js';
-import { GearshopGLB } from '../../media/Gearshop.glb.js';
-import { GrassGLB } from '../../media/Grass.glb.js';
-import { GroundGLB } from '../../media/Ground.glb.js';
-import { HeroAvatarGLB } from '../../media/Hero_avatar.glb.js';
-import { HillGLB } from '../../media/Hill.glb.js';
-import { HouseBlueGLB } from '../../media/House_blue.glb.js';
-import { HouseRedGLB } from '../../media/House_red.glb.js';
-import { LadderGLB } from '../../media/Ladder.glb.js';
-import { LogPileGLB } from '../../media/Log_pile.glb.js';
-import { LogSingleGLB } from '../../media/Log_Single.glb.js';
-import { rattleMP3 } from '../../media/rattle.mp3.js';
-import { revealMP3 } from '../../media/reveal.mp3.js';
-import { TableGLB } from '../../media/Table.glb.js';
-import { TowerGLB } from '../../media/Tower.glb.js';
-import { TowerV2GLB } from '../../media/Tower_V2.glb.js';
-import { TreeGLB } from '../../media/Tree.glb.js';
-import { TreeClusterGLB } from '../../media/Tree_cluster.glb.js';
-import { unwrapMP3 } from '../../media/unwrap.mp3.js';
-import { WallGLB } from '../../media/Wall.glb.js';
-import { WallV2GLB } from '../../media/Wall_V2.glb.js';
-import { WindmillGLB } from '../../media/Windmill.glb.js';
-import { MathUtils } from 'three';
+
+import { Barrell } from '../../media/Barrell.glb.js';
+import { Bench } from '../../media/Bench.glb.js';
+import { Bucket } from '../../media/Bucket.glb.js';
+import { Bush } from '../../media/Bush.glb.js';
+import { Crate } from '../../media/Crate.glb.js';
+import { Crate_V2 } from '../../media/Crate_V2.glb.js';
+import { Crystal_01 } from '../../media/Crystal_01.glb.js';
+import { Crystal_02 } from '../../media/Crystal_02.glb.js';
+import { Gate } from '../../media/Gate.glb.js';
+import { Gearshop } from '../../media/Gearshop.glb.js';
+import { Grass } from '../../media/Grass.glb.js';
+import { Ground } from '../../media/Ground.glb.js';
+import { Hero_avatar } from '../../media/Hero_avatar.glb.js';
+import { Hill } from '../../media/Hill.glb.js';
+import { House_blue } from '../../media/House_blue.glb.js';
+import { House_red } from '../../media/House_red.glb.js';
+import { Ladder } from '../../media/Ladder.glb.js';
+import { Log_pile } from '../../media/Log_pile.glb.js';
+import { Log_Single } from '../../media/Log_Single.glb.js';
+import { rattle } from '../../media/rattle.mp3.js';
+import { reveal } from '../../media/reveal.mp3.js';
+import { Skeleton } from '../../media/Skeleton.glb.js';
+import { Table } from '../../media/Table.glb.js';
+import { Tower } from '../../media/Tower.glb.js';
+import { Tower_V2 } from '../../media/Tower_V2.glb.js';
+import { Tree } from '../../media/Tree.glb.js';
+import { Tree_cluster } from '../../media/Tree_cluster.glb.js';
+import { unwrap } from '../../media/unwrap.mp3.js';
+import { Wall } from '../../media/Wall.glb.js';
+import { Wall_V2 } from '../../media/Wall_V2.glb.js';
+import { Windmill } from '../../media/Windmill.glb.js';
+import { MathUtils, Object3D, Quaternion, Vector3 } from 'three';
+import { Group } from '@tweenjs/tween.js';
+
+const modelMap = {
+    Barrell : Barrell,
+    Bench : Bench,
+    Bucket : Bucket,
+    Bush : Bush,
+    Crate : Crate,
+    Crate_V2 : Crate_V2,
+    Crystal_01 : Crystal_01,
+    Crystal_02 : Crystal_02,
+    Gate : Gate,
+    Gearshop : Gearshop,
+    Grass : Grass,
+    Ground : Ground,
+    Hero_avatar : Hero_avatar,
+    Hill : Hill,
+    House_blue : House_blue,
+    House_red : House_red,
+    Ladder : Ladder,
+    Log_pile : Log_pile,
+    Log_Single : Log_Single,
+    rattle : rattle,
+    reveal : reveal,
+    Skeleton : Skeleton,
+    Table : Table,
+    Tower : Tower,
+    Tower_V2 : Tower_V2,
+    Tree : Tree,
+    Tree_cluster : Tree_cluster,
+    unwrap : unwrap,
+    Wall : Wall,
+    Wall_V2 : Wall_V2,
+    Windmill : Windmill
+}
 
 export function layoutSceneHelper( { data, scene } )
 {
     const loader = new GLTFLoader();
 
+    const layoutParent = new Object3D();
+    layoutParent.scale.set( 1, 1, -1 );
+    layoutParent.rotation.set(
+            MathUtils.degToRad(0), 
+            MathUtils.degToRad(90), 
+            MathUtils.degToRad(0)
+        );
+    scene.add( layoutParent );
+
     data.Meshes.forEach(element => {
-        console.log("element ", element );
-
-        let classToLoad;
-        switch( element.Name )
+       
+        let classToLoad = modelMap[element.Name];
+        if( !classToLoad )
         {
-            case "Wall":
-                classToLoad = WallGLB;                
-                break;
-            case "House_blue":
-                classToLoad = HouseBlueGLB;         
-                break;
-            case "House_red":
-                classToLoad = HouseRedGLB;         
-                break;
-        }
-
-        if( !classToLoad ) return;
+            console.warn("No model found for json item", element.Name);
+            return;
+        } 
 
         loader.load(
             classToLoad, 
             ( e )=>{
-                onLoad( e , scene, element );
+                onLoad( e , scene, layoutParent, element );
             },                   
             undefined, 
             (e) => { console.error("error loading model", e); }
@@ -64,16 +102,48 @@ export function layoutSceneHelper( { data, scene } )
     });
 }
 
-function onLoad( e, scene, element  )
+function onLoad( e, scene, layoutParent,  element  )
 {
     element.instances.forEach( instance => {
         const clone = e.scene.clone();
+        layoutParent.add( clone );  
+
         clone.position.set( instance.position[0] , instance.position[1], instance.position[2])
         clone.rotation.set( 
             MathUtils.degToRad(instance.rotation[0]), 
             MathUtils.degToRad(instance.rotation[1]), 
             MathUtils.degToRad(instance.rotation[2])
         )
-        scene.add( clone );            
+        if (instance.scale) {
+            clone.scale.set(
+                instance.scale[0],
+                instance.scale[1],
+                instance.scale[2]
+            );
+        }
+
+        // Step 2: Force world matrix update
+        clone.updateMatrixWorld(true);
+
+        // Step 3: Capture world transform
+        const worldPos = new Vector3();
+        const worldQuat = new Quaternion();
+        const worldScale = new Vector3();
+
+        clone.matrixWorld.decompose(worldPos, worldQuat, worldScale);
+
+        // Step 4: Remove from current parent
+        layoutParent.remove(clone);
+
+        // Step 5: Reparent to grandparent (scene)
+        scene.add(clone);
+
+        // Step 6: Apply world transform back
+        clone.position.copy(worldPos);
+        clone.quaternion.copy(worldQuat);
+        clone.scale.copy(worldScale);
+
+        clone.updateMatrixWorld(true);
+
     });
 }

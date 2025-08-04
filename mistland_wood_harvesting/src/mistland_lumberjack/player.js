@@ -1,6 +1,6 @@
 import { Body, Material,  Sphere, Vec3 } from "cannon-es";
 import { SphereGeometry, Quaternion, Mesh, MeshStandardMaterial, Object3D, Euler, Vector3 } from "three";
-import { HeroAvatarGLB } from '../../media/Hero_avatar.glb.js';
+import { Hero_avatar } from '../../media/Hero_avatar.glb.js';
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import GlbController from "./glb_controller.js";
 
@@ -51,7 +51,7 @@ export class Player {
                 
             const loader = new GLTFLoader();
             loader.load(
-                HeroAvatarGLB, 
+                Hero_avatar, 
                 (e) => {                 
                     scene.add(e.scene);   
                     console.log("e.scene:", e.scene );

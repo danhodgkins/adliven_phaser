@@ -38,7 +38,8 @@ async function encodeFilesToBase64(inputFolder, outputFolder) {
         const mimeType = getMimeType(fileExt);
 
         // Create the export string
-        const exportName = `${camelCase(fileNameWithoutExt)}${fileExt.toUpperCase()}`;
+        const exportName = fileNameWithoutExt;
+        // const exportName = `${camelCase(fileNameWithoutExt)}${fileExt.toUpperCase()}`;
         const exportContent = `export const ${exportName} = "data:${mimeType};base64,${base64Content}";`;
 
         // Write to a .js file in the output folder
