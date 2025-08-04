@@ -1,10 +1,13 @@
 import { Body, Material,  Sphere, Vec3 } from "cannon-es";
 import { SphereGeometry, Quaternion, Mesh, MeshStandardMaterial, Object3D, Euler, Vector3, EventDispatcher } from "three";
 import { Hero_avatar } from '../../media/Hero_avatar.glb.js';
+import { Log_Single } from "../../media/Log_Single.glb.js";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import GlbController from "./glb_controller.js";
 
+const logSpacing = 0.25;
 export class Player extends EventDispatcher {
+    carriedLogs = [];
 
     STATE_IDLE = "STATE_IDLE";
     STATE_WALKING = "STATE_WALKING";
@@ -161,36 +164,73 @@ export class Player extends EventDispatcher {
 
 
         spawnFlyingSphereToPlayer() {
-        const start = this.closestTreePosition;
-        const end = this.sphereMesh.position.clone();
-        const scene = this.scene;
-        const sphereGeom = new SphereGeometry(0.15, 16, 16);
-        const sphereMat = new MeshStandardMaterial({ color: 0xffcc00 });
-        const flyingSphere = new Mesh(sphereGeom, sphereMat);
-        flyingSphere.position.copy(start);
-        scene.add(flyingSphere);
+            const start = this.closestTreePosition;
+            const logCount = this.carriedLogs.length;
+            const end = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, 0));
+            const scene = this.scene;
 
-        const duration = 0.2; // seconds
-        let elapsed = 0;
-        const peakHeight = 2.0;
-        let lastTime = performance.now();
+            // Load the Log_Single GLB model and animate it
+            const loader = new GLTFLoader();
+            loader.load(
+                Log_Single,
+                (gltf) => {
+                    const logMesh = gltf.scene;
+                    logMesh.position.copy(start);
+                    logMesh.rotation.copy(this.sphereMesh.rotation);
+                    logMesh.scale.set(0.4, 1, 1); // Match player's rotation
+                    scene.add(logMesh);
 
-        const animate = () => {
-            const now = performance.now();
-            const dt = (now - lastTime) / 1000;
-            lastTime = now;
-            elapsed += dt;
-            let t = Math.min(elapsed / duration, 1);
-            const current = start.clone().lerp(end, t);
-            current.y += peakHeight * Math.sin(Math.PI * t);
-            flyingSphere.position.copy(current);
-            if (t < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                scene.remove(flyingSphere);
-            }
-        };
-        requestAnimationFrame(animate);
+                    const duration = 0.25; // seconds
+                    let elapsed = 0;
+                    const peakHeight = 2.0;
+                    let lastTime = performance.now();
+
+                    const animate = () => {
+                        const now = performance.now();
+                        const dt = (now - lastTime) / 1000;
+                        lastTime = now;
+                        elapsed += dt;
+                        let t = Math.min(elapsed / duration, 1);
+                        const current = start.clone().lerp(end, t);
+                        current.y += peakHeight * Math.sin(Math.PI * t);
+                        logMesh.position.copy(current);
+                        if (t < 1) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            scene.remove(logMesh);
+                            // After animation, spawn log on player's back
+                            this.addLogToBack();
+                        }
+                    };
+                    requestAnimationFrame(animate);
+                },
+                undefined,
+                (error) => {
+                    console.error('Error loading Log_Single GLB:', error);
+                }
+            );
+        }
+
+        addLogToBack() {
+            const loader = new GLTFLoader();
+            loader.load(
+                Log_Single,
+                (gltf) => {
+                    const logMesh = gltf.scene;
+                    // Stack logs higher for each new log
+                    const logCount = this.carriedLogs.length;
+                    logMesh.position.set(0, 1 + logCount * logSpacing, -0.5); // Adjust Y and Z for stacking
+                    logMesh.rotation.set(Math.PI / 2, 0, 0); // Optional: rotate to look more like a pile
+                    logMesh.scale.set(0.4, 1, 1); // Match player's rotation
+                    this.sphereMesh.add(logMesh);
+                    this.carriedLogs.push(logMesh);
+                },
+                undefined,
+                (error) => {
+                    console.error('Error loading Log_Single GLB for back:', error);
+                }
+            );
     }
+    
     
 }
