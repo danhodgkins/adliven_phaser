@@ -34,7 +34,7 @@ export class PhysicsBounds {
         
         convertedPhysicsTranforms.forEach(({ position, scale, rotation = 0 }) => {
             
-            const m = 7;
+            const m = 1;
             // const halfExtents = new Vec3( m,  m, m);
             const halfExtents = new Vec3( ( -scale.x / 2 ) * m, ( scale.y / 2 ) * m, (scale.z / 2)*m);
             const boxShape = new Box(halfExtents);

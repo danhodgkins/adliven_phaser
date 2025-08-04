@@ -68,11 +68,14 @@ const modelMap = {
     Windmill : Windmill
 }
 
+const zOffset = 40; // offset for the layout parent object
+
 export function layoutSceneHelper( { data, scene } )
 {
     const loader = new GLTFLoader();
 
     const layoutParent = new Object3D();
+    layoutParent.position.set( 0, 0, zOffset );
     layoutParent.scale.set( 1, 1, -1 );
     layoutParent.rotation.set(
             MathUtils.degToRad(0), 
@@ -151,6 +154,7 @@ export function getWorldFromLocalPhysicsTransforms( { data , scene } )
 {
     const transforms = [];
     const layoutParent = new Object3D();
+    layoutParent.position.set( 0, 0, zOffset );
     layoutParent.scale.set( 1, 1, -1 );
     layoutParent.rotation.set(
             MathUtils.degToRad(0), 
