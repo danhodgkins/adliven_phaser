@@ -8,10 +8,15 @@ export class ApplicationModel extends EventDispatcher{
     logCount = 0;
     gemCount = 0;
 
+    constructor() {
+        super();   
+    }
+
     onLogCollected(){
         if( this.logCount < this.maxLogs )
         {
             this.logCount++;
+            this.dispatchEvent({ type: 'model_event', detail : "log_collected" });
         }
     }
 

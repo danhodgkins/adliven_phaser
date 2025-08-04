@@ -1,7 +1,7 @@
 {
     "Meshes": [
         {
-             "Name": "PhysicsBarrier",
+            "Name": "PhysicsBarrier",
             "instances": [
                 {
                     "position": [

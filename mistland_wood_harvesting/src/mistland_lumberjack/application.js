@@ -96,6 +96,9 @@ export class MistlandLumberjackApplication extends BaseScene{
             scene: scene
         });
 
+        this.boundOnPlayerEvent = this.onPlayerEvent.bind(this);
+        this.player.addEventListener('player_event', this.boundOnPlayerEvent );
+
         
         // workshop
         this.workshop = new WorkshopController({ scene , world })
@@ -105,7 +108,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             // target: this.player.sphereMesh,
             renderer,
             scene,
-            zoom: 20,
+            zoom: 40,
             lerpFactor: 0.1,
             offset: new Vector3(0, 25, 25), // 20 units above the player
         });
@@ -184,7 +187,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.followCam.update();
         if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
         // Update debug visualization
-        //this.cannonDebugRenderer.update();
+        this.cannonDebugRenderer.update();
         this.renderer.render( this.scene, this.camera );
     }
 
@@ -202,7 +205,7 @@ export class MistlandLumberjackApplication extends BaseScene{
 
     onModelEvent( e )
     {
-        console.log("on model event ", e  );
+        //console.log("on model event ", e  );
         switch( e.detail )
         {
             case "unlock_axe":
@@ -212,6 +215,20 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "unlock_workshop":
                 this.workshop.unlock();
                 this.followCam.setNewTarget( this.workshop.mesh );
+                break;
+            case "log_collected":
+                this.uiController.updateUI();
+                break;
+        }
+    }
+
+    onPlayerEvent( e ){
+        //console.log("on player event ", e  );
+        switch( e.detail )
+        {
+            case "axe_chop_complete":
+                this.applicationModel.onLogCollected();
+                this.uiController.updateUI();
                 break;
         }
     }

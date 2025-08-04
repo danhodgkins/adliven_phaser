@@ -1,12 +1,14 @@
 import { AnimationMixer, LoopOnce, LoopRepeat } from "three";
 
 export default class GlbController{
-    constructor({ glb })
-    {
+    constructor({ glb, applicationModel }){
+    
+        this.applicationModel = applicationModel;
         this.glb = glb;
-        this.mixer = new AnimationMixer( glb.scene );
+        this.mixer = new AnimationMixer( glb.scene );       
         this.glbAnimationsList = glb.animations;
     }
+
 
     getAnimIndexByName( name )
     {

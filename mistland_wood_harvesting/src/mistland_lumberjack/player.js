@@ -1,10 +1,10 @@
 import { Body, Material,  Sphere, Vec3 } from "cannon-es";
-import { SphereGeometry, Quaternion, Mesh, MeshStandardMaterial, Object3D, Euler, Vector3 } from "three";
+import { SphereGeometry, Quaternion, Mesh, MeshStandardMaterial, Object3D, Euler, Vector3, EventDispatcher } from "three";
 import { Hero_avatar } from '../../media/Hero_avatar.glb.js';
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import GlbController from "./glb_controller.js";
 
-export class Player {
+export class Player extends EventDispatcher {
 
     STATE_IDLE = "STATE_IDLE";
     STATE_WALKING = "STATE_WALKING";
@@ -13,9 +13,9 @@ export class Player {
     isChopping = false;
     
     constructor({ world, scene }) {
+        super();
             this.world = world;
             this.scene = scene;
-            
             this.joystickInput = { x: 0, y: 0 };
             
             // Create physics material (optional)
@@ -58,6 +58,10 @@ export class Player {
                     this.sphereMesh.add( e.scene );
                     this.glbController = new GlbController({ glb : e } );
                     this.setState( this.STATE_IDLE );
+
+                    // listen for animation complete ( loop only, 'finished' will nly fir on non looping anims )
+                    this.boundOnAnimComplete = this.onAnimComplete.bind(this);
+                    this.glbController.mixer.addEventListener('loop', this.boundOnAnimComplete )
                 }, 
                 undefined, 
                 (e) => { console.error("error loading model", e); }
@@ -131,5 +135,17 @@ export class Player {
             }
 
             if( this.glbController ) this.glbController.update( dt );
+        }
+
+        
+        onAnimComplete( e )
+        {
+            switch( e.action._clip.name )
+            {
+                case "03_chop":
+                    // respond to chop loop complete
+                    this.dispatchEvent({ type: 'player_event', detail : "axe_chop_complete" });
+                    break;
+            }
         }
 }

@@ -60,8 +60,8 @@ export default class SensorsController extends EventDispatcher{
     }
 
     onChopWoodTick() {
-        this.applicationModel.onLogCollected();
-        this.uiController.updateUI();
+        // this.applicationModel.onLogCollected();
+        // this.uiController.updateUI();
     }
 
     onLumbermillTick() {
