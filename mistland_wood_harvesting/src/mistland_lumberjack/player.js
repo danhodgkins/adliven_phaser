@@ -145,7 +145,41 @@ export class Player extends EventDispatcher {
                 case "03_chop":
                     // respond to chop loop complete
                     this.dispatchEvent({ type: 'player_event', detail : "axe_chop_complete" });
+                    this.spawnFlyingSphereToPlayer();
                     break;
             }
         }
+        spawnFlyingSphereToPlayer() {
+        const start = new Vector3(0, 0, 0);
+        const end = this.sphereMesh.position.clone();
+        const scene = this.scene;
+        const sphereGeom = new SphereGeometry(0.15, 16, 16);
+        const sphereMat = new MeshStandardMaterial({ color: 0xffcc00 });
+        const flyingSphere = new Mesh(sphereGeom, sphereMat);
+        flyingSphere.position.copy(start);
+        scene.add(flyingSphere);
+
+        const duration = 0.2; // seconds
+        let elapsed = 0;
+        const peakHeight = 2.0;
+        let lastTime = performance.now();
+
+        const animate = () => {
+            const now = performance.now();
+            const dt = (now - lastTime) / 1000;
+            lastTime = now;
+            elapsed += dt;
+            let t = Math.min(elapsed / duration, 1);
+            const current = start.clone().lerp(end, t);
+            current.y += peakHeight * Math.sin(Math.PI * t);
+            flyingSphere.position.copy(current);
+            if (t < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                scene.remove(flyingSphere);
+            }
+        };
+        requestAnimationFrame(animate);
+    }
+    
 }
