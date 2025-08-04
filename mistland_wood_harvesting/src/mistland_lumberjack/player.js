@@ -149,6 +149,14 @@ export class Player extends EventDispatcher {
                     break;
             }
         }
+
+        playLogCollectionAnim( triggeringBody )
+        {
+            // will be called on each log collected, and receives sensors wolrd body position
+            console.log("triggeringBody", triggeringBody.position );
+        }
+
+
         spawnFlyingSphereToPlayer() {
         const start = new Vector3(0, 0, 0);
         const end = this.sphereMesh.position.clone();
