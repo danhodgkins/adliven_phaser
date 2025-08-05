@@ -169,7 +169,8 @@ export class Player extends EventDispatcher {
         // target vector is the lumbermill
         playLoseLogAnim( targetVector )
         {
-            console.log("play lose log anim")
+            this.closestTreePosition = targetVector.clone();
+            this.SpawnFlyingLogFromPlayerToTarget();
         }
 
 
@@ -221,6 +222,53 @@ export class Player extends EventDispatcher {
             );
         }
 
+        SpawnFlyingLogFromPlayerToTarget() {
+            const start = this.sphereMesh.position.clone();
+            const end = this.closestTreePosition.clone();   
+            const scene = this.scene;
+
+            // Load the Log_Single GLB model and animate it
+            const loader = new GLTFLoader();
+            loader.load(
+                Log_Single,
+                (gltf) => {
+                    const logMesh = gltf.scene;
+                    logMesh.position.copy(start);
+                    logMesh.rotation.copy(this.sphereMesh.rotation);
+                    logMesh.scale.set(0.4, 1, 1); // Match player's rotation
+                    scene.add(logMesh);
+
+                    const duration = 0.25; // seconds
+                    let elapsed = 0;
+                    const peakHeight = 2.0;
+                    let lastTime = performance.now();
+
+                    const animate = () => {
+                        const now = performance.now();
+                        const dt = (now - lastTime) / 1000;
+                        lastTime = now;
+                        elapsed += dt;
+                        let t = Math.min(elapsed / duration, 1);
+                        const current = start.clone().lerp(end, t);
+                        current.y += peakHeight * Math.sin(Math.PI * t);
+                        logMesh.position.copy(current);
+                        if (t < 1) {
+                            requestAnimationFrame(animate);
+                        } else {
+                            scene.remove(logMesh);
+                            // After animation, spawn log on player's back
+                            this.removeLogFromBack();
+                        }
+                    };
+                    requestAnimationFrame(animate);
+                },
+                undefined,
+                (error) => {
+                    console.error('Error loading Log_Single GLB:', error);
+                }
+            );
+        }
+
         addLogToBack() {
             const loader = new GLTFLoader();
             loader.load(
@@ -240,7 +288,25 @@ export class Player extends EventDispatcher {
                     console.error('Error loading Log_Single GLB for back:', error);
                 }
             );
+        
+         }
+
+       removeLogFromBack() {
+           if (this.carriedLogs.length > 0) {
+               const logMesh = this.carriedLogs.pop();
+               this.sphereMesh.remove(logMesh);
+               logMesh.traverse((child) => {
+                   if (child.isMesh) {
+                       if (child.geometry) child.geometry.dispose();
+                       if (child.material) {
+                           if (Array.isArray(child.material)) {
+                               child.material.forEach(mat => mat.dispose());
+                           } else {
+                               child.material.dispose();
+                           }
+                       }
+                   }
+               });
+           }
+       }
     }
-    
-    
-}
