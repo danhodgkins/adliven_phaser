@@ -133,11 +133,22 @@ function onLoad( e, scene, layoutParent,  element  )
             );
         }
 
-        //set the mesh to cast shadows
+        //set the mesh to cast shadows and use MeshStandardMaterial
         clone.traverse((child) => {
             if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
+                // Replace MeshBasicMaterial with MeshStandardMaterial for better quality
+                if (child.material && child.material.type === 'MeshBasicMaterial') {
+                    const oldMat = child.material;
+                    child.material = new MeshStandardMaterial({
+                        map: oldMat.map,
+                        color: oldMat.color,
+                        side: oldMat.side,
+                        roughness: 0.7,
+                        metalness: 0.1
+                    });
+                }
             }
         });
 

@@ -23,11 +23,12 @@ export class PhysicsBounds {
         this.physicsWorld = world;
 
         //init plane
-        const material = new MeshBasicMaterial({ color: 0x327a59 , side: DoubleSide});
+        const material = new MeshStandardMaterial({ color: 0x327a59 , side: DoubleSide });
         const geometry = new PlaneGeometry(1000,1000);
         const plane = new Mesh(geometry, material);
         plane.rotateX(degToRad(270));
-        plane.position.copy(planeBody.position)
+        plane.position.copy(planeBody.position);
+        plane.receiveShadow = true;
         scene.add(plane);
 
         const convertedPhysicsTranforms = getWorldFromLocalPhysicsTransforms({ data: layoutData, scene });
