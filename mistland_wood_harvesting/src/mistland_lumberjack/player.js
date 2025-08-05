@@ -156,11 +156,11 @@ export class Player extends EventDispatcher {
             }
         }
 
-        closestTreePosition = new Vector3(0, 0, 0);
+        currentSensorPosition = new Vector3(0, 0, 0);
         playLogCollectionAnim( triggeringBody )
         {
             // Ensure nearestTree is a Vector3
-            this.closestTreePosition = new Vector3(triggeringBody.position.x, triggeringBody.position.y, triggeringBody.position.z);
+            this.currentSensorPosition = new Vector3(triggeringBody.position.x, triggeringBody.position.y, triggeringBody.position.z);
             this.SpawnFlyingLogToPlayer();
             // will be called on each log collected, and receives sensors wolrd body position
             // console.log("triggeringBody", triggeringBody.position );
@@ -169,13 +169,13 @@ export class Player extends EventDispatcher {
         // target vector is the lumbermill
         playLoseLogAnim( targetVector )
         {
-            this.closestTreePosition = targetVector.clone();
+            this.currentSensorPosition = targetVector.clone();
             this.SpawnFlyingLogFromPlayerToTarget();
         }
 
 
         SpawnFlyingLogToPlayer() {
-            const start = this.closestTreePosition;
+            const start = this.currentSensorPosition;
             const logCount = this.carriedLogs.length + 1;
             const end = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
             const scene = this.scene;
@@ -225,7 +225,7 @@ export class Player extends EventDispatcher {
         SpawnFlyingLogFromPlayerToTarget() {
             const logCount = this.carriedLogs.length + 1;
             const start = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
-            const end = this.closestTreePosition.clone();   
+            const end = this.currentSensorPosition.clone();   
             const scene = this.scene;
 
             // Load the Log_Single GLB model and animate it
