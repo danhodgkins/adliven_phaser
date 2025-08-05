@@ -176,8 +176,8 @@ export class Player extends EventDispatcher {
 
         SpawnFlyingLogToPlayer() {
             const start = this.closestTreePosition;
-            const logCount = this.carriedLogs.length;
-            const end = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, 0));
+            const logCount = this.carriedLogs.length + 1;
+            const end = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
             const scene = this.scene;
 
             // Load the Log_Single GLB model and animate it
@@ -223,7 +223,8 @@ export class Player extends EventDispatcher {
         }
 
         SpawnFlyingLogFromPlayerToTarget() {
-            const start = this.sphereMesh.position.clone();
+            const logCount = this.carriedLogs.length + 1;
+            const start = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
             const end = this.closestTreePosition.clone();   
             const scene = this.scene;
 
