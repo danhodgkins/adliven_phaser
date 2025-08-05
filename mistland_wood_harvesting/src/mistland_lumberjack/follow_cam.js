@@ -1,4 +1,4 @@
-import { OrthographicCamera, Vector3 } from 'three';
+import { BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, Vector3 } from 'three';
 
 export class FollowCamera {
     constructor({ targetTransformVector , renderer, zoom = 10, lerpFactor = 0.1, offset = new Vector3(0, 5, 0) }) {
@@ -18,11 +18,21 @@ export class FollowCamera {
              1000
         );
 
+        // const geometry = new BoxGeometry(10, 10, 10);
+        // const material = new MeshBasicMaterial({ color: 0x00ff00, side: DoubleSide });
+        // const box = new Mesh(geometry, material);
+        // this.camera.add( box );
+        // // box.position.set(0, 0, -20); // relative to camera
+        // // box.material.wireframe = true
+        // this.box = box;
+
         // Initial position and orientation
         const initialPos = new Vector3().addVectors( this.targetTransformVector , this.offset);
         // const initialPos = new Vector3().addVectors(this.target.position, this.offset);
         this.camera.position.copy(initialPos);
+        
         //this.camera.lookAt(initialPos.clone().sub(this.offset)); // Look straight down or toward fixed point
+        // this.camera.lookAt( new Vector3(0,0,0) ); // always face the player
         this.camera.lookAt(this.targetTransformVector ); // always face the player
 
         this.boundHandleResize = this.handleResize.bind(this);
@@ -45,6 +55,10 @@ export class FollowCamera {
 
     update() {
         if (!this.targetTransformVector ) return;
+
+        // // this.box.rotation.x += 0.01; // Rotate around X-axis
+        // this.box.rotation.y += 0.01; // Rotate around Y-axis
+        // // this.box.rotation.z += 0.01; // Rotate around Z-axis
 
         const desiredPos = new Vector3().addVectors(this.targetTransformVector, this.offset);
         this.camera.position.lerp(desiredPos, this.lerpFactor);
