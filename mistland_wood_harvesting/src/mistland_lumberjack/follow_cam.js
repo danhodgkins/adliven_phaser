@@ -1,8 +1,8 @@
 import { OrthographicCamera, Vector3 } from 'three';
 
 export class FollowCamera {
-    constructor({ target, renderer, zoom = 10, lerpFactor = 0.1, offset = new Vector3(0, 5, 0) }) {
-        this.target = target;
+    constructor({ targetTransformVector , renderer, zoom = 10, lerpFactor = 0.1, offset = new Vector3(0, 5, 0) }) {
+        this.targetTransformVector = targetTransformVector;
         this.renderer = renderer;
         this.zoom = zoom;
         this.lerpFactor = lerpFactor;
@@ -19,10 +19,11 @@ export class FollowCamera {
         );
 
         // Initial position and orientation
-        const initialPos = new Vector3().addVectors(this.target.position, this.offset);
+        const initialPos = new Vector3().addVectors( this.targetTransformVector , this.offset);
+        // const initialPos = new Vector3().addVectors(this.target.position, this.offset);
         this.camera.position.copy(initialPos);
         //this.camera.lookAt(initialPos.clone().sub(this.offset)); // Look straight down or toward fixed point
-        this.camera.lookAt(this.target.position); // always face the player
+        this.camera.lookAt(this.targetTransformVector ); // always face the player
 
         this.boundHandleResize = this.handleResize.bind(this);
         window.addEventListener('resize', this.boundHandleResize );
@@ -30,7 +31,7 @@ export class FollowCamera {
     }
 
     setNewTarget( targetMesh ){
-        this.target = targetMesh;
+        this.targetTransformVector = targetMesh;
     }
 
     handleResize() {
@@ -43,9 +44,9 @@ export class FollowCamera {
     }
 
     update() {
-        if (!this.target || !this.target.position ) return;
+        if (!this.targetTransformVector ) return;
 
-        const desiredPos = new Vector3().addVectors(this.target.position, this.offset);
+        const desiredPos = new Vector3().addVectors(this.targetTransformVector, this.offset);
         this.camera.position.lerp(desiredPos, this.lerpFactor);
 
         // Keep fixed orientation — don't look at target

@@ -100,16 +100,13 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.boundOnPlayerEvent = this.onPlayerEvent.bind(this);
         this.player.addEventListener('player_event', this.boundOnPlayerEvent );
 
-        
-        // workshop
-        this.workshop = new WorkshopController({ scene , world })
-
         const followCam = new FollowCamera({
-            target: this.workshop.mesh,
+            // target: this.workshop.mesh,
             // target: this.player.sphereMesh,
+            targetTransformVector : new Vector3(0,0,0),
             renderer,
             scene,
-            zoom: 40,
+            zoom: 15,
             lerpFactor: 0.1,
             offset: new Vector3(0, 25, 25), // 20 units above the player
         });
@@ -117,7 +114,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.camera = followCam.getCamera();
         this.followCam = followCam;
 
-        setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh ) } , 2000 );
+        setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
 
         // Handle window resize or rotation
         window.addEventListener('resize', () => {
@@ -185,6 +182,10 @@ export class MistlandLumberjackApplication extends BaseScene{
         })
 
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
+        
+        // workshop
+        this.workshop = new WorkshopController({ scene:this.scene , world:this.world })
+        this.followCam.setNewTarget( this.workshop.parentObj.position );
     }
 
     destroyLevelAfterStep = false;
@@ -201,6 +202,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         }
 
         if( this.lumberMillZone ) this.lumberMillZone.update();
+        if( this.workshop ) this.workshop.update( dt );
 
         this.followCam.update();
         if( this.world ) this.world.step( this.fixedTimeStep, dt, this.maxSubSteps);
@@ -236,7 +238,7 @@ export class MistlandLumberjackApplication extends BaseScene{
 
             case "unlock_workshop":
                 this.workshop.unlock();
-                this.followCam.setNewTarget( this.workshop.mesh );
+                this.followCam.setNewTarget( this.workshop.parentObj.position );
                 break;
             case "log_collected":
                 this.uiController.updateUI();
