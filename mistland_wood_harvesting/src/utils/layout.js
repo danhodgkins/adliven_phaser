@@ -133,6 +133,14 @@ function onLoad( e, scene, layoutParent,  element  )
             );
         }
 
+        //set the mesh to cast shadows
+        clone.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        });
+
         // so we can grab a reference to it later e.g. Lumbermill, Workshop, Tree etc
         clone.name = element.Name;
 
