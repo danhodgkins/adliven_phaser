@@ -19,7 +19,13 @@ export class Player extends EventDispatcher {
         super();
             this.world = world;
             this.scene = scene;
+
+            this.axeLevel = 0;
+            this.chopSpeed0 = 5;
+            this.chopSpeed1 = 10;
+
             this.joystickInput = { x: 0, y: 0 };
+            this.walkSpeed = getParamsNumberByID("walkSpeed");
             
             // Create physics material (optional)
             const defaultMaterial = new Material("default");
@@ -70,6 +76,11 @@ export class Player extends EventDispatcher {
                 (e) => { console.error("error loading model", e); }
             );
         }
+
+        upgradeAxe()
+        {
+            this.axeLevel++;
+        }
     
         setState( newState  )
         {
@@ -77,16 +88,20 @@ export class Player extends EventDispatcher {
             switch( newState )
             {
                 case this.STATE_WALKING:
+                    this.glbController.mixer.timeScale = 1;
                     animRef = this.glbController.getAnimIndexByName("02_walk");
                     this.glbController.playAnimByIndex( animRef );
                     break;
     
                 case this.STATE_IDLE:
+                    this.glbController.mixer.timeScale = 1;
                     animRef = this.glbController.getAnimIndexByName("01_idle");
                     this.glbController.playAnimByIndex( animRef );
                     break;
 
                 case this.STATE_CHOPPING:
+                    const speed = this.axeLevel == 0 ? this.chopSpeed0 : this.chopSpeed1; 
+                    this.glbController.mixer.timeScale = speed;
                     animRef = this.glbController.getAnimIndexByName("03_chop");
                     this.glbController.playAnimByIndex( animRef );
                     break;
@@ -115,9 +130,8 @@ export class Player extends EventDispatcher {
             
             const { sphereBody, sphereMesh, joystickInput } = this;
             
-            const speed = 6;
-            sphereBody.velocity.x = joystickInput.x * speed;
-            sphereBody.velocity.z = -joystickInput.y * speed;
+            sphereBody.velocity.x = joystickInput.x * this.walkSpeed;
+            sphereBody.velocity.z = -joystickInput.y * this.walkSpeed;
             
             // Sync mesh with physics body
             sphereMesh.position.copy(sphereBody.position);

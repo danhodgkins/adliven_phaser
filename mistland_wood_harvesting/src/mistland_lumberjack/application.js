@@ -210,6 +210,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         {
             case "unlock_axe":
                 console.log("unlock axe");
+                this.player.upgradeAxe();
                 break;
 
             case "unlock_workshop":

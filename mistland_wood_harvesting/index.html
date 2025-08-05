@@ -7,46 +7,53 @@
     <!-- <link rel="stylesheet" href="./style.css"> -->
     <title>XXXXX</title>
     <script>
-        const tuneableGameParams = {
-            floorColour : 0x336633,
-            boxColour : 0x663366,
-            bulletColour : 0xf9cb9d,
-            numBoxesBoxes : 1,
-            boxSpawnInterval : 100,
-            bulletMass : 1
+    // ● gemsNeeded: amount of gems needed to unlock the workshop
+    // ● woodNeeded: amount of wood needed
+    // ● backpackSize: amount of wood character can carry before upgrading axe
+    // ● walkSpeed: character movement speed
+    // ● skeletons: on/off: optional skeletons that roam the village
+    // ● hintTimer: time before a hint is shown after initial hint in sec.
+    // ● tapstoAutoRedirect: taps to redirect, o to disable
+    // ● redirectType: redirect to store on tap or release
+    // ● hideLogo: hides in game logo. on/off
+    // ● fullScreenCta: if active, interaction anywhere on end card will redirect
+    // ● hideCta: hides in game CTA button. on/off
+    // ● playSfx: turn on/off the SFX
+    // ● playMusic: turn on/off music
+    // ● musicVolume: set the volume of the music, 1-100
+    // ● timer: set time before player fails in seconds, 0 to disable
+
+    var params = {
+        gemsNeeded: { value: 20, default: 20, min: 0, max: 90, type: "number", description: 'gemsNeeded: amount of gems needed to unlock the workshop' },
+        woodNeeded: { value: 10, default: 10, min: 0, max: 100, type: "number", description: 'woodNeeded: amount of wood needed' },
+        backpackSize: { value: 10, default: 10, min: 0, max: 20, type: "number", description: 'backpackSize: amount of wood character can carry before upgrading axe' },
+        walkSpeed: { value: 10, default: 10, min: 1, max: 25, type: "number", description: 'walkSpeed: character movement speed' },
+        skeletons: { value: true, default: true, type: "boolean", description: 'skeletons: on/off: optional skeletons that roam the village' },
+        hintTimer: { value: 10, default: 10, min: 0, max: 30, type: "number", description: 'hintTimer: time before a hint is shown after initial hint in sec.' },
+        tapstoAutoRedirect: { value: 1, default: 1, min: 0, max: 1, type: "number", description: 'tapstoAutoRedirect: taps to redirect, 0 to disable' },
+        redirectType: { value: 'tap', default: 'tap', type: "string", description: 'redirectType: redirect to store on tap or release' },
+        hideLogo: { value: false, default: false, type: "boolean", description: 'hideLogo: hides in game logo. on/off' },
+        fullScreenCta: { value: true, default: true, type: "boolean", description: 'fullScreenCta: if active, interaction anywhere on end card will redirect' },
+        hideCta: { value: false, default: false, type: "boolean", description: 'hideCta: hides in game CTA button. on/off' },
+        playSfx: { value: true, default: true, type: "boolean", description: 'playSfx: turn on/off the SFX' },
+        playMusic: { value: true, default: true, type: "boolean", description: 'playMusic: turn on/off music' },
+        musicVolume: { value: 100, default: 100, min: 0, max: 100, type: "number", description: 'musicVolume: set the volume of the music, 1-100' },
+        timer: { value: 0, default: 0, min: 0, max: 120, type: "number", description: 'timer: set time before player fails in seconds, 0 to disable' }
+    };
+
+    // getters from params in index.html
+    function getParamsNumberByID( id ) {
+        const config =  params[ id ]; 
+        if( !config ) 
+        {
+            console.error("attempt to get invalid param property : ", id );      
+            return;
         }
-        const frLevels = [
-            {
-                duration : 5000,
-                targetPoints : 6,
-                targetTypes : ['zombunnie'],
-                boxColour : 0x663366,
-            },
-            {
-                duration : 10000,
-                targetPoints :8,
-                targetTypes : ['zombunnie'],
-                boxColour : 0x333366,
-            },
-            {
-                duration : 10000,
-                targetPoints : 10,
-                targetTypes : ['zombunnie'],
-                boxColour : 0xfff662,
-            },
-            {
-                duration : 10000,
-                targetPoints : 7,
-                targetTypes : ['zombunnie'],
-                boxColour : 0xffffff,
-            },
-            {
-                duration : 10000,
-                targetPoints : 7,
-                targetTypes : ['zombunnie'],
-                boxColour : 0x00ff66,
-            }
-        ];
+        if( config.value >= config.max ) return config.max;
+        else if( config.value <= config.min ) return config.min;
+        else return config.value;
+    }
+
     </script>
 </head>
 

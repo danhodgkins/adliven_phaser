@@ -23,7 +23,7 @@ export class PhysicsBounds {
         this.physicsWorld = world;
 
         //init plane
-        const material = new MeshBasicMaterial({ color: tuneableGameParams.floorColour , side: DoubleSide});
+        const material = new MeshBasicMaterial({ color: 0xff00ff , side: DoubleSide});
         const geometry = new PlaneGeometry(1000,1000);
         const plane = new Mesh(geometry, material);
         plane.rotateX(degToRad(270));
