@@ -2,16 +2,13 @@ import { EventDispatcher } from "three";
 
 export default class SensorsController extends EventDispatcher{
 
-    intervalDuraion = 150;
+    intervalDuraion = 250;
     intervalID = -1;
 
-    constructor( { uiController, applicationModel, trees, lumbermill })
+    constructor( { applicationModel, trees, lumbermill })
     {
         super();
-
-        this.uiController = uiController;
         this.applicationModel = applicationModel;
-
         this.boundOnZoneEnter = this.onZoneEnter.bind(this);
         this.boundOnZoneExit = this.onZoneExit.bind(this);
         trees.forEach(element => {
@@ -33,7 +30,6 @@ export default class SensorsController extends EventDispatcher{
         switch( e.sensor.sensorType )
         {
             case "tree":
-                this.intervalID = setInterval(this.boundOnChopWoodTick, this.intervalDuraion); // Chop wood every second
                 this.currentTreeSensor = e.sensor;
                 break;
 
@@ -70,6 +66,5 @@ export default class SensorsController extends EventDispatcher{
 
     onLumbermillTick() {
         this.applicationModel.handleLumbermillTick();
-        this.uiController.updateUI();
     }
 }

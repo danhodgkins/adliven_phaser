@@ -25,6 +25,9 @@ export class ApplicationModel extends EventDispatcher{
         if( this.logCount  > 0 ) {
             this.logCount--;
             this.gemCount++;
+
+            // to trigger a "lose log" animation from the player
+            this.dispatchEvent({ type: 'model_event', detail : "lumbermill_tick"});
         }
 
         const targetGems =  getParamsNumberByID("gemsNeeded");
