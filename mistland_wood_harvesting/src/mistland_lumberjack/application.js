@@ -39,15 +39,27 @@ export class MistlandLumberjackApplication extends BaseScene{
         scene.add(light);
 
         // Add a directional light
-        const dirLight = new DirectionalLight(0xFFFACD, 5); // faint yellow
-        dirLight.position.set(10, 20, 10);
+        const dirLight = new DirectionalLight(0xFFFACD, 7.5); // faint yellow
+        dirLight.position.set(20, 20, 10); // Lower and more horizontal for longer shadows
+        dirLight.target.position.set(0, 0, 0); // Point at scene center
+        scene.add(dirLight.target);
         dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 1;
+        dirLight.shadow.camera.far = 100;
+        dirLight.shadow.camera.left = -40;
+        dirLight.shadow.camera.right = 40;
+        dirLight.shadow.camera.top = 40;
+        dirLight.shadow.camera.bottom = -40;
         scene.add(dirLight);
 
         // renderer
         const renderer = new WebGLRenderer();
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.outputEncoding = SRGBColorSpace;
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = 2;
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
         this.renderer = renderer;
