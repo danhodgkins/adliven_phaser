@@ -175,7 +175,6 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.lumberMillZone = lumberMillZone;
 
         this.sensorsController = new SensorsController({ 
-            uiController : this.uiController,
             applicationModel : this.applicationModel,
             trees : this.trees,
             lumbermill : lumberMillZone
@@ -243,6 +242,11 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "log_collected":
                 this.uiController.updateUI();
                 break;
+            
+            case "lumbermill_tick":
+                this.player.playLoseLogAnim( this.lumberMillZone.model.position );
+                this.uiController.updateUI();
+                break
         }
     }
 

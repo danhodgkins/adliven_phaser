@@ -166,6 +166,12 @@ export class Player extends EventDispatcher {
             // console.log("triggeringBody", triggeringBody.position );
         }
 
+        // target vector is the lumbermill
+        playLoseLogAnim( targetVector )
+        {
+            console.log("play lose log anim")
+        }
+
 
         spawnFlyingSphereToPlayer() {
             const start = this.closestTreePosition;

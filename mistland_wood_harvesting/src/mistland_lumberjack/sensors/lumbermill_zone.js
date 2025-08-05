@@ -7,6 +7,7 @@ export default class LumberMillZone {
         this.radius = radius;
 
         const model = this.scene.getObjectByName("Lumbermill");
+        this.model = model;
 
         const sensor = new SensorZone({
             world, 
