@@ -229,7 +229,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.followCam.update();
         if( this.world ) this.world.step( this.fixedTimeStep, dt, this.maxSubSteps);
         // Update debug visualization
-        //  this.cannonDebugRenderer.update();
+        // this.cannonDebugRenderer.update();
         this.renderer.render( this.scene, this.camera );
     }
 

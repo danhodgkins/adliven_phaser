@@ -1,3 +1,4 @@
+import { Body, Sphere, Vec3 } from "cannon-es";
 import { SensorZone } from "./sensor";
 
 export default class TreeZone {
@@ -16,8 +17,18 @@ export default class TreeZone {
             radius: this.radius,
             playerBody: playerBody, 
             color: 0xff00ff,
-            sensorType : sensorType
+            sensorType : sensorType,
+            visible : false
         });
+
+        const sphereShape = new Sphere(radius * 0.75);
+        const sphereBody = new Body({
+            mass: 0, // > 0 makes it dynamic
+            shape: sphereShape,
+            position: new Vec3(position.x, 1.0, position.z),
+        });
+        world.addBody(sphereBody);
+
 
         this.sensor = sensor;
     }
