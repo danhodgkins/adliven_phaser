@@ -152,7 +152,6 @@ export class Player extends EventDispatcher {
                 case "03_chop":
                     // respond to chop loop complete
                     this.dispatchEvent({ type: 'player_event', detail : "axe_chop_complete" });
-                    this.spawnFlyingSphereToPlayer();
                     break;
             }
         }
@@ -162,6 +161,7 @@ export class Player extends EventDispatcher {
         {
             // Ensure nearestTree is a Vector3
             this.closestTreePosition = new Vector3(triggeringBody.position.x, triggeringBody.position.y, triggeringBody.position.z);
+            this.spawnFlyingSphereToPlayer();
             // will be called on each log collected, and receives sensors wolrd body position
             // console.log("triggeringBody", triggeringBody.position );
         }
