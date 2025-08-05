@@ -161,13 +161,13 @@ export class Player extends EventDispatcher {
         {
             // Ensure nearestTree is a Vector3
             this.closestTreePosition = new Vector3(triggeringBody.position.x, triggeringBody.position.y, triggeringBody.position.z);
-            this.spawnFlyingSphereToPlayer();
+            this.SpawnFlyingLogToPlayer();
             // will be called on each log collected, and receives sensors wolrd body position
             // console.log("triggeringBody", triggeringBody.position );
         }
 
 
-        spawnFlyingSphereToPlayer() {
+        SpawnFlyingLogToPlayer() {
             const start = this.closestTreePosition;
             const logCount = this.carriedLogs.length;
             const end = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, 0));
