@@ -5,16 +5,18 @@ export default class LumberMillZone {
         this.world = world;
         this.scene = scene;
         this.radius = radius;
-        
+
+        const model = this.scene.getObjectByName("Lumbermill");
 
         const sensor = new SensorZone({
             world, 
             scene,
-            position: position || new Vec3(0, 0, 0),
+            position:  model.position,
             radius: this.radius,
             playerBody: playerBody, 
             color: 0xfff,
-            sensorType 
+            sensorType ,
+            visible:false
         });
 
         this.sensor = sensor;

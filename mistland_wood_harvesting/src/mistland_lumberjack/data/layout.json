@@ -451,13 +451,18 @@
             ]
         },
         {
-            "Name": "House_red",
-            "instances": [
+            "Name": "Lumbermill",
+            "instances":[
                 {
                     "position": [44.94, 0.10, -14.92],
                     "rotation": [0.00, 355.23, 0.00],
                     "scale": [0.70, 0.70, 0.70]
-                },
+                }
+            ]
+        },
+        {
+            "Name": "House_red",
+            "instances": [                
                 {
                     "position": [16.09, 0.00, -15.93],
                     "rotation": [0.00, 179.69, 0.00],

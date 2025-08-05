@@ -16,6 +16,7 @@ import { Hero_avatar } from '../../media/Hero_avatar.glb.js';
 import { Hill } from '../../media/Hill.glb.js';
 import { House_blue } from '../../media/House_blue.glb.js';
 import { House_red } from '../../media/House_red.glb.js';
+import { Lumbermill } from '../../media/Lumbermill.glb.js';
 import { Ladder } from '../../media/Ladder.glb.js';
 import { Log_pile } from '../../media/Log_pile.glb.js';
 import { Log_Single } from '../../media/Log_Single.glb.js';
@@ -51,6 +52,7 @@ const modelMap = {
     Hill : Hill,
     House_blue : House_blue,
     House_red : House_red,
+    Lumbermill : Lumbermill,
     Ladder : Ladder,
     Log_pile : Log_pile,
     Log_Single : Log_Single,
@@ -69,9 +71,13 @@ const modelMap = {
 }
 
 const zOffset = 40; // offset for the layout parent object
+let completeCallback;
+let assetCtr = 0;
+let loadedCtr = 0;
 
-export function layoutSceneHelper( { data, scene } )
+export function layoutSceneHelper( { data, scene, onCompleteCallback } )
 {
+    completeCallback = onCompleteCallback;
     const loader = new GLTFLoader();
 
     const layoutParent = new Object3D();
@@ -93,6 +99,7 @@ export function layoutSceneHelper( { data, scene } )
             return;
         } 
 
+        assetCtr++;
         loader.load(
             classToLoad, 
             ( e )=>{
@@ -107,6 +114,7 @@ export function layoutSceneHelper( { data, scene } )
 
 function onLoad( e, scene, layoutParent,  element  )
 {
+    loadedCtr++;
     element.instances.forEach( instance => {
         const clone = e.scene.clone();
         layoutParent.add( clone );  
@@ -123,6 +131,14 @@ function onLoad( e, scene, layoutParent,  element  )
                 instance.scale[1],
                 instance.scale[2]
             );
+        }
+
+        // so we can grab a reference to it later e.g. Lumbermill, Workshop, Tree etc
+        clone.name = element.Name;
+
+        if( element.Name == "Tree")
+        {
+            // console.log( "pre world pos = " , instance.position );
         }
 
         // Step 2: Force world matrix update
@@ -146,8 +162,15 @@ function onLoad( e, scene, layoutParent,  element  )
         clone.quaternion.copy(worldQuat);
         clone.scale.copy(worldScale);
 
+        if( element.Name == "Tree")
+        {
+            //console.log( "post world pos = " , clone.position );
+        }
+
         clone.updateMatrixWorld(true);
     });
+
+    if( loadedCtr == assetCtr ) completeCallback();
 }
 
 export function getWorldFromLocalPhysicsTransforms( { data , scene } )

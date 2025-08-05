@@ -47,7 +47,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.renderer = renderer;
 
         // layout scene 
-        layoutSceneHelper( { data:layoutData , scene })
+        this.boundOnLayoutComplete = this.onLayoutComplete.bind( this );
+        layoutSceneHelper( { data:layoutData , scene, onCompleteCallback : this.boundOnLayoutComplete });
 
         // input 
         
@@ -79,7 +80,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         var world = new World();
         world.solver.iterations = 10;
         world.gravity.set(0, -10, 0); // m/s²
-        this.physicsWorld = world;     
+        this.world = world;     
         
         // Set up debug visualization
         const cannonDebugRenderer = CannonDebugger(scene, world, {
@@ -118,21 +119,47 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh ) } , 2000 );
 
+        // Handle window resize or rotation
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            followCam.camera.aspect = width / height;
+            followCam.camera.updateProjectionMatrix();
+
+            renderer.setSize(width, height);
+        });
+    }
+
+    // await layout complete callback as we'll need the adjusted world transforms for the lumbermill, trees and workshop for sensors
+    onLayoutComplete()
+    {
+        // grab all the trees and make zones using their positions 
+        const matches = [];
+        this.scene.traverse(child => {
+            // the second condition ( child.parent == this.scene ) prevents spawing a zone if the Tree has a child called Tree in the model
+            // I think thats whats happening anyhow.. child.parent logs as Group instaed of Scene and we dont want those
+            if (child.name === "Tree" && child.parent == this.scene ) {
+                matches.push(child);
+            }
+        });
+        
+        const treeConfigs = [];
+        matches.forEach(element => {
+            // we need to convert Threes Vector3 to Cannons Vec3
+            const config = { position: new Vec3(element.position.x, element.position.y, element.position.z) }
+            treeConfigs.push( config );
+        });
+        
         // trees 
         this.trees = [];
-        const treeConfigs = [
-            { position: new Vec3(5, 0.5, 5) },
-            { position: new Vec3(5, 0.5, -5) },
-            { position: new Vec3(5, 0.5, -10) },
-            { position: new Vec3(5, 0.5, -15) },
-        ];
 
         treeConfigs.forEach(element => {
             const tz = new TreeZone( {
-                world,
-                scene,
+                world : this.world,
+                scene : this.scene,
                 position: element.position,
-                radius: 1.5,
+                radius: 3,
                 playerBody: this.player.sphereBody,
                 sensorType: "tree"
             });            
@@ -141,10 +168,10 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         // lumbermill zonenew 
         const lumberMillZone = new LumberMillZone({
-            world,
-            scene,
+            world : this.world,
+            scene : this.scene,
             position: new Vec3(-5, 0.5, 5),
-            radius: 1.5,
+            radius: 5,
             playerBody: this.player.sphereBody,
             sensorType: "lumbermill"
         });
@@ -158,17 +185,6 @@ export class MistlandLumberjackApplication extends BaseScene{
         })
 
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
-
-        // Handle window resize or rotation
-        window.addEventListener('resize', () => {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-
-            followCam.camera.aspect = width / height;
-            followCam.camera.updateProjectionMatrix();
-
-            renderer.setSize(width, height);
-        });
     }
 
     destroyLevelAfterStep = false;
@@ -178,19 +194,24 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.player.setInput(this.joystickInput.x, this.joystickInput.y, this.joystickInput.rotation);
         this.player.update(dt);
 
-        this.trees.forEach(element => {
-            element.update();            
-        });
+        if( this.trees ) {
+                this.trees.forEach(element => {
+                    element.update();            
+                });
+        }
 
-        this.lumberMillZone.update();
+        if( this.lumberMillZone ) this.lumberMillZone.update();
 
         this.followCam.update();
-        if( this.physicsWorld ) this.physicsWorld.step( this.fixedTimeStep, dt, this.maxSubSteps);
+        if( this.world ) this.world.step( this.fixedTimeStep, dt, this.maxSubSteps);
         // Update debug visualization
-        // this.cannonDebugRenderer.update();
+        //  this.cannonDebugRenderer.update();
         this.renderer.render( this.scene, this.camera );
     }
 
+
+
+    //////////////////////////////////////////////////////////////////////////////////// EVENT HANDLERS 
     onSensorEvent( e )
     {
         // tree or lumbermill
@@ -234,4 +255,5 @@ export class MistlandLumberjackApplication extends BaseScene{
                 break;
         }
     }
+    //////////////////////////////////////////////////////////////////////////////////// END EVENT HANDLERS 
 }

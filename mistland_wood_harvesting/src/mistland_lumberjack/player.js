@@ -44,17 +44,7 @@ export class Player extends EventDispatcher {
             
             world.addBody(sphereBody);
             this.sphereBody = sphereBody;
-            
-            // Three.js mesh
-            // const sphereMesh = new Mesh(
-            //     new SphereGeometry(radius, 32, 32),
-            //     new MeshStandardMaterial({ color: 0x00ff00 })
-            // );
-            // scene.add(sphereMesh);
-            // this.sphereMesh = sphereMesh;
-            
-            // create parent object so sensors etc dont throw null error until glb inited
-            
+                        
             this.sphereMesh = new Object3D();
             scene.add(this.sphereMesh);
                 
@@ -173,7 +163,7 @@ export class Player extends EventDispatcher {
             // Ensure nearestTree is a Vector3
             this.closestTreePosition = new Vector3(triggeringBody.position.x, triggeringBody.position.y, triggeringBody.position.z);
             // will be called on each log collected, and receives sensors wolrd body position
-            console.log("triggeringBody", triggeringBody.position );
+            // console.log("triggeringBody", triggeringBody.position );
         }
 
 

@@ -7,10 +7,12 @@ export default class TreeZone {
         this.radius = radius;
         // this.sensorType = sensorType;
 
+
         const sensor = new SensorZone({
             world, 
             scene,
-            position: position || new Vec3(0, 0, 0),
+            position: position,
+            // position: position || new Vec3(0, 0, 0),
             radius: this.radius,
             playerBody: playerBody, 
             color: 0xff00ff,
