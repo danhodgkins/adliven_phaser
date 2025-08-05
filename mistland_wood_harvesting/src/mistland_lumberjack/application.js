@@ -240,6 +240,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.followCam.setNewTarget( this.workshop.parentObj.position );
                 break;
             case "log_collected":
+                if(  this.sensorsController.currentTreeSensor ) this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
                 this.uiController.updateUI();
                 break;
             
@@ -257,7 +258,6 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "axe_chop_complete":
                 this.applicationModel.onLogCollected();
                 this.uiController.updateUI();
-                if(  this.sensorsController.currentTreeSensor ) this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
                 break;
         }
     }
