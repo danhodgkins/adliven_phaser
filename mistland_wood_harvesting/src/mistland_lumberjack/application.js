@@ -1,6 +1,6 @@
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import BaseScene from "../scene/basescene";
-import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3 } from "three/src/Three.Core.js";
+import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3, DirectionalLight } from "three/src/Three.Core.js";
 import { MistlandLumberjackUIController } from "./ui_controller";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
@@ -33,10 +33,16 @@ export class MistlandLumberjackApplication extends BaseScene{
         const scene = new Scene();
         this.scene = scene;
 
-        const color = 0xFFFFFF;
-        const intensity = 5;
+        const color = 0xFFFFFF; // LemonChiffon (faint yellow)
+        const intensity = 1;
         const light = new AmbientLight(color, intensity);
         scene.add(light);
+
+        // Add a directional light
+        const dirLight = new DirectionalLight(0xFFFACD, 5); // faint yellow
+        dirLight.position.set(10, 20, 10);
+        dirLight.castShadow = true;
+        scene.add(dirLight);
 
         // renderer
         const renderer = new WebGLRenderer();
