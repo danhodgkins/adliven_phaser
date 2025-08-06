@@ -26,7 +26,7 @@
     var params = {
         gemsNeeded: { value: 20, default: 20, min: 0, max: 90, type: "number", description: 'gemsNeeded: amount of gems needed to unlock the workshop' },
         woodNeeded: { value: 10, default: 10, min: 0, max: 100, type: "number", description: 'woodNeeded: amount of wood needed' },
-        backpackSize: { value: 10, default: 10, min: 0, max: 20, type: "number", description: 'backpackSize: amount of wood character can carry before upgrading axe' },
+        backpackSize: { value: 20, default: 10, min: 0, max: 20, type: "number", description: 'backpackSize: amount of wood character can carry before upgrading axe' },
         walkSpeed: { value: 10, default: 10, min: 1, max: 25, type: "number", description: 'walkSpeed: character movement speed' },
         skeletons: { value: true, default: true, type: "boolean", description: 'skeletons: on/off: optional skeletons that roam the village' },
         hintTimer: { value: 10, default: 10, min: 0, max: 30, type: "number", description: 'hintTimer: time before a hint is shown after initial hint in sec.' },
@@ -52,6 +52,11 @@
         if( config.value >= config.max ) return config.max;
         else if( config.value <= config.min ) return config.min;
         else return config.value;
+    }
+
+    function isPortrait()
+    {
+        return window.innerWidth < window.innerHeight
     }
 
     </script>
