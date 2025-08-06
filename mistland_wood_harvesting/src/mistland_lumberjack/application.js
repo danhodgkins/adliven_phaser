@@ -18,6 +18,9 @@ import CannonDebugger from "cannon-es-debugger";
 import { AxeUpgradeController } from "./axe_upgrade_controller";
 
 export class MistlandLumberjackApplication extends BaseScene{
+
+    timeoutID = -1;
+
     constructor({ config }) {
         super({config});
         console.log("Application initialized with parent:", config);
@@ -142,7 +145,7 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.axeUpgradeController = new AxeUpgradeController({ camera : this.camera });
 
-        setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
+        this.timeoutID = setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
 
         // Handle window resize or rotation
         window.addEventListener('resize', () => {
@@ -206,17 +209,24 @@ export class MistlandLumberjackApplication extends BaseScene{
         });
         this.lumberMillZone = lumberMillZone;
 
+        // workshop
+        this.workshop = new WorkshopController({ 
+            scene:this.scene , 
+            world:this.world, 
+            playerBody: this.player.sphereBody,
+            sensorType: "workshop"
+         })
+        this.followCam.setNewTarget( this.workshop.parentObj.position );
+
         this.sensorsController = new SensorsController({ 
             applicationModel : this.applicationModel,
             trees : this.trees,
-            lumbermill : lumberMillZone
+            lumbermill : lumberMillZone,
+            workshop : this.workshop
         })
 
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
         
-        // workshop
-        this.workshop = new WorkshopController({ scene:this.scene , world:this.world })
-        this.followCam.setNewTarget( this.workshop.parentObj.position );
     }
 
     destroyLevelAfterStep = false;
@@ -256,6 +266,15 @@ export class MistlandLumberjackApplication extends BaseScene{
             if( enter ) this.player.startChopping();
             else this.player.stopChopping();
         }
+
+        if( enter && sensorType == "workshop")
+        {
+            console.log("player entered workshop sensor gems: ",  this.applicationModel.gemCount , getParamsNumberByID("gemsNeeded"))
+            if( this.applicationModel.gemCount >= getParamsNumberByID("gemsNeeded") )
+            {
+                this.workshop.reveal();
+            }
+        }
     }
 
     onModelEvent( e )
@@ -272,6 +291,10 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "unlock_workshop":
                 this.workshop.unlock();
                 this.followCam.setNewTarget( this.workshop.parentObj.position );
+
+                if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
+                this.timeoutID = setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
+
                 break;
             case "log_collected":
                 if(  this.sensorsController.currentTreeSensor ) this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );

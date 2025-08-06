@@ -3,12 +3,14 @@ import { BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial,
 import { lock } from '../../media/pngs_lock.png.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Easing, Tween } from "@tweenjs/tween.js";
+import { SensorZone } from "./sensors/sensor.js";
 
 export default class WorkshopController{
-    constructor({ scene, world  })
+    constructor({ scene, world, playerBody, sensorType})
     {
         this.scene = scene;
         this.world = world;
+        //this.playerBody = playerBody;
 
         const model = this.scene.getObjectByName("Gearshop");
         this.clonedScale = model.scale.clone();
@@ -44,6 +46,25 @@ export default class WorkshopController{
             this.scene.add(plane);
             this.texturedPlane = plane;
         });        
+
+        const sensor = new SensorZone({
+            world, 
+            scene,
+            position: this.clonedPosition,
+            // position: position || new Vec3(0, 0, 0),
+            radius: 8,
+            playerBody: playerBody, 
+            color: 0xff00ff,
+            sensorType : sensorType,
+            visible : true
+        })
+
+        this.sensor = sensor;
+    }
+
+    reveal()
+    {
+        console.log("reveal");
     }
 
     unlock()
@@ -63,6 +84,7 @@ export default class WorkshopController{
     }
 
     update(dt){
-        if( this.scaleUpTween ) this.scaleUpTween.update()
+        if( this.scaleUpTween ) this.scaleUpTween.update();
+        this.sensor.update();
     }
 }

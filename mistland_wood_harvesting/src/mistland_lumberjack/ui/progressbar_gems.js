@@ -20,7 +20,7 @@ export default class ProgressBarGems{
 
         });
 
-        console.log("pixiApp.stage.width ", pixiApp.stage.width, window.innerWidth);
+        // console.log("pixiApp.stage.width ", pixiApp.stage.width, window.innerWidth);
         
         this.initSprites();
     }
@@ -84,12 +84,9 @@ export default class ProgressBarGems{
 
     update(dt) {
 
-        //const targetGemCount = this.applicationModel.gemCount;
-        
         if (this.currentGems !== this.applicationModel.gemCount) {
             this.currentGems = this.applicationModel.gemCount;
             this.targetFillRatio = Math.min(this.currentGems / this.max, 1);
-            console.log("updaete pb ", this.targetFillRatio )
         }
 
         // Smoothly interpolate fill ratio (lerp)
@@ -103,27 +100,5 @@ export default class ProgressBarGems{
             // So we want to shift the sprite's x to the right as fill increases.
             this.barFillSprite.x = this.fillBarSpacer + fullWidth * this.currentFillRatio;
         }
-
-        // if (this.barFillSprite && this.progressBarContainer) {
-        //     const containerWidth = this.progressBarContainer.width;
-        //     const fillWidth = containerWidth * this.currentFillRatio;
-
-        //     // Compute how much of the fill should be visible
-        //     const visibleWidth = containerWidth * this.currentFillRatio;
-
-        //     // Since anchor.x = 1 (right-aligned), adjust x to shift left as progress decreases
-        //     this.barFillSprite.x = containerWidth - visibleWidth;
-        // }
     }
-
-    // update( dt )
-    // {
-    //     if( this.currentGems != this.applicationModel.gemCount )
-    //     {
-    //         this.currentGems = this.applicationModel.gemCount;
-    //         // animate this.barFillTextureSprite to reflect progress as a proportion of the  this.progressBarContainer width               
-    //     }
-    // }
-
-
 }

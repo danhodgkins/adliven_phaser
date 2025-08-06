@@ -5,7 +5,7 @@ export default class SensorsController extends EventDispatcher{
     intervalDuraion = 250;
     intervalID = -1;
 
-    constructor( { applicationModel, trees, lumbermill })
+    constructor( { applicationModel, trees, lumbermill, workshop })
     {
         super();
         this.applicationModel = applicationModel;
@@ -19,6 +19,9 @@ export default class SensorsController extends EventDispatcher{
         lumbermill.sensor.addEventListener('enter',  this.boundOnZoneEnter);
         lumbermill.sensor.addEventListener('exit',  this.boundOnZoneExit);
 
+        workshop.sensor.addEventListener('enter',  this.boundOnZoneEnter);
+        workshop.sensor.addEventListener('exit',  this.boundOnZoneExit);
+
         this.boundOnChopWoodTick = this.onChopWoodTick.bind(this);
         this.boundOnLumbermillTick = this.onLumbermillTick.bind(this);
 
@@ -29,6 +32,9 @@ export default class SensorsController extends EventDispatcher{
         console.log("e = " , e.sensor.sensorType)
         switch( e.sensor.sensorType )
         {
+            case "workshop":
+                break;
+
             case "tree":
                 this.currentTreeSensor = e.sensor;
                 break;
