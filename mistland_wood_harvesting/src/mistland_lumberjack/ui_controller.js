@@ -1,5 +1,6 @@
 import { Assets, Container, Sprite, Texture } from 'pixi.js';
-import { title_gameplay } from '../../media/pngs_title_gameplay.png.js';
+// import { title_gameplay } from '../../media/pngs_title_gameplay.png.js';
+import { title_gameplay } from '../../media/img_title_gameplay.webp.js';
 
 import '@pixi/layout';
 import ProgressBarGems from './ui/progressbar_gems.js';
@@ -15,6 +16,12 @@ export class MistlandLumberjackUIController {
         this.updateUI();
 
         this.initPixiContainer();
+
+        const logoImg = new Image()
+        logoImg.src = title_gameplay;
+        
+        const logoEl = this.uiLayerElement.querySelector("#logo-container");
+        logoEl.appendChild(logoImg);
         
     }
 
