@@ -4,6 +4,7 @@ import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, Me
 import { MistlandLumberjackUIController } from "./ui_controller";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
+import { SkeletonController } from "./Skeleton";
 import { PhysicsBounds } from "./physics_bounds";
 import { FollowCamera } from "./follow_cam";
 import TreeZone from "./sensors/tree_zone";
@@ -162,7 +163,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             if( this.uiController ) this.uiController.onResize();
         });
     }
-
+    skeletonsEnabled = false;
     // await layout complete callback as we'll need the adjusted world transforms for the lumbermill, trees and workshop for sensors
     onLayoutComplete()
     {
@@ -227,6 +228,32 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
         
+
+        if(this.skeletonsEnabled){
+            this.Skeleton0 = new SkeletonController({
+                world: this.world,
+                scene: this.scene,
+                position: new Vector3(0, 3, 0), // Adjust as needed
+                rotation: new Quaternion(0, 0, 0, 1), // Adjust as needed
+                player: this.player
+            });
+
+            this.Skeleton1 = new SkeletonController({
+                world: this.world,
+                scene: this.scene,   
+                position: new Vector3(5, 0, 0), // Adjust as needed
+                rotation: new Quaternion(0, 0, 0, 1), // Adjust
+                player: this.player
+            });
+
+            this.skeleton2 = new SkeletonController({
+                world: this.world,
+                scene: this.scene,
+                position: new Vector3(-5, 0, 0), // Adjust as needed
+                rotation: new Quaternion(0, 0, 0, 1), // Adjust
+                player: this.player
+            });
+        }
     }
 
     destroyLevelAfterStep = false;
@@ -236,6 +263,13 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.player.setInput(this.joystickInput.x, this.joystickInput.y, this.joystickInput.rotation);
         this.player.update(dt);
         this.axeUpgradeController.update(dt);
+
+        // Update skeletons
+        if( this.skeletonsEnabled ){
+            if (this.Skeleton0) this.Skeleton0.update(dt);
+            if (this.Skeleton1) this.Skeleton1.update(dt);
+            if (this.skeleton2) this.skeleton2.update(dt);
+        }
 
         if( this.trees ) {
             this.trees.forEach(element => {
