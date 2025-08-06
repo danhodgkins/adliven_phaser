@@ -7,7 +7,7 @@ export default StartGame;
 import SceneManager from '../scene/scenemanager.js';
 import { MistlandLumberjackApplication } from '../mistland_lumberjack/application.js';
 
-import '@pixi/layout';
+// import '@pixi/layout';
 import { Application, Container, Graphics } from 'pixi.js';
 // import '@pixi/layout/devtools';
 // import { LayoutSystem } from '@pixi/layout';

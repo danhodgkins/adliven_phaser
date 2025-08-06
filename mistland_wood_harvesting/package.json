@@ -32,7 +32,6 @@
         "webpack-merge": "^6.0.0"
     },
     "dependencies": {
-        "@pixi/layout": "^3.1.0",
         "@tweenjs/tween.js": "^25.0.0",
         "cannon-es": "^0.20.0",
         "cannon-es-debugger": "^1.0.0",

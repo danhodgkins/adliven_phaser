@@ -2,7 +2,7 @@ import { Assets, Container, Sprite, Texture } from 'pixi.js';
 // import { title_gameplay } from '../../media/pngs_title_gameplay.png.js';
 import { title_gameplay } from '../../media/img_title_gameplay.webp.js';
 
-import '@pixi/layout';
+// import '@pixi/layout';
 import ProgressBarGems from './ui/progressbar_gems.js';
 
 export class MistlandLumberjackUIController {
