@@ -32,7 +32,7 @@ import { unwrap } from '../../media/unwrap.mp3.js';
 import { Wall } from '../../media/Wall.glb.js';
 import { Wall_V2 } from '../../media/Wall_V2.glb.js';
 import { Windmill } from '../../media/Windmill.glb.js';
-import { MathUtils, MeshBasicMaterial, MeshStandardMaterial, Object3D, Quaternion, Vector3, Color } from 'three';
+import { MathUtils, MeshBasicMaterial, MeshStandardMaterial, Object3D, Quaternion, Vector3, Color, BackSide, FrontSide } from 'three';
 import { Group } from '@tweenjs/tween.js';
 
 const modelMap = {
@@ -144,11 +144,30 @@ function onLoad( e, scene, layoutParent,  element  )
                 {
                 const oldMat = child.material;
                     console.log("Replacing MeshBasicMaterial with MeshStandardMaterial for", element.Name, child.name);
-                    if (element.Name =="Gearshop"){
+                    if (element.Name === "Gearshop"){
+                        // Create yellow outline by duplicating the mesh
+                        const outlineMesh = child.clone();
+                        outlineMesh.material = new MeshBasicMaterial({
+                            color: new Color(1, 1, 0), // Yellow
+                            side: FrontSide,
+                            depthTest: true,
+                            depthWrite: true,
+                        });
+                        outlineMesh.scale.multiplyScalar(1.05); // Make larger for outline
+                        
+                        // Add outline to the same parent as the original mesh
+                        child.parent.add(outlineMesh);
+                        
+                        // Create the main white material
                         child.material = new MeshBasicMaterial({
                             color: new Color(1, 1, 1), // Solid white
                             side: oldMat.side,
+                            depthTest: false, // Disable depth testing to render on top
+                            depthWrite: false, // Don't write to depth buffer
                         });
+                        
+                        // Move white mesh slightly forward to ensure it's in front
+                        child.position.z += 0.001;
                     }else {
                         child.material = new MeshStandardMaterial({
                         map: oldMat.map,
