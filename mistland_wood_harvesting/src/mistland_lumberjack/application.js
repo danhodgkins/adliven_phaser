@@ -70,7 +70,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.outputEncoding = SRGBColorSpace;
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = 2;
+        renderer.shadowMap.type = 3;
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
         this.renderer = renderer;
