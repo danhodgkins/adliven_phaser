@@ -4,6 +4,7 @@ import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, Me
 import { MistlandLumberjackUIController } from "./ui_controller";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
+import { SkeletonController } from "./Skeleton";
 import { PhysicsBounds } from "./physics_bounds";
 import { FollowCamera } from "./follow_cam";
 import TreeZone from "./sensors/tree_zone";
