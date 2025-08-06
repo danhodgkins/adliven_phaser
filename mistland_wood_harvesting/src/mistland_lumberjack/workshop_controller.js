@@ -1,5 +1,5 @@
-import { Body, Box, Quaternion, Vec3 } from "cannon-es";
-import { BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, PlaneGeometry, TextureLoader } from "three";
+
+import { DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, PlaneGeometry, TextureLoader, Color, BackSide, FrontSide } from "three";
 import { lock } from '../../media/pngs_lock.png.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Easing, Tween } from "@tweenjs/tween.js";
@@ -13,6 +13,8 @@ export default class WorkshopController{
         //this.playerBody = playerBody;
 
         const model = this.scene.getObjectByName("Gearshop");
+
+        
         this.clonedScale = model.scale.clone();
         this.clonedPosition = model.position.clone();
 
@@ -21,7 +23,34 @@ export default class WorkshopController{
         parentObj.position.copy( this.clonedPosition );
         this.scene.add( parentObj );
         parentObj.add( model );
-        
+        parentObj.traverse((child) => {
+            if (child.isMesh) {
+                const oldMat = child.material;
+                const outlineMesh = child.clone();
+                        outlineMesh.material = new MeshBasicMaterial({
+                            color: new Color(1, 1, 0), // Yellow
+                            side: FrontSide,
+                            depthTest: true,
+                            depthWrite: true,
+                        });
+                        outlineMesh.scale.multiplyScalar(1.05); // Make larger for outline
+                        //outlineMesh.position.y += 0.001; // Move slightly forward to ensure it's in front
+                        // Add outline to the same parent as the original mesh
+                        child.parent.add(outlineMesh);
+                        
+                        // Create the main white material
+                        child.material = new MeshBasicMaterial({
+                            color: new Color(1, 1, 1), // Solid white
+                            side: oldMat.side,
+                            depthTest: false, // Disable depth testing to render on top
+                            depthWrite: false, // Don't write to depth buffer
+                        });
+                        
+                        // Move white mesh slightly forward to ensure it's in front
+                        child.position.z += 0.001;
+            }
+        });
+
         parentObj.scale.set(0, 0, 0);
         model.position.set(0, 0, 0);
         this.parentObj = parentObj;
