@@ -1,3 +1,4 @@
+import { Axe } from '../../media/Axe.glb.js';
 import { Barrell } from '../../media/Barrell.glb.js';
 import { Bench } from '../../media/Bench.glb.js';
 import { Bucket } from '../../media/Bucket.glb.js';

@@ -15,6 +15,7 @@ import WorkshopController from "./workshop_controller";
 import layoutData from "./data/layout.json"
 import { layoutSceneHelper } from "../utils/layout";
 import CannonDebugger from "cannon-es-debugger";
+import { AxeUpgradeController } from "./axe_upgrade_controller";
 
 export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
@@ -115,12 +116,12 @@ export class MistlandLumberjackApplication extends BaseScene{
             scene: scene
         });
 
+
         this.boundOnPlayerEvent = this.onPlayerEvent.bind(this);
         this.player.addEventListener('player_event', this.boundOnPlayerEvent );
 
+        // workshop gets set as taget after it has loaded, use 0,0,0 in th emeantime
         const followCam = new FollowCamera({
-            // target: this.workshop.mesh,
-            // target: this.player.sphereMesh,
             targetTransformVector : new Vector3(0,0,0),
             renderer,
             scene,
@@ -131,6 +132,9 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.camera = followCam.getCamera();
         this.followCam = followCam;
+        this.scene.add( this.camera );
+
+        this.axeUpgradeController = new AxeUpgradeController({ camera : this.camera });
 
         setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
 
@@ -211,11 +215,12 @@ export class MistlandLumberjackApplication extends BaseScene{
     update( dt ) {
         this.player.setInput(this.joystickInput.x, this.joystickInput.y, this.joystickInput.rotation);
         this.player.update(dt);
+        this.axeUpgradeController.update(dt);
 
         if( this.trees ) {
-                this.trees.forEach(element => {
-                    element.update();            
-                });
+            this.trees.forEach(element => {
+                element.update();            
+            });
         }
 
         if( this.lumberMillZone ) this.lumberMillZone.update();
@@ -224,10 +229,9 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.followCam.update();
         if( this.world ) this.world.step( this.fixedTimeStep, dt, this.maxSubSteps);
         // Update debug visualization
-        //  this.cannonDebugRenderer.update();
+        // this.cannonDebugRenderer.update();
         this.renderer.render( this.scene, this.camera );
     }
-
 
 
     //////////////////////////////////////////////////////////////////////////////////// EVENT HANDLERS 
@@ -251,6 +255,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "unlock_axe":
                 console.log("unlock axe");
                 this.player.upgradeAxe();
+                this.axeUpgradeController.show( 4000 );
                 break;
 
             case "unlock_workshop":
