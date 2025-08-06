@@ -44,8 +44,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         dirLight.target.position.set(0, 0, 0); // Point at scene center
         scene.add(dirLight.target);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
         dirLight.shadow.camera.near = 1;
         dirLight.shadow.camera.far = 100;
         dirLight.shadow.camera.left = -40;
