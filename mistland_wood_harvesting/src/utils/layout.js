@@ -32,7 +32,7 @@ import { unwrap } from '../../media/unwrap.mp3.js';
 import { Wall } from '../../media/Wall.glb.js';
 import { Wall_V2 } from '../../media/Wall_V2.glb.js';
 import { Windmill } from '../../media/Windmill.glb.js';
-import { MathUtils, Object3D, Quaternion, Vector3 } from 'three';
+import { MathUtils, MeshBasicMaterial, MeshStandardMaterial, Object3D, Quaternion, Vector3, Color } from 'three';
 import { Group } from '@tweenjs/tween.js';
 
 const modelMap = {
@@ -138,16 +138,26 @@ function onLoad( e, scene, layoutParent,  element  )
             if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
+                console.log("Setting castShadow and receiveShadow for", element.Name, child.name);
                 // Replace MeshBasicMaterial with MeshStandardMaterial for better quality
-                if (child.material && child.material.type === 'MeshBasicMaterial') {
-                    const oldMat = child.material;
-                    child.material = new MeshStandardMaterial({
+                //if (child.material && child.material.type === 'MeshBasicMaterial') {
+                {
+                const oldMat = child.material;
+                    console.log("Replacing MeshBasicMaterial with MeshStandardMaterial for", element.Name, child.name);
+                    if (element.Name =="Gearshop"){
+                        child.material = new MeshBasicMaterial({
+                            color: new Color(1, 1, 1), // Solid white
+                            side: oldMat.side,
+                        });
+                    }else {
+                        child.material = new MeshStandardMaterial({
                         map: oldMat.map,
                         color: oldMat.color,
                         side: oldMat.side,
-                        roughness: 0.7,
+                        roughness: 0.3,
                         metalness: 0.1
                     });
+                    }
                 }
             }
         });
