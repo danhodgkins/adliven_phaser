@@ -21,13 +21,19 @@ export class MistlandLumberjackApplication extends BaseScene{
     constructor({ config }) {
         super({config});
         console.log("Application initialized with parent:", config);
+
+        this.pixiApp = config.pixiApp;
         
         this.boundOnSensorEvent = this.onSensorEvent.bind( this );
         
         this.applicationModel = new ApplicationModel();
         this.boundOnModelEvent = this.onModelEvent.bind( this );
         this.applicationModel.addEventListener('model_event', this.boundOnModelEvent );
-        this.uiController = new MistlandLumberjackUIController( document.getElementById("ui-overlay"),this.applicationModel );
+        this.uiController = new MistlandLumberjackUIController({ 
+                pixiApp : config.pixiApp, 
+                uiLayerElement : document.getElementById("ui-overlay"),
+                applicationModel : this.applicationModel 
+            });
     }
 
     init(){
@@ -140,6 +146,8 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         // Handle window resize or rotation
         window.addEventListener('resize', () => {
+
+            console.log("on resize " , window.innerWidth)
             const width = window.innerWidth;
             const height = window.innerHeight;
 
@@ -147,6 +155,8 @@ export class MistlandLumberjackApplication extends BaseScene{
             followCam.camera.updateProjectionMatrix();
 
             renderer.setSize(width, height);
+
+            if( this.uiController ) this.uiController.onResize();
         });
     }
 
@@ -225,6 +235,7 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         if( this.lumberMillZone ) this.lumberMillZone.update();
         if( this.workshop ) this.workshop.update( dt );
+        if( this.uiController ) this.uiController.update( dt );
 
         this.followCam.update();
         if( this.world ) this.world.step( this.fixedTimeStep, dt, this.maxSubSteps);

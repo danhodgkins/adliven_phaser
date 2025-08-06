@@ -1,6 +1,6 @@
 import { Body, Box, Quaternion, Vec3 } from "cannon-es";
 import { BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, PlaneGeometry, TextureLoader } from "three";
-import { lock } from '../../media/img_lock.png.js';
+import { lock } from '../../media/pngs_lock.png.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Easing, Tween } from "@tweenjs/tween.js";
 
