@@ -14,6 +14,8 @@ export class Player extends EventDispatcher {
     STATE_CHOPPING = "STATE_CHOPPING";
 
     isChopping = false;
+    lastDropTime = 0; // Track last time logs were dropped
+    dropCooldown = 3000; // 3 seconds in milliseconds
     
     constructor({ world, scene }) {
         super();
@@ -170,7 +172,7 @@ export class Player extends EventDispatcher {
         playLoseLogAnim( targetVector )
         {
             this.currentSensorPosition = targetVector.clone();
-            this.SpawnFlyingLogFromPlayerToTarget();
+            this.SpawnFlyingLogFromPlayerToTarget(this.currentSensorPosition);
         }
 
 
@@ -222,10 +224,39 @@ export class Player extends EventDispatcher {
             );
         }
 
-        SpawnFlyingLogFromPlayerToTarget() {
+        DropMultipleLogs(){
+            // Check if cooldown period has passed
+            const currentTime = performance.now();
+            if (currentTime - this.lastDropTime < this.dropCooldown) {
+                console.log(`Drop logs on cooldown. ${((this.dropCooldown - (currentTime - this.lastDropTime)) / 1000).toFixed(1)}s remaining`);
+                return; // Still in cooldown period
+            }
+
+            //for 0-5 logs, send flyinglogfromplayerto radius around player
+            const logCount = 5;
+            if (logCount === 0) return; // No logs to drop  
+
+            // Update last drop time
+            this.lastDropTime = currentTime;
+
+            const radius = 2.0; // Radius around player to drop logs
+            const angleStep = (2 * Math.PI) / logCount; // Evenly distribute
+            const startAngle = Math.random() * 2 * Math.PI; // Random starting angle    
+            for (let i = 0; i < logCount; i++) {
+                const angle = startAngle + i * angleStep;
+                const targetPosition = new Vector3(
+                    this.sphereMesh.position.x + radius * Math.cos(angle),
+                    this.sphereMesh.position.y,
+                    this.sphereMesh.position.z + radius * Math.sin(angle)
+                );
+                this.SpawnFlyingLogFromPlayerToTarget(targetPosition);
+            }        
+        }
+
+        SpawnFlyingLogFromPlayerToTarget(targetposition) {
             const logCount = this.carriedLogs.length + 1;
             const start = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
-            const end = this.currentSensorPosition.clone();   
+            const end = targetposition.clone();   
             const scene = this.scene;
 
             // Load the Log_Single GLB model and animate it

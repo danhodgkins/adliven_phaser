@@ -149,7 +149,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             renderer.setSize(width, height);
         });
     }
-
+    skeletonsEnabled = false;
     // await layout complete callback as we'll need the adjusted world transforms for the lumbermill, trees and workshop for sensors
     onLayoutComplete()
     {
@@ -207,6 +207,32 @@ export class MistlandLumberjackApplication extends BaseScene{
         // workshop
         this.workshop = new WorkshopController({ scene:this.scene , world:this.world })
         this.followCam.setNewTarget( this.workshop.parentObj.position );
+
+        if(this.skeletonsEnabled){
+            this.Skeleton0 = new SkeletonController({
+                world: this.world,
+                scene: this.scene,
+                position: new Vector3(0, 3, 0), // Adjust as needed
+                rotation: new Quaternion(0, 0, 0, 1), // Adjust as needed
+                player: this.player
+            });
+
+            this.Skeleton1 = new SkeletonController({
+                world: this.world,
+                scene: this.scene,   
+                position: new Vector3(5, 0, 0), // Adjust as needed
+                rotation: new Quaternion(0, 0, 0, 1), // Adjust
+                player: this.player
+            });
+
+            this.skeleton2 = new SkeletonController({
+                world: this.world,
+                scene: this.scene,
+                position: new Vector3(-5, 0, 0), // Adjust as needed
+                rotation: new Quaternion(0, 0, 0, 1), // Adjust
+                player: this.player
+            });
+        }
     }
 
     destroyLevelAfterStep = false;
@@ -216,6 +242,13 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.player.setInput(this.joystickInput.x, this.joystickInput.y, this.joystickInput.rotation);
         this.player.update(dt);
         this.axeUpgradeController.update(dt);
+
+        // Update skeletons
+        if( this.skeletonsEnabled ){
+            if (this.Skeleton0) this.Skeleton0.update(dt);
+            if (this.Skeleton1) this.Skeleton1.update(dt);
+            if (this.skeleton2) this.skeleton2.update(dt);
+        }
 
         if( this.trees ) {
             this.trees.forEach(element => {
