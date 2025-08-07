@@ -6,16 +6,20 @@ import { Easing, Tween } from "@tweenjs/tween.js";
 export class AxeUpgradeController{ 
 
     timeoutID = -1;
-    constructor( { camera })
-    {
+    constructor( { camera, isPerspective = false } ){
         this.parentObj = new Object3D();
         this.parentObj.scale.set(0,0,0);
 
         const loader = new GLTFLoader();
         loader.load(
             Axe, 
-            (e) => {                 
-                e.scene.scale.set( 10,10,10);
+            (e) => {
+                                 
+                if( isPerspective ){
+                    e.scene.scale.set( 3,3,3);
+                }else {
+                    e.scene.scale.set( 10,10,10);
+                }
                 this.parentObj.add(e.scene);   
             }, 
             undefined, 
