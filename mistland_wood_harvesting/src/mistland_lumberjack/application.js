@@ -129,24 +129,71 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.boundOnPlayerEvent = this.onPlayerEvent.bind(this);
         this.player.addEventListener('player_event', this.boundOnPlayerEvent );
+        
+        var usePerspectiveCamera = false;
+        if (usePerspectiveCamera) {
+            // Create a simple perspective camera
+            const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 6);
+            camera.lookAt(new Vector3(0, 0, 0));
+            this.camera = camera;
+            
+            // Create a mock followCam object that just tracks the target for lookAt
+            this.followCam = {
+                targetPosition: new Vector3(0, 0, 0),
+                focusObject: null, // Track if we're focusing on a specific object
+                isFollowingPlayer: false,
+                
+                setNewTarget: (targetPos) => {
+                    this.followCam.targetPosition.copy(targetPos);
+                    // Check if this is the player by comparing the target with player position
+                    this.followCam.isFollowingPlayer = (this.player?.sphereMesh && 
+                        targetPos.equals(this.player.sphereMesh.position));
+                    this.followCam.focusObject = targetPos;
+                },
+                
+                update: () => {
+                    if (this.followCam.isFollowingPlayer && this.player?.sphereMesh) {
+                        // When following player, smoothly rotate on all axes to look at player
+                        const playerPos = this.player.sphereMesh.position;
+                        
+                        // Create a temporary camera to calculate the target rotation
+                        const tempCamera = this.camera.clone();
+                        tempCamera.lookAt(playerPos);
+                        
+                        // Smooth rotation interpolation on all axes
+                        this.camera.quaternion.slerp(tempCamera.quaternion, 0.05);
+                    } else if (this.followCam.focusObject) {
+                        // When focusing on a specific object, look directly at it
+                        this.camera.lookAt(this.followCam.targetPosition);
+                    }
+                },
+                
+                getCamera: () => this.camera
+            };
+        } 
+        else {
+            // workshop gets set as target after it has loaded, use 0,0,0 in the meantime
+            const followCam = new FollowCamera({
+                targetTransformVector: new Vector3(0,0,0),
+                renderer,
+                scene,
+                zoom: 15,
+                lerpFactor: 0.1,
+                offset: new Vector3(0, 25, 25), // 20 units above the player
+            });
+            
+            this.camera = followCam.getCamera();
+            this.followCam = followCam;
+        }
 
-        // workshop gets set as taget after it has loaded, use 0,0,0 in th emeantime
-        const followCam = new FollowCamera({
-            targetTransformVector : new Vector3(0,0,0),
-            renderer,
-            scene,
-            zoom: 15,
-            lerpFactor: 0.1,
-            offset: new Vector3(0, 25, 25), // 20 units above the player
-        });
-
-        this.camera = followCam.getCamera();
-        this.followCam = followCam;
-        this.scene.add( this.camera );
+        this.scene.add(this.camera);
 
         this.axeUpgradeController = new AxeUpgradeController({ camera : this.camera });
 
-        this.timeoutID = setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
+        this.timeoutID = setTimeout( ()=>{ 
+            this.followCam.setNewTarget( this.player.sphereMesh.position );
+        } , 2000 );
 
         // Handle window resize or rotation
         window.addEventListener('resize', () => {
@@ -155,8 +202,8 @@ export class MistlandLumberjackApplication extends BaseScene{
             const width = window.innerWidth;
             const height = window.innerHeight;
 
-            followCam.camera.aspect = width / height;
-            followCam.camera.updateProjectionMatrix();
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
 
             renderer.setSize(width, height);
 
@@ -217,6 +264,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             playerBody: this.player.sphereBody,
             sensorType: "workshop"
          })
+        
         this.followCam.setNewTarget( this.workshop.parentObj.position );
 
         this.sensorsController = new SensorsController({ 
@@ -328,7 +376,6 @@ export class MistlandLumberjackApplication extends BaseScene{
 
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
                 this.timeoutID = setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
-
                 break;
             case "log_collected":
                 if(  this.sensorsController.currentTreeSensor ) this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
