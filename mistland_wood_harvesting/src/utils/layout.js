@@ -153,7 +153,7 @@ function onLoad( e, scene, layoutParent,  element  )
                     map: oldMat.map,
                     color: oldMat.color,
                     side: oldMat.side,
-                    roughness: 0.3,
+                    roughness: 0.6,
                     metalness: 0.1
                 });
                     
