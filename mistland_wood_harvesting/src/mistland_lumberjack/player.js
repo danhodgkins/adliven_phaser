@@ -5,7 +5,7 @@ import { Log_Single } from "../../media/Log_Single.glb.js";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import GlbController from "./glb_controller.js";
 
-const logSpacing = 0.25;
+const logSpacing = 0.3;
 export class Player extends EventDispatcher {
     carriedLogs = [];
 
@@ -190,7 +190,7 @@ export class Player extends EventDispatcher {
                     const logMesh = gltf.scene;
                     logMesh.position.copy(start);
                     logMesh.rotation.copy(this.sphereMesh.rotation);
-                    logMesh.scale.set(0.4, 1, 1); // Match player's rotation
+                    logMesh.scale.set(0.4, 1.1, 1.1); // Match player's rotation
                     scene.add(logMesh);
 
                     const duration = 0.25; // seconds
@@ -267,7 +267,7 @@ export class Player extends EventDispatcher {
                     const logMesh = gltf.scene;
                     logMesh.position.copy(start);
                     logMesh.rotation.copy(this.sphereMesh.rotation);
-                    logMesh.scale.set(0.4, 1, 1); // Match player's rotation
+                    logMesh.scale.set(0.4, 1.1, 1.1);; // Match player's rotation
                     scene.add(logMesh);
 
                     const duration = 0.25; // seconds
@@ -311,7 +311,7 @@ export class Player extends EventDispatcher {
                     const logCount = this.carriedLogs.length;
                     logMesh.position.set(0, 1 + logCount * logSpacing, -0.5); // Adjust Y and Z for stacking
                     logMesh.rotation.set(Math.PI / 2, 0, 0); // Optional: rotate to look more like a pile
-                    logMesh.scale.set(0.4, 1, 1); // Match player's rotation
+                    logMesh.scale.set(0.4, 1.1, 1.1); // Match player's rotation
                     this.sphereMesh.add(logMesh);
                     this.carriedLogs.push(logMesh);
                 },

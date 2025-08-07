@@ -1,6 +1,6 @@
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import BaseScene from "../scene/basescene";
-import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3, DirectionalLight } from "three/src/Three.Core.js";
+import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3, DirectionalLight, WebGLCubeRenderTarget, CubeCamera, Color, Float32BufferAttribute } from "three/src/Three.Core.js";
 import { MistlandLumberjackUIController } from "./ui_controller";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
@@ -99,6 +99,9 @@ export class MistlandLumberjackApplication extends BaseScene{
         el.appendChild( renderer.domElement );
         this.renderer = renderer;
 
+        // Create gradient environment map for reflections
+        this.setupEnvironmentMap(renderer, scene);
+
         // layout scene 
         this.boundOnLayoutComplete = this.onLayoutComplete.bind( this );
         layoutSceneHelper( { data:layoutData , scene, onCompleteCallback : this.boundOnLayoutComplete });
@@ -155,24 +158,71 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.boundOnPlayerEvent = this.onPlayerEvent.bind(this);
         this.player.addEventListener('player_event', this.boundOnPlayerEvent );
+        
+        
+        if (params.perspectiveCamera.value) {
+            // Create a simple perspective camera
+            const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 10, 6);
+            camera.lookAt(new Vector3(0, 0, 0));
+            this.camera = camera;
+            
+            // Create a mock followCam object that just tracks the target for lookAt
+            this.followCam = {
+                targetPosition: new Vector3(0, 0, 0),
+                focusObject: null, // Track if we're focusing on a specific object
+                isFollowingPlayer: false,
+                
+                setNewTarget: (targetPos) => {
+                    this.followCam.targetPosition.copy(targetPos);
+                    // Check if this is the player by comparing the target with player position
+                    this.followCam.isFollowingPlayer = (this.player?.sphereMesh && 
+                        targetPos.equals(this.player.sphereMesh.position));
+                    this.followCam.focusObject = targetPos;
+                },
+                
+                update: () => {
+                    if (this.followCam.isFollowingPlayer && this.player?.sphereMesh) {
+                        // When following player, smoothly rotate on all axes to look at player
+                        const playerPos = this.player.sphereMesh.position;
+                        
+                        // Create a temporary camera to calculate the target rotation
+                        const tempCamera = this.camera.clone();
+                        tempCamera.lookAt(playerPos);
+                        
+                        // Smooth rotation interpolation on all axes
+                        this.camera.quaternion.slerp(tempCamera.quaternion, 0.05);
+                    } else if (this.followCam.focusObject) {
+                        // When focusing on a specific object, look directly at it
+                        this.camera.lookAt(this.followCam.targetPosition);
+                    }
+                },
+                
+                getCamera: () => this.camera
+            };
+        } 
+        else {
+            // workshop gets set as target after it has loaded, use 0,0,0 in the meantime
+            const followCam = new FollowCamera({
+                targetTransformVector: new Vector3(0,0,0),
+                renderer,
+                scene,
+                zoom: 15,
+                lerpFactor: 0.1,
+                offset: new Vector3(0, 25, 25), // 20 units above the player
+            });
+            
+            this.camera = followCam.getCamera();
+            this.followCam = followCam;
+        }
 
-        // workshop gets set as taget after it has loaded, use 0,0,0 in th emeantime
-        const followCam = new FollowCamera({
-            targetTransformVector : new Vector3(0,0,0),
-            renderer,
-            scene,
-            zoom: 15,
-            lerpFactor: 0.1,
-            offset: new Vector3(0, 25, 25), // 20 units above the player
-        });
-
-        this.camera = followCam.getCamera();
-        this.followCam = followCam;
-        this.scene.add( this.camera );
+        this.scene.add(this.camera);
 
         this.axeUpgradeController = new AxeUpgradeController({ camera : this.camera });
 
-        this.timeoutID = setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
+        this.timeoutID = setTimeout( ()=>{ 
+            this.followCam.setNewTarget( this.player.sphereMesh.position );
+        } , 2000 );
 
         // Handle window resize or rotation
         this.boundResizeListener = this.onResize.bind( this );
@@ -185,9 +235,11 @@ export class MistlandLumberjackApplication extends BaseScene{
         console.log("on resize " , window.innerWidth)
         const width = window.innerWidth;
         const height = window.innerHeight;
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
 
-        this.followCam.camera.aspect = width / height;
-        this.followCam.camera.updateProjectionMatrix();
+        this.this.camera.aspect = width / height;
+        this.this.camera.updateProjectionMatrix();
 
         this.renderer.setSize(width, height);
 
@@ -195,6 +247,74 @@ export class MistlandLumberjackApplication extends BaseScene{
     }
 
     skeletonsEnabled = false;
+    setupEnvironmentMap(renderer, scene) {
+        // Create a cube render target for the environment map
+        const cubeRenderTarget = new WebGLCubeRenderTarget(256, {
+            generateMipmaps: true,
+            minFilter: 3, // LinearMipmapLinearFilter
+            magFilter: 1  // LinearFilter
+        });
+
+        // Create a cube camera to capture the environment
+        const cubeCamera = new CubeCamera(0.1, 1000, cubeRenderTarget);
+        scene.add(cubeCamera);
+
+        // Create a simple gradient environment scene
+        const envScene = new Scene();
+        
+        // Create gradient background using scene.background with colors
+        // Sky gradient: light blue to darker blue
+        const skyColor = new Color(0x87CEEB); // Sky blue
+        const horizonColor = new Color(0x4682B4); // Steel blue
+        const groundColor = new Color(0x8FBC8F); // Dark sea green
+        
+        // Create a simple sphere geometry for the environment
+        const envGeometry = new SphereGeometry(500, 32, 16);
+        const envMaterial = new MeshBasicMaterial({
+            vertexColors: true,
+            side: 2 // BackSide
+        });
+
+        // Add vertex colors for gradient effect
+        const colors = [];
+        const positions = envGeometry.attributes.position;
+        
+        for (let i = 0; i < positions.count; i++) {
+            const y = positions.getY(i);
+            const normalizedY = (y + 500) / 1000; // Normalize to 0-1
+            
+            let color;
+            if (normalizedY > 0.5) {
+                // Upper hemisphere - sky gradient
+                const factor = (normalizedY - 0.5) * 2;
+                color = skyColor.clone().lerp(new Color(0x4169E1), factor); // Royal blue at top
+            } else {
+                // Lower hemisphere - ground gradient
+                const factor = normalizedY * 2;
+                color = groundColor.clone().lerp(horizonColor, factor);
+            }
+            
+            colors.push(color.r, color.g, color.b);
+        }
+        
+        envGeometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
+        
+        const envSphere = new Mesh(envGeometry, envMaterial);
+        envScene.add(envSphere);
+
+        // Render the environment map
+        cubeCamera.position.set(0, 0, 0);
+        cubeCamera.update(renderer, envScene);
+
+        // Set the environment map on the main scene
+        scene.environment = cubeRenderTarget.texture;
+        
+        // Store references for potential cleanup
+        this.cubeCamera = cubeCamera;
+        this.cubeRenderTarget = cubeRenderTarget;
+        this.envScene = envScene;
+    }
+
     // await layout complete callback as we'll need the adjusted world transforms for the lumbermill, trees and workshop for sensors
     onLayoutComplete()
     {
@@ -248,6 +368,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             playerBody: this.player.sphereBody,
             sensorType: "workshop"
          })
+        
         this.followCam.setNewTarget( this.workshop.parentObj.position );
 
         this.sensorsController = new SensorsController({ 
@@ -260,7 +381,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
         
 
-        if(this.skeletonsEnabled){
+        if(params.skeletons.value){
             this.Skeleton0 = new SkeletonController({
                 world: this.world,
                 scene: this.scene,
@@ -296,7 +417,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.axeUpgradeController.update(dt);
 
         // Update skeletons
-        if( this.skeletonsEnabled ){
+        if( params.skeletons.value ) {
             if (this.Skeleton0) this.Skeleton0.update(dt);
             if (this.Skeleton1) this.Skeleton1.update(dt);
             if (this.skeleton2) this.skeleton2.update(dt);
@@ -362,7 +483,6 @@ export class MistlandLumberjackApplication extends BaseScene{
 
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
                 this.timeoutID = setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
-
                 break;
             case "log_collected":
                 if(  this.sensorsController.currentTreeSensor ) this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
