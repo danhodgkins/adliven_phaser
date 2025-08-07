@@ -141,7 +141,10 @@ export class MistlandLumberjackApplication extends BaseScene{
             camera.lookAt(new Vector3(0, 0, 0));
             this.camera = camera;
             
-            // Create a mock followCam object that just tracks the target for lookAt
+            // Camera offset for following player on Z-axis
+            this.cameraZOffset = 12; // Distance behind player on Z-axis
+            
+            // Create a mock followCam object that follows player on Z-axis only
             this.followCam = {
                 targetPosition: new Vector3(0, 0, 0),
                 focusObject: null, // Track if we're focusing on a specific object
@@ -157,15 +160,17 @@ export class MistlandLumberjackApplication extends BaseScene{
                 
                 update: () => {
                     if (this.followCam.isFollowingPlayer && this.player?.sphereMesh) {
-                        // When following player, smoothly rotate on all axes to look at player
+                        // When following player, move camera along Z-axis only with offset
                         const playerPos = this.player.sphereMesh.position;
                         
-                        // Create a temporary camera to calculate the target rotation
-                        const tempCamera = this.camera.clone();
-                        tempCamera.lookAt(playerPos);
+                        // Keep X and Y fixed, only update Z position with offset
+                        const targetZ = playerPos.z + this.cameraZOffset;
                         
-                        // Smooth rotation interpolation on all axes
-                        this.camera.quaternion.slerp(tempCamera.quaternion, 0.05);
+                        // Smooth Z-axis movement
+                        this.camera.position.z += (targetZ - this.camera.position.z) * 0.05;
+                        
+                        // Always look at the player
+                        this.camera.lookAt(playerPos);
                     } else if (this.followCam.focusObject) {
                         // When focusing on a specific object, look directly at it
                         this.camera.lookAt(this.followCam.targetPosition);
@@ -231,7 +236,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         
         // Create gradient background using scene.background with colors
         // Sky gradient: light blue to darker blue
-        const skyColor = new Color(0x87CEEB); // Sky blue
+        const skyColor = new Color(0xFFFFFF); // Sky blue
         const horizonColor = new Color(0x4682B4); // Steel blue
         const groundColor = new Color(0x8FBC8F); // Dark sea green
         

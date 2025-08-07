@@ -61,7 +61,13 @@ export class FollowCamera {
         // // this.box.rotation.z += 0.01; // Rotate around Z-axis
 
         const desiredPos = new Vector3().addVectors(this.targetTransformVector, this.offset);
-        this.camera.position.lerp(desiredPos, this.lerpFactor);
+        
+        // Only follow on Z-axis with smooth lerping, keep X and Y position fixed
+        const targetZ = desiredPos.z;
+        const currentZ = this.camera.position.z;
+        
+        // Lerp only the Z position for smooth following with delay
+        this.camera.position.z += (targetZ - currentZ) * this.lerpFactor;
 
         // Keep fixed orientation — don't look at target
         // Optionally, you can lock lookAt to a fixed point or direction:
