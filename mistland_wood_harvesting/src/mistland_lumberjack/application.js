@@ -110,7 +110,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         
         var options = {           
             mode: "dynamic",   // 'dynamic', 'static' or 'semi'
-            color: "blue"
+            color: "blue",
+            // zone: document.getElementById('zone_joystick'), // Your container
         };
         
         var joystick = nipplejs.create(options);
@@ -238,8 +239,8 @@ export class MistlandLumberjackApplication extends BaseScene{
             this.camera.aspect = width / height;
             this.camera.updateProjectionMatrix();
 
-        this.this.camera.aspect = width / height;
-        this.this.camera.updateProjectionMatrix();
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
 
         this.renderer.setSize(width, height);
 
@@ -461,7 +462,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.workshop.reveal();
 
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
-                setTimeout( ()=>{ this.onSceneComplete() } , 2000 );
+                setTimeout( ()=>{ this.onSceneComplete() } , 4000 );
             }
         }
     }

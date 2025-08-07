@@ -22,37 +22,56 @@ export default class WorkshopController{
         const parentObj = new Object3D();
         parentObj.position.copy( this.clonedPosition );
         this.scene.add( parentObj );
+
+        const whiteoutModel = model.clone();
         parentObj.add( model );
-        parentObj.traverse((child) => {
+        parentObj.add( whiteoutModel );
+
+        // get reference to models material so we can fade the transparecy
+        model.traverse((child) => {
+            if (child.isMesh) {
+                console.log("model mesh = "  , child.material)
+                this.materialToFadeIn = child.material;
+                this.materialToFadeIn.transparent =true;
+                this.materialToFadeIn.opacity =0;
+            }
+        });
+        
+
+       // replace material of clone for whiteout material
+        whiteoutModel.traverse((child) => {
             if (child.isMesh) {
                 const oldMat = child.material;
                 const outlineMesh = child.clone();
-                        outlineMesh.material = new MeshBasicMaterial({
-                            color: new Color(1, 1, 0), // Yellow
-                            side: FrontSide,
-                            depthTest: true,
-                            depthWrite: true,
-                        });
-                        outlineMesh.scale.multiplyScalar(1.05); // Make larger for outline
-                        //outlineMesh.position.y += 0.001; // Move slightly forward to ensure it's in front
-                        // Add outline to the same parent as the original mesh
-                        child.parent.add(outlineMesh);
-                        
-                        // Create the main white material
-                        child.material = new MeshBasicMaterial({
-                            color: new Color(1, 1, 1), // Solid white
-                            side: oldMat.side,
-                            depthTest: false, // Disable depth testing to render on top
-                            depthWrite: false, // Don't write to depth buffer
-                        });
-                        
-                        // Move white mesh slightly forward to ensure it's in front
-                        child.position.z += 0.001;
+                    outlineMesh.material = new MeshBasicMaterial({
+                        color: new Color(1, 1, 0), // Yellow
+                        side: FrontSide,
+                        depthTest: true,
+                        depthWrite: true,
+                    });
+                    outlineMesh.scale.multiplyScalar(1.05); // Make larger for outline
+                    //outlineMesh.position.y += 0.001; // Move slightly forward to ensure it's in front
+                    // Add outline to the same parent as the original mesh
+                    child.parent.add(outlineMesh);
+                    
+                    // Create the main white material
+                    child.material = new MeshBasicMaterial({
+                        color: new Color(1, 1, 1), // Solid white
+                        side: oldMat.side,
+                        depthTest: false, // Disable depth testing to render on top
+                        depthWrite: false, // Don't write to depth buffer
+                    });
+                    
+                    // Move white mesh slightly forward to ensure it's in front
+                    child.position.z += 0.001;
             }
         });
 
         parentObj.scale.set(0, 0, 0);
         model.position.set(0, 0, 0);
+        whiteoutModel.position.set(0, 0, 0);
+        this.whiteoutModel = whiteoutModel;
+
         this.parentObj = parentObj;
 
 
@@ -93,7 +112,17 @@ export default class WorkshopController{
 
     reveal()
     {
+        this.whiteoutModel.scale.set(0, 0, 0);
         console.log("reveal");
+
+        const params = { opacity: 0 };
+
+        this.fadeInTween = new Tween( params )
+        .to( { opacity: 1 }, 500 ).onUpdate(()=>{
+            this.materialToFadeIn.opacity = params.opacity;
+        }).onComplete( ()=>{
+            console.log("fade in complete");
+        }).start();
     }
 
     unlock()
@@ -114,6 +143,7 @@ export default class WorkshopController{
 
     update(dt){
         if( this.scaleUpTween ) this.scaleUpTween.update();
+        if( this.fadeInTween ) this.fadeInTween.update();
         this.sensor.update();
     }
 }
