@@ -196,11 +196,17 @@ export class MistlandLumberjackApplication extends BaseScene{
                         // Smooth Z-axis movement
                         this.camera.position.z += (targetZ - this.camera.position.z) * 0.05;
                         
-                        // Always look at the player
-                        this.camera.lookAt(playerPos);
+                        // Smoothly look at the player using slerp
+                        const tempCamera = this.camera.clone();
+                        tempCamera.lookAt(playerPos);
+                        this.camera.quaternion.slerp(tempCamera.quaternion, 0.05);
                     } else if (this.followCam.focusObject) {
-                        // When focusing on a specific object, look directly at it
-                        this.camera.lookAt(this.followCam.targetPosition);
+                        // When focusing on a specific object, smoothly rotate towards it
+                        const tempCamera = this.camera.clone();
+                        tempCamera.lookAt(this.followCam.targetPosition);
+                        
+                        // Smooth rotation interpolation towards the target
+                        this.camera.quaternion.slerp(tempCamera.quaternion, 0.05);
                     }
                 },
                 
