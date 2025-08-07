@@ -25,6 +25,10 @@ export class MistlandLumberjackUIController {
         
     }
 
+    destroy(){
+
+    }
+
     update( dt )
     {
         if( this.progressBar ) this.progressBar.update( dt );

@@ -7,6 +7,7 @@ export default StartGame;
 import SceneManager from '../scene/scenemanager.js';
 import { MistlandLumberjackApplication } from '../mistland_lumberjack/application.js';
 import { Application, Container, Graphics } from 'pixi.js';
+import CTAScene from '../cta/cta_scene.js';
 
 export class GameApplication {
     constructor({ parent }) {
@@ -24,8 +25,14 @@ export class GameApplication {
                     parent: parent,
                     pixiApp : app
                 }
+            }),
+            new CTAScene({
+                config: {
+                    id: 'cta', 
+                    parent: parent
+                }
             })
-        ]); 
+        ], parent ); 
 
         this.boundUpdate = this.update.bind(this);
         requestAnimationFrame(this.boundUpdate );
