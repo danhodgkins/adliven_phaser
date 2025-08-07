@@ -216,6 +216,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 zoom: 15,
                 lerpFactor: 0.1,
                 offset: new Vector3(0, 25, 25), // 20 units above the player
+                mode: 'isometric' // Change to 'orthographic' for Z-only movement
             });
             
             this.camera = followCam.getCamera();

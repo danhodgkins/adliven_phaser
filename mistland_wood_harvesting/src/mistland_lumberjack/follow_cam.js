@@ -1,12 +1,13 @@
 import { BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, OrthographicCamera, Vector3 } from 'three';
 
 export class FollowCamera {
-    constructor({ targetTransformVector , renderer, zoom = 10, lerpFactor = 0.1, offset = new Vector3(0, 5, 0) }) {
+    constructor({ targetTransformVector , renderer, zoom = 10, lerpFactor = 0.1, offset = new Vector3(0, 5, 0), mode = 'orthographic' }) {
         this.targetTransformVector = targetTransformVector;
         this.renderer = renderer;
         this.zoom = zoom;
         this.lerpFactor = lerpFactor;
         this.offset = offset;
+        this.mode = mode; // 'orthographic' or 'isometric'
 
         const aspect = window.innerWidth / window.innerHeight;
         this.camera = new OrthographicCamera(
@@ -62,13 +63,25 @@ export class FollowCamera {
 
         const desiredPos = new Vector3().addVectors(this.targetTransformVector, this.offset);
         
-        // Only follow on Z-axis with smooth lerping, keep X and Y position fixed
-        const targetZ = desiredPos.z;
-        const currentZ = this.camera.position.z;
+        if (this.mode === 'isometric') {
+            // Isometric mode: follow on both X and Z axes with smooth lerping, keep Y position fixed
+            const targetX = desiredPos.x;
+            const targetZ = desiredPos.z;
+            const currentX = this.camera.position.x;
+            const currentZ = this.camera.position.z;
+            
+            // Lerp both X and Z positions for smooth following with delay
+            this.camera.position.x += (targetX - currentX) * this.lerpFactor;
+            this.camera.position.z += (targetZ - currentZ) * this.lerpFactor;
+        } else {
+            // Orthographic mode: only follow on Z-axis with smooth lerping, keep X and Y position fixed
+            const targetZ = desiredPos.z;
+            const currentZ = this.camera.position.z;
+            
+            // Lerp only the Z position for smooth following with delay
+            this.camera.position.z += (targetZ - currentZ) * this.lerpFactor;
+        }
         
-        // Lerp only the Z position for smooth following with delay
-        this.camera.position.z += (targetZ - currentZ) * this.lerpFactor;
-
         // Keep fixed orientation — don't look at target
         // Optionally, you can lock lookAt to a fixed point or direction:
         // this.camera.lookAt(this.camera.position.clone().sub(this.offset));
