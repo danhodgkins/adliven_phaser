@@ -231,7 +231,7 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.scene.add(this.camera);
 
-        this.axeUpgradeController = new AxeUpgradeController({ camera : this.camera, isPerspective: params.perspectiveCamera.value });
+        this.axeUpgradeController = new AxeUpgradeController({ camera : this.camera });
 
         this.timeoutID = setTimeout( ()=>{ 
             this.followCam.setNewTarget( this.player.sphereMesh.position );

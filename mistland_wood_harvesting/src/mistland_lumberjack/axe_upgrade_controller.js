@@ -6,7 +6,7 @@ import { Easing, Tween } from "@tweenjs/tween.js";
 export class AxeUpgradeController{ 
 
     timeoutID = -1;
-    constructor( { camera, isPerspective = false } ){
+    constructor( { camera } ){
         this.parentObj = new Object3D();
         this.parentObj.scale.set(0,0,0);
 
@@ -15,7 +15,7 @@ export class AxeUpgradeController{
             Axe, 
             (e) => {
                                  
-                if( isPerspective ){
+                if( params.perspectiveCamera.value ){
                     e.scene.scale.set( 3,3,3);
                 }else {
                     e.scene.scale.set( 10,10,10);
