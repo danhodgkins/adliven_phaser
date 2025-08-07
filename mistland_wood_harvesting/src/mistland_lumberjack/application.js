@@ -130,8 +130,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.boundOnPlayerEvent = this.onPlayerEvent.bind(this);
         this.player.addEventListener('player_event', this.boundOnPlayerEvent );
         
-        var usePerspectiveCamera = false;
-        if (usePerspectiveCamera) {
+        
+        if (params.perspectiveCamera.value) {
             // Create a simple perspective camera
             const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 10, 6);
@@ -210,7 +210,6 @@ export class MistlandLumberjackApplication extends BaseScene{
             if( this.uiController ) this.uiController.onResize();
         });
     }
-    skeletonsEnabled = false;
     // await layout complete callback as we'll need the adjusted world transforms for the lumbermill, trees and workshop for sensors
     onLayoutComplete()
     {
@@ -277,7 +276,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
         
 
-        if(this.skeletonsEnabled){
+        if(params.skeletons.value){
             this.Skeleton0 = new SkeletonController({
                 world: this.world,
                 scene: this.scene,
@@ -313,7 +312,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.axeUpgradeController.update(dt);
 
         // Update skeletons
-        if( this.skeletonsEnabled ){
+        if( params.skeletons.value ) {
             if (this.Skeleton0) this.Skeleton0.update(dt);
             if (this.Skeleton1) this.Skeleton1.update(dt);
             if (this.skeleton2) this.skeleton2.update(dt);
