@@ -1,4 +1,5 @@
 body {
+    /* position: relative; */
     margin: 0;
     padding: 0;
     color: rgba(255, 255, 255, 0.87);
@@ -33,6 +34,37 @@ h1 {
     justify-content: start;
     /* align-items: end; */
     pointer-events: none; /* Allow clicks to pass through */
+}
+
+#ui-overlay-cta{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    /* align-items: end; */
+    pointer-events: none; /* Allow clicks to pass through */
+}
+
+#cta-button-container{
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3em;
+}
+
+#cta-logo-container{
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    margin: 1em;
+}
+
+#cta-logo-container img{
+    width : 80%; 
 }
 
 #pixi-container{
@@ -89,9 +121,9 @@ h1 {
 }
 
 #zone_joystick{
-    position: absolute;
+    /* position: absolute;
     width: 100dvw;
-    height: 100dvh;
+    height: 100dvh; */
 }
 
 #header-container{
@@ -104,4 +136,39 @@ h1 {
     margin: 5px;
     max-height: 50px;
     width: auto;
+}
+
+@media (orientation: landscape) {
+
+    #ui-overlay-cta{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        /* align-items: end; */
+        /* pointer-events: none; Allow clicks to pass through */
+    }
+
+    #cta-button-container{
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        margin-bottom: 3em;
+    }
+
+    #cta-logo-container{
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        margin: 1em;
+    }
+
+    #cta-logo-container img{
+        width : 80%; 
+    }
+
 }

@@ -1,5 +1,6 @@
-export default class BaseScene {
+export default class BaseScene extends EventTarget{
     constructor({config}) {
+        super();
         this.config = config;        
     }
 
@@ -10,5 +11,16 @@ export default class BaseScene {
     init()
     {
         
+    }
+
+    destroy(){
+
+    }
+
+    onSceneComplete(){
+        const event = new CustomEvent("scene_complete", {detail: {
+            sceneID: this.sceneID
+        }});
+        this.dispatchEvent( event );
     }
 } 

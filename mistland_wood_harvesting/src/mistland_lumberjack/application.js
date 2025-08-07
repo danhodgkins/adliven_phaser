@@ -38,9 +38,33 @@ export class MistlandLumberjackApplication extends BaseScene{
                 uiLayerElement : document.getElementById("ui-overlay"),
                 applicationModel : this.applicationModel 
             });
+
+        // hide ctaOverlay
+        const ctaOverlay = document.getElementById("ui-overlay-cta");
+        ctaOverlay.style.display = 'none'; // Hides the element and removes it from the layout
+    }
+
+    destroy()
+    {
+        super.destroy();
+        this.uiController.destroy();
+        this.joystick.destroy();
+
+        window.removeEventListener('resize', this.boundResizeListener );
+
+        // being lazy as we dont have to replay the scene
+        this.pixiApp.destroy(true, {
+            children: true,
+            texture: true,
+            baseTexture: true,
+        });
     }
 
     init(){
+
+        // debug test cta screen
+        //setTimeout( ()=>{ this.onSceneComplete() } , 1000 );
+
         const scene = new Scene();
         this.scene = scene;
 
@@ -86,12 +110,15 @@ export class MistlandLumberjackApplication extends BaseScene{
         
         var options = {           
             mode: "dynamic",   // 'dynamic', 'static' or 'semi'
-            color: "blue"
+            color: "blue",
+            // zone: document.getElementById('zone_joystick'), // Your container
         };
         
+        var joystick = nipplejs.create(options);
+        this.joystick = joystick;
+
         this.joystickInput = { x: 0, y: 0, rotation: 0 };  
              
-        var joystick = nipplejs.create(options);
         joystick.on('move', (evt, data) => {
             const rad = data.angle.radian;
             const dist = Math.min(data.distance / 50, 1); // Normalize to max speed
@@ -204,21 +231,28 @@ export class MistlandLumberjackApplication extends BaseScene{
         } , 2000 );
 
         // Handle window resize or rotation
-        window.addEventListener('resize', () => {
+        this.boundResizeListener = this.onResize.bind( this );
 
-            console.log("on resize " , window.innerWidth)
-            const width = window.innerWidth;
-            const height = window.innerHeight;
+        window.addEventListener('resize', this.boundResizeListener );
+    }
 
+    onResize()
+    {
+        console.log("on resize " , window.innerWidth)
+        const width = window.innerWidth;
+        const height = window.innerHeight;
             this.camera.aspect = width / height;
             this.camera.updateProjectionMatrix();
 
-            renderer.setSize(width, height);
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
 
-            if( this.uiController ) this.uiController.onResize();
-        });
+        this.renderer.setSize(width, height);
+
+        if( this.uiController ) this.uiController.onResize();       
     }
 
+    skeletonsEnabled = false;
     setupEnvironmentMap(renderer, scene) {
         // Create a cube render target for the environment map
         const cubeRenderTarget = new WebGLCubeRenderTarget(256, {
@@ -431,6 +465,9 @@ export class MistlandLumberjackApplication extends BaseScene{
             if( this.applicationModel.gemCount >= getParamsNumberByID("gemsNeeded") )
             {
                 this.workshop.reveal();
+
+                if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
+                setTimeout( ()=>{ this.onSceneComplete() } , 4000 );
             }
         }
     }
