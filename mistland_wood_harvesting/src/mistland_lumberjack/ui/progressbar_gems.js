@@ -1,11 +1,10 @@
-import { Assets, Container, Graphics, Sprite } from 'pixi.js';
+import { Assets, Container, Graphics, Loader, Sprite } from 'pixi.js';
 import { bar } from '../../../media/pngs_bar.png.js';
 import { bar_fill } from '../../../media/pngs_bar_fill.png.js';
 import { bar_sparkles } from '../../../media/pngs_bar_sparkles.png.js';
 import { icon_gem } from '../../../media/pngs_icon_gem.png.js';
 
 export default class ProgressBarGems{
-
 
     constructor( { pixiApp, applicationModel })
     {
@@ -16,61 +15,53 @@ export default class ProgressBarGems{
         this.currentGems = 0;
         this.targetFillRatio = 0;
         this.currentFillRatio = 0;
-        this.progressBarContainer = new Container({     
-
-        });
-
-        // console.log("pixiApp.stage.width ", pixiApp.stage.width, window.innerWidth);
-        
+        this.progressBarContainer = new Container({ });        
         this.initSprites();
     }
 
     async initSprites()
     {
         const barBGTexture = await Assets.load(bar);
-        const barBGSprite = new Sprite({ texture : barBGTexture });
-        this.progressBarContainer.addChild(barBGSprite);
+        const barBGSprite = Sprite.from(barBGTexture);
 
+        this.progressBarContainer.addChild(barBGSprite);
+        
         this.fillBarSpacer = 3;
         const barFillTexture = await Assets.load(bar_fill);
-        const barFillSprite = new Sprite({ 
-            x : this.fillBarSpacer,
-            y : this.fillBarSpacer,
-            texture : barFillTexture,
-            anchor: {
+        const barFillSprite = Sprite.from(barFillTexture);
+        barFillSprite.x = this.fillBarSpacer;
+        barFillSprite.y = this.fillBarSpacer;
+        barFillSprite.anchor = {
                 x: 1,  // Right-aligned
                 y: 0   // Top-aligned
-            }
-        });
-
+            };
+            
+        
         this.barFillSprite = barFillSprite;
         this.progressBarContainer.addChild(barFillSprite);
 
-        // mask 
-        const mask = new Graphics();
-        mask.roundRect(
-            this.fillBarSpacer, 
-            this.fillBarSpacer, 
-            barBGTexture.width, 
-            barBGTexture.height - this.fillBarSpacer , 
-            20); // 10 = corner radius
-
-        mask.fill(0x00ff00);
-        this.progressBarContainer.addChild(mask);
-        this.barFillSprite.mask = mask;
+        // Create a new Graphics object for the mask
+        const graphics = new Graphics();
+        // Set fill color (optional: add line style)
+        graphics.beginFill(0xff9900); // orange
+        // Draw rounded rectangle (x, y, width, height, radius)
+        graphics.drawRoundedRect( this.fillBarSpacer, this.fillBarSpacer, barBGTexture.width, barBGTexture.height - this.fillBarSpacer, 20);
+        // End fill
+        graphics.endFill();
 
         // gem decoration
         const gemTexture = await Assets.load(icon_gem);
-        const gemSprite = new Sprite({ 
-            x : -30,
-            y : -10, 
-            texture : gemTexture,
-            scale : {
+        const gemSprite = Sprite.from(gemTexture);
+        gemSprite.x = -30;
+        gemSprite.y = -10;
+        gemSprite.scale = {
                 x:0.5,
                 y:0.5
             }
+        
+        this.progressBarContainer.addChild(graphics);
+        this.barFillSprite.mask = graphics;
 
-        });
         this.progressBarContainer.addChild(gemSprite);
         this.onResize();
     }

@@ -140,11 +140,11 @@ function onLoad( e, scene, layoutParent,  element  )
             if (child.isMesh) {
                 child.castShadow = true;
                 child.receiveShadow = true;
-                console.log("Setting castShadow and receiveShadow for", element.Name, child.name);
+                //console.log("Setting castShadow and receiveShadow for", element.Name, child.name);
                 // Replace MeshBasicMaterial with MeshStandardMaterial for better quality
 
                 const oldMat = child.material;
-                console.log("Replacing MeshBasicMaterial with MeshStandardMaterial for", element.Name, child.name);
+                //console.log("Replacing MeshBasicMaterial with MeshStandardMaterial for", element.Name, child.name);
                 if (element.Name === "Gearshop"){
                     // Create yellow outline by duplicating the mesh
                     
