@@ -1,9 +1,11 @@
 import { Body, Material,  Sphere, Vec3 } from "cannon-es";
-import { SphereGeometry, Quaternion, Mesh, MeshStandardMaterial, Object3D, Euler, Vector3, EventDispatcher } from "three";
+import { SphereGeometry, Quaternion, Mesh, MeshStandardMaterial, Object3D, Euler, Vector3, EventDispatcher, TextureLoader, PlaneGeometry, MeshBasicMaterial, DoubleSide } from "three";
 import { Hero_avatar } from '../../media/Hero_avatar.glb.js';
 import { Log_Single } from "../../media/Log_Single.glb.js";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import GlbController from "./glb_controller.js";
+import { wood_icon } from '../../media/img_wood_icon.webp.js';
+import { degToRad } from "three/src/math/MathUtils.js";
 
 const logSpacing = 0.3;
 export class Player extends EventDispatcher {
@@ -67,6 +69,27 @@ export class Player extends EventDispatcher {
                 undefined, 
                 (e) => { console.error("error loading model", e); }
             );
+
+            /// direction marker
+            const tloader = new TextureLoader();
+    
+            const texture = tloader.load(wood_icon, () => {
+                texture.needsUpdate = true;
+                const geometry = new PlaneGeometry(1, 1); // Width and height
+                const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : true  });
+                const plane = new Mesh(geometry, material);
+    
+                // the model rotation is not visually aliging the texcture so manually set it for now
+                // plane.rotation.copy( rotation );
+                // const rotationY = degToRad(61);
+                // plane.rotation.y = rotationY;
+                plane.rotateX(degToRad(270));
+                plane.position.copy( this.sphereMesh.position );
+                plane.position.y +=0.1;
+                this.scene.add(plane);
+                
+                this.directionMarker = plane;
+            });  
         }
 
         upgradeAxe()
@@ -101,6 +124,11 @@ export class Player extends EventDispatcher {
     
             this.currentState = newState;
         }
+
+        setHintVector( vec )
+        {
+            this.hintVector = vec ;
+        }
         
         startChopping()
         {
@@ -127,6 +155,15 @@ export class Player extends EventDispatcher {
             
             // Sync mesh with physics body
             sphereMesh.position.copy(sphereBody.position);
+            if( this.directionMarker )
+            {
+                this.directionMarker.position.copy(sphereBody.position);
+                // up it a litle so it clears the ground
+                this.directionMarker.position.y +=0.5;
+
+                console.log("this.hintVector " , this.hintVector );
+                if( this.hintVector ) this.directionMarker.lookAt( this.hintVector );
+            } 
             
             if( !this.glbController ) return;
 

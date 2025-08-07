@@ -1,6 +1,7 @@
 
 import { DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, PlaneGeometry, TextureLoader, Color, BackSide, FrontSide } from "three";
 import { lock } from '../../media/pngs_lock.png.js';
+// import { locked_area } from '../../media/img_locked_area.webp.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Easing, Tween } from "@tweenjs/tween.js";
 import { SensorZone } from "./sensors/sensor.js";
@@ -82,7 +83,7 @@ export default class WorkshopController{
         const texture = loader.load(lock, () => {
             texture.needsUpdate = true;
             const geometry = new PlaneGeometry(8, 8); // Width and height
-            const material = new MeshBasicMaterial({ map: texture, side: DoubleSide });
+            const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : true  });
             const plane = new Mesh(geometry, material);
 
             // the model rotation is not visually aliging the texcture so manually set it for now
@@ -91,6 +92,7 @@ export default class WorkshopController{
             plane.rotation.y = rotationY;
             plane.rotateX(degToRad(270));
             plane.position.copy( this.clonedPosition );
+            plane.position.y +=0.5;
             this.scene.add(plane);
             this.texturedPlane = plane;
         });        
@@ -104,7 +106,7 @@ export default class WorkshopController{
             playerBody: playerBody, 
             color: 0xff00ff,
             sensorType : sensorType,
-            visible : true
+            visible : false
         })
 
         this.sensor = sensor;
