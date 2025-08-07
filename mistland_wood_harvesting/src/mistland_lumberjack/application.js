@@ -1,6 +1,6 @@
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import BaseScene from "../scene/basescene";
-import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3, DirectionalLight } from "three/src/Three.Core.js";
+import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3, DirectionalLight, WebGLCubeRenderTarget, CubeCamera, Color, Float32BufferAttribute } from "three/src/Three.Core.js";
 import { MistlandLumberjackUIController } from "./ui_controller";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
@@ -74,6 +74,9 @@ export class MistlandLumberjackApplication extends BaseScene{
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
         this.renderer = renderer;
+
+        // Create gradient environment map for reflections
+        this.setupEnvironmentMap(renderer, scene);
 
         // layout scene 
         this.boundOnLayoutComplete = this.onLayoutComplete.bind( this );
@@ -210,6 +213,75 @@ export class MistlandLumberjackApplication extends BaseScene{
             if( this.uiController ) this.uiController.onResize();
         });
     }
+
+    setupEnvironmentMap(renderer, scene) {
+        // Create a cube render target for the environment map
+        const cubeRenderTarget = new WebGLCubeRenderTarget(256, {
+            generateMipmaps: true,
+            minFilter: 3, // LinearMipmapLinearFilter
+            magFilter: 1  // LinearFilter
+        });
+
+        // Create a cube camera to capture the environment
+        const cubeCamera = new CubeCamera(0.1, 1000, cubeRenderTarget);
+        scene.add(cubeCamera);
+
+        // Create a simple gradient environment scene
+        const envScene = new Scene();
+        
+        // Create gradient background using scene.background with colors
+        // Sky gradient: light blue to darker blue
+        const skyColor = new Color(0x87CEEB); // Sky blue
+        const horizonColor = new Color(0x4682B4); // Steel blue
+        const groundColor = new Color(0x8FBC8F); // Dark sea green
+        
+        // Create a simple sphere geometry for the environment
+        const envGeometry = new SphereGeometry(500, 32, 16);
+        const envMaterial = new MeshBasicMaterial({
+            vertexColors: true,
+            side: 2 // BackSide
+        });
+
+        // Add vertex colors for gradient effect
+        const colors = [];
+        const positions = envGeometry.attributes.position;
+        
+        for (let i = 0; i < positions.count; i++) {
+            const y = positions.getY(i);
+            const normalizedY = (y + 500) / 1000; // Normalize to 0-1
+            
+            let color;
+            if (normalizedY > 0.5) {
+                // Upper hemisphere - sky gradient
+                const factor = (normalizedY - 0.5) * 2;
+                color = skyColor.clone().lerp(new Color(0x4169E1), factor); // Royal blue at top
+            } else {
+                // Lower hemisphere - ground gradient
+                const factor = normalizedY * 2;
+                color = groundColor.clone().lerp(horizonColor, factor);
+            }
+            
+            colors.push(color.r, color.g, color.b);
+        }
+        
+        envGeometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
+        
+        const envSphere = new Mesh(envGeometry, envMaterial);
+        envScene.add(envSphere);
+
+        // Render the environment map
+        cubeCamera.position.set(0, 0, 0);
+        cubeCamera.update(renderer, envScene);
+
+        // Set the environment map on the main scene
+        scene.environment = cubeRenderTarget.texture;
+        
+        // Store references for potential cleanup
+        this.cubeCamera = cubeCamera;
+        this.cubeRenderTarget = cubeRenderTarget;
+        this.envScene = envScene;
+    }
+
     // await layout complete callback as we'll need the adjusted world transforms for the lumbermill, trees and workshop for sensors
     onLayoutComplete()
     {
