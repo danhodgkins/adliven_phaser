@@ -17,6 +17,7 @@ import layoutData from "./data/layout.json"
 import { layoutSceneHelper } from "../utils/layout";
 import CannonDebugger from "cannon-es-debugger";
 import { AxeUpgradeController } from "./axe_upgrade_controller";
+import HintManager from "./ui/hint_controller";
 
 export class MistlandLumberjackApplication extends BaseScene{
 
@@ -49,6 +50,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         super.destroy();
         this.uiController.destroy();
         this.joystick.destroy();
+        this.hintManager.destroy();
 
         window.removeEventListener('resize', this.boundResizeListener );
 
@@ -159,6 +161,12 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.boundOnPlayerEvent = this.onPlayerEvent.bind(this);
         this.player.addEventListener('player_event', this.boundOnPlayerEvent );
+
+        this.hintManager = new HintManager({ 
+            playerController : this.player, 
+            pixiApp : this.pixiApp ,
+            joystick : this.joystick
+        })
         
         
         if (params.perspectiveCamera.value) {
@@ -257,6 +265,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.renderer.setSize(width, height);
 
         if( this.uiController ) this.uiController.onResize();       
+        if( this.hintManager ) this.hintManager.onResize();
     }
 
     skeletonsEnabled = false;
@@ -374,6 +383,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         });
         this.lumberMillZone = lumberMillZone;
 
+        this.player.setHintVector( this.lumberMillZone.sensor.mesh.position );
+
         // workshop
         this.workshop = new WorkshopController({ 
             scene:this.scene , 
@@ -428,6 +439,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.player.setInput(this.joystickInput.x, this.joystickInput.y, this.joystickInput.rotation);
         this.player.update(dt);
         this.axeUpgradeController.update(dt);
+        this.hintManager.update( dt );
 
         // Update skeletons
         if( params.skeletons.value ) {
@@ -472,6 +484,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             if( this.applicationModel.gemCount >= getParamsNumberByID("gemsNeeded") )
             {
                 this.workshop.reveal();
+                this.workshop.disable();
 
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
                 setTimeout( ()=>{ this.onSceneComplete() } , 4000 );

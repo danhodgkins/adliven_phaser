@@ -75,8 +75,8 @@ export class Player extends EventDispatcher {
     
             const texture = tloader.load(wood_icon, () => {
                 texture.needsUpdate = true;
-                const geometry = new PlaneGeometry(1, 1); // Width and height
-                const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : true  });
+                const geometry = new PlaneGeometry(3, 3); // Width and height
+                const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : false, wireframe: true   });
                 const plane = new Mesh(geometry, material);
     
                 // the model rotation is not visually aliging the texcture so manually set it for now
@@ -128,6 +128,7 @@ export class Player extends EventDispatcher {
         setHintVector( vec )
         {
             this.hintVector = vec ;
+            console.log("this.hintVector " , this.hintVector );
         }
         
         startChopping()
@@ -161,8 +162,15 @@ export class Player extends EventDispatcher {
                 // up it a litle so it clears the ground
                 this.directionMarker.position.y +=0.5;
 
-                console.log("this.hintVector " , this.hintVector );
-                if( this.hintVector ) this.directionMarker.lookAt( this.hintVector );
+                // console.log("this.hintVector " , this.hintVector );
+                if( this.hintVector )
+                    {
+                        // Example usage in your render loop:
+                        faceTargetFlat(this.directionMarker, this.hintVector );
+
+                        //this.directionMarker.lookAt( this.hintVector );
+                        //this.directionMarker.rotateX(degToRad(270));
+                    } 
             } 
             
             if( !this.glbController ) return;
@@ -378,4 +386,35 @@ export class Player extends EventDispatcher {
                });
            }
        }
+    }
+
+    // function faceTargetFlat(object, target) {
+    //     // Get direction vector in world space
+    //     const dx = target.x - object.position.x;
+    //     const dz = target.z - object.position.z;
+
+    //     // Calculate rotation in yaw only
+    //     const angle = Math.atan2(dx, dz);
+
+    //     // Set rotation so plane stays flat (only Y rotation changes)
+    //     object.rotation.set(0, angle, 0);
+    // }
+
+    function faceTargetFlat(object, target) {
+        // Get world positions
+        const objPos = new Vector3().copy(object.position);
+        const targetPos = new Vector3().copy(target);
+
+        // Ignore Y difference (force same height)
+        targetPos.y = objPos.y;
+
+        // Compute the direction vector
+        const dir = new Vector3().subVectors(targetPos, objPos);
+
+        // Calculate yaw angle (around Y axis)
+        const angle = Math.atan2(dir.x, dir.z);
+
+        // Apply only yaw rotation, keep pitch/roll at 0
+        object.rotation.set(0, angle, 0);
+        object.rotateX(degToRad(270));
     }

@@ -112,6 +112,12 @@ export default class WorkshopController{
         this.sensor = sensor;
     }
 
+    // stop sensor events firing after user has entered for final time
+    disable()
+    {
+        this.sensor.deactivate();
+    }
+
     reveal()
     {
         this.whiteoutModel.scale.set(0, 0, 0);
