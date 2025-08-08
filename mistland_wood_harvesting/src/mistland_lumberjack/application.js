@@ -18,6 +18,7 @@ import { layoutSceneHelper } from "../utils/layout";
 import CannonDebugger from "cannon-es-debugger";
 import { AxeUpgradeController } from "./axe_upgrade_controller";
 import HintManager from "./ui/hint_controller";
+import { GemAnimator } from "./ui/gem_animator";
 
 export class MistlandLumberjackApplication extends BaseScene{
 
@@ -112,7 +113,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         
         var options = {           
             mode: "dynamic",   // 'dynamic', 'static' or 'semi'
-            color: "blue",
+            color: "white",
+            size : 200
             // zone: document.getElementById('zone_joystick'), // Your container
         };
         
@@ -168,6 +170,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             joystick : this.joystick,
             applicationModel : this.applicationModel
         })
+
         
         
         if (params.perspectiveCamera.value) {
@@ -239,6 +242,9 @@ export class MistlandLumberjackApplication extends BaseScene{
         }
 
         this.scene.add(this.camera);
+
+        this.gemAnimator = new GemAnimator({ scene : this.scene, camera : this.camera });
+        
 
         this.axeUpgradeController = new AxeUpgradeController({ camera : this.camera });
 
@@ -441,6 +447,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.player.update(dt);
         this.axeUpgradeController.update(dt);
         this.hintManager.update( dt );
+        this.gemAnimator.update( dt );
 
         // Update skeletons
         if( params.skeletons.value ) {
@@ -521,7 +528,8 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "lumbermill_tick":
                 this.player.playLoseLogAnim( this.lumberMillZone.model.position );
                 this.uiController.updateUI();
-                break
+                this.gemAnimator.from3Dto2D( this.lumberMillZone.model.position );
+                break;
         }
     }
 
