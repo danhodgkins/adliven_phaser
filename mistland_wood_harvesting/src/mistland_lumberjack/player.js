@@ -4,7 +4,7 @@ import { Hero_avatar } from '../../media/Hero_avatar.glb.js';
 import { Log_Single } from "../../media/Log_Single.glb.js";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import GlbController from "./glb_controller.js";
-import { wood_icon } from '../../media/img_wood_icon.webp.js';
+import { arrow_plane } from '../../media/img_arrow_plane.webp.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 
 const logSpacing = 0.3;
@@ -73,10 +73,11 @@ export class Player extends EventDispatcher {
             /// direction marker
             const tloader = new TextureLoader();
     
-            const texture = tloader.load(wood_icon, () => {
+            const texture = tloader.load(arrow_plane, () => {
                 texture.needsUpdate = true;
-                const geometry = new PlaneGeometry(3, 3); // Width and height
-                const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : false, wireframe: true   });
+                const geometry = new PlaneGeometry(6, 6); // Width and height
+                const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : true   });
+                // const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : false, wireframe: true   });
                 const plane = new Mesh(geometry, material);
     
                 // the model rotation is not visually aliging the texcture so manually set it for now
@@ -85,11 +86,23 @@ export class Player extends EventDispatcher {
                 // plane.rotation.y = rotationY;
                 plane.rotateX(degToRad(270));
                 plane.position.copy( this.sphereMesh.position );
-                plane.position.y +=0.1;
+                plane.position.y +=0.3;
                 this.scene.add(plane);
                 
                 this.directionMarker = plane;
+
+                this.hideHintArrow();
             });  
+        }
+
+        showHintArrow()
+        {
+            this.directionMarker.visible = true;
+        }
+        
+        hideHintArrow()
+        {
+            this.directionMarker.visible = false;
         }
 
         upgradeAxe()

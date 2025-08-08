@@ -16,6 +16,7 @@ import { Hill } from '../../media/Hill.glb.js';
 import { House_blue } from '../../media/House_blue.glb.js';
 import { House_red } from '../../media/House_red.glb.js';
 import { arrow } from '../../media/img_arrow.webp.js';
+import { arrow_plane } from '../../media/img_arrow_plane.webp.js';
 import { axe_blur } from '../../media/img_axe_blur.webp.js';
 import { axe_upgrade } from '../../media/img_axe_upgrade.webp.js';
 import { bar } from '../../media/img_bar.webp.js';

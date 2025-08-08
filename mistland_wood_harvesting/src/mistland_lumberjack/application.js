@@ -165,7 +165,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.hintManager = new HintManager({ 
             playerController : this.player, 
             pixiApp : this.pixiApp ,
-            joystick : this.joystick
+            joystick : this.joystick,
+            applicationModel : this.applicationModel
         })
         
         
@@ -383,7 +384,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         });
         this.lumberMillZone = lumberMillZone;
 
-        this.player.setHintVector( this.lumberMillZone.sensor.mesh.position );
+        this.player.setHintVector( this.trees[0].sensor.mesh.position );
 
         // workshop
         this.workshop = new WorkshopController({ 
@@ -506,6 +507,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "unlock_workshop":
                 this.workshop.unlock();
                 this.followCam.setNewTarget( this.workshop.parentObj.position );
+                this.player.setHintVector( this.workshop.parentObj.position );
 
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
                 this.timeoutID = setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
@@ -513,6 +515,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "log_collected":
                 if(  this.sensorsController.currentTreeSensor ) this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
                 this.uiController.updateUI();
+                this.player.setHintVector( this.lumberMillZone.model.position );
                 break;
             
             case "lumbermill_tick":

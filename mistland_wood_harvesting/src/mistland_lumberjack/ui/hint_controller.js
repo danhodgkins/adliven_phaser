@@ -7,11 +7,14 @@ import { Easing, Tween } from '@tweenjs/tween.js';
 export default class HintManager{
     constructor({ playerController, pixiApp, applicationModel, joystick })
     {
+        this.playerController = playerController;
         this.joystick = joystick;
         this.pixiApp = pixiApp;
         this.initSprites();
 
-        this.noInputTimeoutDuration = 10000;
+        // no input hint ( convert to millisec from value in index.html)
+        this.noInputTimeoutDuration = getParamsNumberByID("hintTimer") * 1000;
+
         this.boundOnNoInputTimeout = this.onNoInputTimeout.bind( this );
         this.boundOnJoystickEnd = this.onJoystickEnd.bind( this );
         joystick.on('move end', this.boundOnJoystickEnd );
@@ -20,6 +23,13 @@ export default class HintManager{
         joystick.on('start', this.boundOnJoystickStart );
 
         this.noInputTimeoutID = setInterval( this.boundOnNoInputTimeout, this.noInputTimeoutDuration );
+        // end no input hint
+
+        this.boundNoGameActionTick = this.onNoGameActionTick.bind( this );
+        this.noGameActionIntervalID = setInterval( this.boundNoGameActionTick, this.noInputTimeoutDuration );
+
+        this.boundOnModelEvent = this.onModelEvent.bind( this );
+        applicationModel.addEventListener('model_event', this.boundOnModelEvent );
     }
 
     destroy()
@@ -31,6 +41,36 @@ export default class HintManager{
         this.fadeOutTween = null;
     }
 
+    //////////////// no game action interval
+
+    noGameActionIntervalID = -1;
+    onNoGameActionTick()
+    {
+        this.playerController.showHintArrow();
+    }
+
+
+
+    ////////////////////////////////////////
+
+
+
+    onModelEvent( e )
+    {
+        switch( e.detail )
+        {
+            case "unlock_workshop":
+            case "log_collected":
+            case "lumbermill_tick":
+                if( this.noGameActionIntervalID > -1 ) {
+                    this.noGameActionIntervalID = setInterval( this.onNoInputGameActionTick, this.noInputTimeoutDuration );
+                    this.playerController.hideHintArrow();
+                }
+                break;
+        }
+    }
+
+    //////////// no input hints
     onNoInputTimeout()
     {
         this.startHandAnim();
@@ -116,19 +156,12 @@ export default class HintManager{
         }).delay( 5000 ).start();
     }
 
-    fadeOutHandAnim()
-    {
-
-    }
-
     onResize()
     {
-        
         this.handContainer.x = window.innerWidth * 0.5;
-        // this.handContainer.y =  window.innerHeight - 300; 
-        
-
     }
+
+    /////////////////////////// end no input shiz
 
     update( dt )
     {   
