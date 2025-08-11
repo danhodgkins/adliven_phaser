@@ -19,6 +19,8 @@ import CannonDebugger from "cannon-es-debugger";
 import { AxeUpgradeController } from "./axe_upgrade_controller";
 import HintManager from "./ui/hint_controller";
 import { GemAnimator } from "./ui/gem_animator";
+import TargetValueIndicator from "./ui/target_value_indicator";
+import { bubble_wood } from '../../media/img_bubble_wood.webp.js';
 
 export class MistlandLumberjackApplication extends BaseScene{
 
@@ -180,6 +182,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 10, 6);
             camera.lookAt(new Vector3(0, 0, 0));
+            camera.name="main_cam";
             this.camera = camera;
             
             // Camera offset for following player on Z-axis
@@ -241,8 +244,10 @@ export class MistlandLumberjackApplication extends BaseScene{
             
             this.camera = followCam.getCamera();
             this.followCam = followCam;
-        }
 
+        }
+        
+        console.log("cam name = " , this.camera.name)
         this.scene.add(this.camera);
 
         this.gemAnimator = new GemAnimator({ scene : this.scene, camera : this.camera });
@@ -381,6 +386,14 @@ export class MistlandLumberjackApplication extends BaseScene{
             this.trees.push( tz );
         });
 
+        this.treesTargetValueIndicator = new TargetValueIndicator({ 
+            scene : this.scene,
+            textureRef:bubble_wood,
+            target: new Vec3(-3, 0, -25),
+            yOffset:4,
+            defaultText : getParamsNumberByID("woodNeeded")
+        })
+
         // lumbermill zonenew 
         const lumberMillZone = new LumberMillZone({
             world : this.world,
@@ -463,7 +476,8 @@ export class MistlandLumberjackApplication extends BaseScene{
                 element.update();            
             });
         }
-
+        
+        if( this.treesTargetValueIndicator ) this.treesTargetValueIndicator.update();
         if( this.lumberMillZone ) this.lumberMillZone.update();
         if( this.workshop ) this.workshop.update( dt );
         if( this.uiController ) this.uiController.update( dt );
@@ -546,6 +560,8 @@ export class MistlandLumberjackApplication extends BaseScene{
 
                 const gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
                 gemSFX.play();
+
+                this.lumberMillZone.updateTargetIndicatorText( getParamsNumberByID("gemsNeeded") - this.applicationModel.gemCount )
 
                 break;
         }
