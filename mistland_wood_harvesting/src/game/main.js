@@ -1,10 +1,10 @@
-import { mus_town_slow } from '../../media/audio_mus_town_slow.wav.js';
-import { sfx_bandit_attack_04 } from '../../media/audio_sfx_bandit_attack_04.wav.js';
-import { sfx_player_sword_swing_02 } from '../../media/audio_sfx_player_sword_swing_02.wav.js';
-import { sfx_quest_win } from '../../media/audio_sfx_quest_win.wav.js';
-import { sfx_reward_xp_fly_01 } from '../../media/audio_sfx_reward_xp_fly_01.wav.js';
-import { sfx_skeleton_alert_01 } from '../../media/audio_sfx_skeleton_alert_01.wav.js';
-import { sfx_skillcheck_success_01 } from '../../media/audio_sfx_skillcheck_success_01.wav.js';
+import { mus_town_slow } from '../../media/mp3_mus_town_slow.mp3.js';
+import { sfx_bandit_attack_04 } from '../../media/mp3_sfx_bandit_attack_04.mp3.js';
+import { sfx_player_sword_swing_02 } from '../../media/mp3_sfx_player_sword_swing_02.mp3.js';
+import { sfx_quest_win } from '../../media/mp3_sfx_quest_win.mp3.js';
+import { sfx_reward_xp_fly_01 } from '../../media/mp3_sfx_reward_xp_fly_01.mp3.js';
+import { sfx_skeleton_alert_01 } from '../../media/mp3_sfx_skeleton_alert_01.mp3.js';
+import { sfx_skillcheck_success_01 } from '../../media/mp3_sfx_skillcheck_success_01.mp3.js';
 
 const StartGame = (parent) => {
     return new GameApplication({ parent });
@@ -73,6 +73,7 @@ export class GameApplication {
         console.log("onPointerdown" );
         document.removeEventListener("pointerdown",this.boundOnPointerdown);
         const music = this.loadedAudioByRef[ "mus_town_slow" ];
+        music.loop( true);
         music.play();
         this.music = music;
     }
