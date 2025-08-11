@@ -574,6 +574,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         {
             case "axe_chop_complete":
                 this.applicationModel.onLogCollected();
+                if( this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ) this.player.stopChopping();
                 this.uiController.updateUI();
                 break;
         }
