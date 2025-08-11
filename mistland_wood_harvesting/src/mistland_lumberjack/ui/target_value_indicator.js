@@ -21,18 +21,19 @@ export default class TargetValueIndicator{
 
             const textTexture = createTextTexture(defaultText, {
                 fontFamily: 'Arial',
+                ontWeight : 'bold',
                 textColor: '#000000',
                 padding: 20,
-                width: 256,
-                height: 256
+                width: 400,
+                height: 400
             });
 
             // text plane 
             const textGeometry = new PlaneGeometry(planeSize,planeSize); // Width and height
             const textMmaterial = new MeshBasicMaterial({ map: textTexture, side: DoubleSide, transparent : true });
             const textPlane = new Mesh(textGeometry, textMmaterial);
-            textPlane.position.y-= 0.1;
-            textPlane.position.z += 0.05;
+            textPlane.position.y-= 0.25;
+            textPlane.position.z += 0.2;
             this.textPlane = textPlane;
             plane.add(textPlane);
         });  
@@ -44,10 +45,11 @@ export default class TargetValueIndicator{
     {
         const textTexture = createTextTexture( newVal , {
             fontFamily: 'Arial',
+            fontWeight : 'bold',
             textColor: '#000000',
             padding: 20,
-            width: 256,
-            height: 256
+            width: 400,
+            height: 400
         });
         this.textPlane.material.map = textTexture;
     }
@@ -60,6 +62,7 @@ export default class TargetValueIndicator{
 function createTextTexture(text, options = {}) {
     const {
         fontFamily = 'Arial',
+        fontWeight = 'bold',
         textColor = '#fff',
         backgroundColor = 'transparent',
         padding = 20,
@@ -85,15 +88,14 @@ function createTextTexture(text, options = {}) {
     // 3. Find best font size
     let fontSize = maxFontSize;
     do {
-        ctx.font = `${fontSize}px ${fontFamily}`;
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
         const metrics = ctx.measureText(text);
-        const textWidth = metrics.width;
-        if (textWidth <= width - padding * 2) break;
+        if (metrics.width <= width - padding * 2) break;
         fontSize -= 2;
     } while (fontSize > 10);
 
     // 4. Draw text
-    ctx.font = `${fontSize}px ${fontFamily}`;
+    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
     ctx.fillStyle = textColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';

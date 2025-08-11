@@ -1,6 +1,7 @@
 import { Assets, Container, Sprite, Texture } from 'pixi.js';
 // import { title_gameplay } from '../../media/pngs_title_gameplay.png.js';
 import { title_gameplay } from '../../media/img_title_gameplay.webp.js';
+import { play_gameplay } from '../../media/img_play_gameplay.webp.js';
 
 // import '@pixi/layout';
 import ProgressBarGems from './ui/progressbar_gems.js';
@@ -22,6 +23,12 @@ export class MistlandLumberjackUIController {
         
         const logoEl = this.uiLayerElement.querySelector("#logo-container");
         logoEl.appendChild(logoImg);
+
+        
+        const ctaImg = new Image()
+        ctaImg.src = play_gameplay;
+        const ctaEl = this.uiLayerElement.querySelector("#button-container");
+        ctaEl.appendChild(ctaImg);
         
     }
 
@@ -36,15 +43,15 @@ export class MistlandLumberjackUIController {
 
     updateUI() {
         // Update UI elements based on application model state
-        const logCountOutput = this.uiLayerElement.querySelector("#logCountOutput");
-        if (logCountOutput) {
-            logCountOutput.textContent = `Logs: ${this.applicationModel.logCount}`;
-        }
+        // const logCountOutput = this.uiLayerElement.querySelector("#logCountOutput");
+        // if (logCountOutput) {
+        //     logCountOutput.textContent = `Logs: ${this.applicationModel.logCount}`;
+        // }
                 
-        const gemCountOutput = this.uiLayerElement.querySelector("#gemCountOutput");
-        if (logCountOutput) {
-            gemCountOutput.textContent = `Gems: ${this.applicationModel.gemCount}`;
-        }
+        // const gemCountOutput = this.uiLayerElement.querySelector("#gemCountOutput");
+        // if (logCountOutput) {
+        //     gemCountOutput.textContent = `Gems: ${this.applicationModel.gemCount}`;
+        // }
     }
 
     async initPixiContainer()
