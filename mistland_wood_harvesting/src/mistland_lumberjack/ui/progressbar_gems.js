@@ -1,4 +1,4 @@
-import { Assets, Container, Graphics, Loader, Sprite } from 'pixi.js';
+import { Assets, Container, Graphics, Loader, Sprite, Text } from 'pixi.js';
 import { bar } from '../../../media/pngs_bar.png.js';
 import { bar_fill } from '../../../media/pngs_bar_fill.png.js';
 import { bar_sparkles } from '../../../media/pngs_bar_sparkles.png.js';
@@ -63,6 +63,21 @@ export default class ProgressBarGems{
         this.barFillSprite.mask = graphics;
 
         this.progressBarContainer.addChild(gemSprite);
+
+        this.tf = new Text('0', {
+            fontFamily: 'Arial',
+            fontSize: 40,
+            fontWeight:"800",
+            fill: 0xffffff,
+            align: 'center',
+            anchor : { x : 0.5, y : 0.5 }
+        });
+
+        this.tf.x =  80;
+        this.tf.y = 3;
+
+        this.progressBarContainer.addChild( this.tf);
+
         this.onResize();
     }
 
@@ -78,6 +93,7 @@ export default class ProgressBarGems{
         if (this.currentGems !== this.applicationModel.gemCount) {
             this.currentGems = this.applicationModel.gemCount;
             this.targetFillRatio = Math.min(this.currentGems / this.max, 1);
+            this.tf.text = this.currentGems;
         }
 
         // Smoothly interpolate fill ratio (lerp)

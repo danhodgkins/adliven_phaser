@@ -48,8 +48,8 @@ export class GemAnimator{
                 x: targetPos.x, 
                 y: targetPos.y, 
                 z: targetPos.z,
-                scale: 0.2 // end scale (20% of original size)
-            }, 1500)
+                scale: 0.1 // end scale (20% of original size)
+            }, 500)
             .easing( Easing.Quadratic.Out)
             .onUpdate(() => {
                 plane.position.set(params.x, params.y, params.z);
