@@ -389,10 +389,12 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.treesTargetValueIndicator = new TargetValueIndicator({ 
             scene : this.scene,
             textureRef:bubble_wood,
-            target: new Vec3(-3, 0, -25),
+            target: new Vec3(-3.5, 0, -25),
             yOffset:4,
             defaultText : getParamsNumberByID("woodNeeded")
         })
+
+        this.player.setHintVector( new Vec3(-3.5, 0, -25) );
 
         // lumbermill zonenew 
         const lumberMillZone = new LumberMillZone({
@@ -405,7 +407,6 @@ export class MistlandLumberjackApplication extends BaseScene{
         });
         this.lumberMillZone = lumberMillZone;
 
-        this.player.setHintVector( this.trees[0].sensor.mesh.position );
 
         // workshop
         this.workshop = new WorkshopController({ 
