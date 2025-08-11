@@ -145,7 +145,7 @@ export class Player extends EventDispatcher {
         setHintVector( vec )
         {
             this.hintVector = vec ;
-            console.log("this.hintVector " , this.hintVector );
+            //console.log("this.hintVector " , this.hintVector );
         }
         
         startChopping()

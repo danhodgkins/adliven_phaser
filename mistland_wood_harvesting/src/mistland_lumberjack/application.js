@@ -566,7 +566,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 const gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
                 gemSFX.play();
 
-                this.lumberMillZone.updateTargetIndicatorText( getParamsNumberByID("gemsNeeded") - this.applicationModel.gemCount )
+                this.lumberMillZone.updateTargetIndicatorText( Math.max( getParamsNumberByID("gemsNeeded") - this.applicationModel.gemCount , 0 ))
 
                 break;
         }
@@ -578,6 +578,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         {
             case "axe_chop_complete":
                 this.applicationModel.onLogCollected();
+                if( this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ) this.player.stopChopping();
                 this.uiController.updateUI();
                 break;
         }
