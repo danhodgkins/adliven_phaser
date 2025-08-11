@@ -562,7 +562,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 const gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
                 gemSFX.play();
 
-                this.lumberMillZone.updateTargetIndicatorText( getParamsNumberByID("gemsNeeded") - this.applicationModel.gemCount )
+                this.lumberMillZone.updateTargetIndicatorText( Math.max( getParamsNumberByID("gemsNeeded") - this.applicationModel.gemCount , 0 ))
 
                 break;
         }

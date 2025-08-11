@@ -11,7 +11,6 @@ export class AxeUpgradeController{
         this.parentObj = new Object3D();
         this.parentObj.scale.set(0,0,0);
 
-        /// direction marker
         const tloader = new TextureLoader();
         const texture = tloader.load(axe_upgrade, () => {
             texture.needsUpdate = true;
@@ -19,15 +18,7 @@ export class AxeUpgradeController{
             const planeSize = 5;
             const geometry = new PlaneGeometry(planeSize,planeSize); // Width and height
             const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : true   });
-            // const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : false, wireframe: true   });
             const plane = new Mesh(geometry, material);
-
-            // the model rotation is not visually aliging the texcture so manually set it for now
-            // plane.rotation.copy( rotation );
-            // const rotationY = degToRad(61);
-            // plane.rotation.y = rotationY;
-            // plane.rotateX(degToRad(270));
-            // plane.position.copy( this.sphereMesh.position );
             plane.position.z -=1;
             plane.position.y +=1;
             this.parentObj.add(plane);
@@ -77,7 +68,7 @@ export class AxeUpgradeController{
             y: 1, 
             z: 1 
         }, 500 )
-        .easing(Easing.Linear).onComplete( ()=>{
+        .easing(Easing.Linear.Out).onComplete( ()=>{
             this.timeoutID = setTimeout( ()=>{
                 this.hide();
             }, hideDelay );
@@ -85,13 +76,8 @@ export class AxeUpgradeController{
     }
 
     update( dt ){
-        // this.box.rotation.x += 0.01; // Rotate around X-axis
-        ///this.parentObj.rotation.y += 0.03; // Rotate around Y-axis
-        // this.box.rotation.z += 0.01; // Rotate around Z-axis
-
         if( this.axe ) this.axe.rotation.y += 0.03; // Rotate around Y-axis
-        if( this.bgPlane ) this.bgPlane.rotation.z += 0.0006; // Rotate around Y-axis
-
+        if( this.bgPlane ) this.bgPlane.rotation.z += 0.0006; // Rotate around Z-axis
         if( this.tween ) this.tween.update()
     }
 }
