@@ -1,3 +1,10 @@
+import { mus_town_slow } from '../../media/audio_mus_town_slow.wav.js';
+import { sfx_bandit_attack_04 } from '../../media/audio_sfx_bandit_attack_04.wav.js';
+import { sfx_player_sword_swing_02 } from '../../media/audio_sfx_player_sword_swing_02.wav.js';
+import { sfx_quest_win } from '../../media/audio_sfx_quest_win.wav.js';
+import { sfx_reward_xp_fly_01 } from '../../media/audio_sfx_reward_xp_fly_01.wav.js';
+import { sfx_skeleton_alert_01 } from '../../media/audio_sfx_skeleton_alert_01.wav.js';
+import { sfx_skillcheck_success_01 } from '../../media/audio_sfx_skillcheck_success_01.wav.js';
 import { Axe } from '../../media/Axe.glb.js';
 import { Barrell } from '../../media/Barrell.glb.js';
 import { Bench } from '../../media/Bench.glb.js';

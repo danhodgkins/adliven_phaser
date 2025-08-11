@@ -19,11 +19,11 @@ export class Player extends EventDispatcher {
     lastDropTime = 0; // Track last time logs were dropped
     dropCooldown = 3000; // 3 seconds in milliseconds
     
-    constructor({ world, scene }) {
+    constructor({ world, scene, loadedAudioByRef }) {
         super();
             this.world = world;
             this.scene = scene;
-
+            this.loadedAudioByRef = loadedAudioByRef;
             this.axeLevel = 0;
             this.chopSpeed0 = 5;
             this.chopSpeed1 = 10;
@@ -132,6 +132,10 @@ export class Player extends EventDispatcher {
                     this.glbController.mixer.timeScale = speed;
                     animRef = this.glbController.getAnimIndexByName("03_chop");
                     this.glbController.playAnimByIndex( animRef );
+
+                    const axeSFX = this.loadedAudioByRef[ "sfx_player_sword_swing_02" ];
+                    axeSFX.play();
+
                     break;
             }
     
@@ -212,6 +216,8 @@ export class Player extends EventDispatcher {
                 case "03_chop":
                     // respond to chop loop complete
                     this.dispatchEvent({ type: 'player_event', detail : "axe_chop_complete" });
+                    const axeSFX = this.loadedAudioByRef[ "sfx_player_sword_swing_02" ];
+                    axeSFX.play();
                     break;
             }
         }

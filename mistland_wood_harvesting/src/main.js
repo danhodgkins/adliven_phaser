@@ -7,7 +7,7 @@ import {Howl, Howler} from 'howler';
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    StartGame('game-container');
+    StartGame();
 
     // const testSfx = new Howl({
     //     src: [ unwrapMP3 ],

@@ -28,6 +28,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         super({config});
         console.log("Application initialized with parent:", config);
 
+        this.loadedAudioByRef = config.loadedAudioByRef;
         this.pixiApp = config.pixiApp;
         
         this.boundOnSensorEvent = this.onSensorEvent.bind( this );
@@ -157,7 +158,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         // player
         this.player = new Player({
             world: world,
-            scene: scene
+            scene: scene,
+            loadedAudioByRef : this.loadedAudioByRef
         });
 
 
@@ -495,7 +497,11 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.workshop.disable();
 
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
-                setTimeout( ()=>{ this.onSceneComplete() } , 4000 );
+                setTimeout( ()=>{ this.onSceneComplete() } , 3000 );
+
+                const winSFX = this.loadedAudioByRef[ "sfx_quest_win" ];
+                winSFX.play();
+                
             }
         }
     }
@@ -509,6 +515,10 @@ export class MistlandLumberjackApplication extends BaseScene{
                 console.log("unlock axe");
                 this.player.upgradeAxe();
                 this.axeUpgradeController.show( 4000 );
+
+                const upgradeSFX = this.loadedAudioByRef[ "sfx_skillcheck_success_01" ];
+                upgradeSFX.play();
+
                 break;
 
             case "unlock_workshop":
@@ -518,6 +528,10 @@ export class MistlandLumberjackApplication extends BaseScene{
 
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
                 this.timeoutID = setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
+                
+                const unlockSFX = this.loadedAudioByRef[ "sfx_skillcheck_success_01" ];
+                unlockSFX.play();
+                
                 break;
             case "log_collected":
                 if(  this.sensorsController.currentTreeSensor ) this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
@@ -529,6 +543,10 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.player.playLoseLogAnim( this.lumberMillZone.model.position );
                 this.uiController.updateUI();
                 this.gemAnimator.from3Dto2D( this.lumberMillZone.model.position );
+
+                const gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
+                gemSFX.play();
+
                 break;
         }
     }
