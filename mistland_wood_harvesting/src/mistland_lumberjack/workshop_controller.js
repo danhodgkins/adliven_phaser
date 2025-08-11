@@ -1,10 +1,12 @@
 
 import { DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, PlaneGeometry, TextureLoader, Color, BackSide, FrontSide } from "three";
-import { lock } from '../../media/pngs_lock.png.js';
-// import { locked_area } from '../../media/img_locked_area.webp.js';
+// import { lock } from '../../media/pngs_lock.png.js';
+import { locked_area } from '../../media/img_locked_area.webp.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Easing, Tween } from "@tweenjs/tween.js";
 import { SensorZone } from "./sensors/sensor.js";
+import TargetValueIndicator from "./ui/target_value_indicator.js";
+import { bubble_gem } from '../../media/img_bubble_gem.webp.js';
 
 export default class WorkshopController{
     constructor({ scene, world, playerBody, sensorType})
@@ -31,7 +33,7 @@ export default class WorkshopController{
         // get reference to models material so we can fade the transparecy
         model.traverse((child) => {
             if (child.isMesh) {
-                console.log("model mesh = "  , child.material)
+                
                 this.materialToFadeIn = child.material;
                 this.materialToFadeIn.transparent =true;
                 this.materialToFadeIn.opacity =0;
@@ -80,7 +82,7 @@ export default class WorkshopController{
 
         const loader = new TextureLoader();
 
-        const texture = loader.load(lock, () => {
+        const texture = loader.load(locked_area, () => {
             texture.needsUpdate = true;
             const geometry = new PlaneGeometry(8, 8); // Width and height
             const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : true  });
@@ -110,6 +112,14 @@ export default class WorkshopController{
         })
 
         this.sensor = sensor;
+
+        this.targetValueIndicator = new TargetValueIndicator({ 
+            scene,
+            textureRef:bubble_gem,
+            target: parentObj.position,
+            yOffset: 2,
+            defaultText : getParamsNumberByID("gemsNeeded")
+        })
     }
 
     // stop sensor events firing after user has entered for final time
@@ -152,6 +162,7 @@ export default class WorkshopController{
     update(dt){
         if( this.scaleUpTween ) this.scaleUpTween.update();
         if( this.fadeInTween ) this.fadeInTween.update();
+        if( this.targetValueIndicator ) this.targetValueIndicator.update();
         this.sensor.update();
     }
 }
