@@ -80,7 +80,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         scene.add(light);
 
         // Add a directional light
-        const dirLight = new DirectionalLight(0xFFFACD, 7.5); // faint yellow
+        const dirLight = new DirectionalLight(0xFFFFFF, 6.5); // faint yellow
         dirLight.position.set(20, 20, 10); // Lower and more horizontal for longer shadows
         dirLight.target.position.set(0, 0, 0); // Point at scene center
         scene.add(dirLight.target);
@@ -103,6 +103,10 @@ export class MistlandLumberjackApplication extends BaseScene{
         renderer.shadowMap.type = 3;
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
+        
+        // Add CSS filters for enhanced visuals
+        renderer.domElement.style.filter = 'saturate(1.35) contrast(1.1) brightness(0.9)';
+        
         this.renderer = renderer;
 
         // Create gradient environment map for reflections
