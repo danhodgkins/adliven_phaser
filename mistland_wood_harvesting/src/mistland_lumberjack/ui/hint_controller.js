@@ -158,7 +158,7 @@ export default class HintManager{
 
     onResize()
     {
-        this.handContainer.x = window.innerWidth * 0.5;
+        if( this.handContainer ) this.handContainer.x = window.innerWidth * 0.5;
     }
 
     /////////////////////////// end no input shiz

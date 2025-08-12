@@ -83,7 +83,7 @@ export default class ProgressBarGems{
 
     onResize()
     {
-        const scale = isPortrait() ? { x : 0.5, y : 0.5} :  { x : 1, y : 1};
+        const scale = isPortrait() ? { x : 0.5, y : 0.5} :  { x : 0.5, y : 0.5};
         this.progressBarContainer.scale.set( scale.x , scale.y );
         this.progressBarContainer.position.set(  window.innerWidth -  this.progressBarContainer.width  , 10 );
     }

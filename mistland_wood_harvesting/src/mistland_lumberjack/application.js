@@ -1,6 +1,6 @@
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import BaseScene from "../scene/basescene";
-import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3, DirectionalLight, WebGLCubeRenderTarget, CubeCamera, Color, Float32BufferAttribute } from "three/src/Three.Core.js";
+import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3, DirectionalLight, WebGLCubeRenderTarget, CubeCamera, Color, Float32BufferAttribute, MathUtils } from "three/src/Three.Core.js";
 import { MistlandLumberjackUIController } from "./ui_controller";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
@@ -178,16 +178,26 @@ export class MistlandLumberjackApplication extends BaseScene{
             joystick : this.joystick,
             applicationModel : this.applicationModel
         })
-
-        
         
         if (params.perspectiveCamera.value) {
             // Create a simple perspective camera
-            const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const camera = new PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);            
             camera.position.set(0, 10, 6);
             camera.lookAt(new Vector3(0, 0, 0));
             camera.name="main_cam";
             this.camera = camera;
+
+            // const width = window.innerWidth;
+            // const height = window.innerHeight;
+            // const aspect = width / height;
+            // // Choose a base horizontal FOV (in degrees)
+            // const horizontalFOV = 20; 
+
+            // // Convert to vertical FOV based on aspect
+            // const verticalFOV = 2 * Math.atan(Math.tan(MathUtils.degToRad(horizontalFOV) / 2) / aspect);
+            // this.camera.fov = MathUtils.radToDeg(verticalFOV);
+            // this.camera.aspect = aspect;
+
             
             // Camera offset for following player on Z-axis
             this.cameraZOffset = 12; // Distance behind player on Z-axis
@@ -250,13 +260,9 @@ export class MistlandLumberjackApplication extends BaseScene{
             this.followCam = followCam;
 
         }
-        
-        console.log("cam name = " , this.camera.name)
+
         this.scene.add(this.camera);
-
         this.gemAnimator = new GemAnimator({ scene : this.scene, camera : this.camera });
-        
-
         this.axeUpgradeController = new AxeUpgradeController({ camera : this.camera });
 
         this.timeoutID = setTimeout( ()=>{ 
@@ -266,20 +272,34 @@ export class MistlandLumberjackApplication extends BaseScene{
         // Handle window resize or rotation
         this.boundResizeListener = this.onResize.bind( this );
 
-        window.addEventListener('resize', this.boundResizeListener );
+        // do initial fov calc
+        this.boundResizeListener();
+
+        // this timeout is to allow transitioning width / height to be calculated before FOV calculation is made
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => this.boundResizeListener(), 10);
+        });
+
+        this.renderer.render(this.scene, this.camera);
     }
 
     onResize()
     {
-        console.log("on resize " , window.innerWidth)
         const width = window.innerWidth;
         const height = window.innerHeight;
-            this.camera.aspect = width / height;
-            this.camera.updateProjectionMatrix();
+        const aspect = width / height;
 
-        this.camera.aspect = width / height;
+        // Choose a base horizontal FOV (in degrees)
+        const horizontalFOV = isPortrait() ? 35 : 80; 
+
+        // Convert to vertical FOV based on aspect
+        const verticalFOV = 2 * Math.atan(Math.tan(MathUtils.degToRad(horizontalFOV) / 2) / aspect);
+        this.camera.fov = MathUtils.radToDeg(verticalFOV);
+        this.camera.aspect = aspect;
+        
         this.camera.updateProjectionMatrix();
-
         this.renderer.setSize(width, height);
 
         if( this.uiController ) this.uiController.onResize();       
