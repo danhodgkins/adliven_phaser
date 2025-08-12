@@ -463,8 +463,8 @@ export class MistlandLumberjackApplication extends BaseScene{
     fixedTimeStep = 1.0 / 60.0; // seconds
     maxSubSteps = 3;
     update( dt ) {
-        this.player.setInput(this.joystickInput.x, this.joystickInput.y, this.joystickInput.rotation);
-        this.player.update(dt);
+        // this.player.setInput(this.joystickInput.x, this.joystickInput.y, this.joystickInput.rotation);
+        // this.player.update(dt);
         this.axeUpgradeController.update(dt);
         this.hintManager.update( dt );
         this.gemAnimator.update( dt );
@@ -489,6 +489,11 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.followCam.update();
         if( this.world ) this.world.step( this.fixedTimeStep, dt, this.maxSubSteps);
+
+        // update player AFTER world step to avoid jitters
+        this.player.setInput(this.joystickInput.x, this.joystickInput.y, this.joystickInput.rotation);
+        this.player.update(dt);
+
         // Update debug visualization
         // this.cannonDebugRenderer.update();
         this.renderer.render( this.scene, this.camera );

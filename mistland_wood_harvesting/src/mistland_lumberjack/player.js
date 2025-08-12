@@ -57,7 +57,7 @@ export class Player extends EventDispatcher {
                 Hero_avatar, 
                 (e) => {                 
                     scene.add(e.scene);   
-                    console.log("e.scene:", e.scene );
+                    // console.log("e.scene:", e.scene );
                     this.sphereMesh.add( e.scene );
                     this.glbController = new GlbController({ glb : e } );
                     this.setState( this.STATE_IDLE );
@@ -172,7 +172,9 @@ export class Player extends EventDispatcher {
             sphereBody.velocity.z = -joystickInput.y * this.walkSpeed;
             
             // Sync mesh with physics body
-            sphereMesh.position.copy(sphereBody.position);
+            // sphereMesh.position.copy(sphereBody.position);
+            // to fix the jitters - ease towards the physics object, 2nd param too low makes the hero slide 
+            sphereMesh.position.lerp(sphereBody.position, 0.25); // 0.5 is smoothing factor
             if( this.directionMarker )
             {
                 this.directionMarker.position.copy(sphereBody.position);
@@ -184,9 +186,6 @@ export class Player extends EventDispatcher {
                     {
                         // Example usage in your render loop:
                         faceTargetFlat(this.directionMarker, this.hintVector );
-
-                        //this.directionMarker.lookAt( this.hintVector );
-                        //this.directionMarker.rotateX(degToRad(270));
                     } 
             } 
             
