@@ -16,7 +16,7 @@ import WorkshopController from "./workshop_controller";
 import layoutData from "./data/layout.json"
 import { layoutSceneHelper } from "../utils/layout";
 import CannonDebugger from "cannon-es-debugger";
-import { AxeUpgradeController } from "./axe_upgrade_controller";
+import { AxeUpgradeController } from "./ui/axe_upgrade_controller.js";
 import HintManager from "./ui/hint_controller";
 import { GemAnimator } from "./ui/gem_animator";
 import TargetValueIndicator from "./ui/target_value_indicator";

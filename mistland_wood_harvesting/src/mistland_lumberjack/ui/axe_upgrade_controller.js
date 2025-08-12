@@ -1,8 +1,8 @@
 import { BoxGeometry, DoubleSide, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, TextureLoader } from "three";
-import { Axe } from '../../media/Axe.glb.js';
+import { Axe } from '../../../media/Axe.glb.js';
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import { Easing, Tween } from "@tweenjs/tween.js";
-import { axe_upgrade } from '../../media/img_axe_upgrade.webp.js';
+import { axe_upgrade } from '../../../media/img_axe_upgrade.webp.js';
 
 export class AxeUpgradeController{ 
 
@@ -10,6 +10,7 @@ export class AxeUpgradeController{
     constructor( { camera } ){
         this.parentObj = new Object3D();
         this.parentObj.scale.set(0,0,0);
+        this.enableRotationAnimation = false;
 
         const tloader = new TextureLoader();
         const texture = tloader.load(axe_upgrade, () => {
@@ -57,11 +58,13 @@ export class AxeUpgradeController{
         .easing(Easing.Elastic.Out).onComplete( ()=>{
             this.timeoutID = -1;
             this.tween = null;
+            this.enableRotationAnimation = false;
         }).start();
     }
 
     show( hideDelay )
     {
+        this.enableRotationAnimation = true;
         this.tween = new Tween( this.parentObj.scale )
         .to({
             x: 1, 
@@ -76,6 +79,7 @@ export class AxeUpgradeController{
     }
 
     update( dt ){
+        if( !this.enableRotationAnimation ) return;
         if( this.axe ) this.axe.rotation.y += 0.03; // Rotate around Y-axis
         if( this.bgPlane ) this.bgPlane.rotation.z += 0.0006; // Rotate around Z-axis
         if( this.tween ) this.tween.update()

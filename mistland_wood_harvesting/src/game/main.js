@@ -33,7 +33,7 @@ export class GameApplication {
         
         // Create a new pixi application
         const app = new Application({ 
-            background: '#1099bb', 
+            background: '#000000', 
             resizeTo: el,backgroundAlpha:0.0
         });
         el.appendChild(app.view);  
