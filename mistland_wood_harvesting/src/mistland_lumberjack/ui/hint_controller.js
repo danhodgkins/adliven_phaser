@@ -39,6 +39,7 @@ export default class HintManager{
         this.fadeInTween = null;
         this.translateUpTween = null;
         this.fadeOutTween = null;
+        this.handContainer = null;
     }
 
     //////////////// no game action interval

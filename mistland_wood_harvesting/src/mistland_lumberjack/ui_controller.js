@@ -33,7 +33,8 @@ export class MistlandLumberjackUIController {
     }
 
     destroy(){
-
+        this.pixiApp = null;
+        this.progressBar = null;
     }
 
     update( dt )
@@ -89,8 +90,8 @@ export class MistlandLumberjackUIController {
 
     onResize()
     {
-        this.pixiApp.resize();
-        this.progressBar.onResize();
+        if( this.pixiApp ) this.pixiApp.resize();
+        if( this.progressBar ) this.progressBar.onResize();
     }
     // splashUIString() {
     //     return `

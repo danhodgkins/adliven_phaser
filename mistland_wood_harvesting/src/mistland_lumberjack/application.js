@@ -45,8 +45,12 @@ export class MistlandLumberjackApplication extends BaseScene{
             });
 
         // hide ctaOverlay
-        const ctaOverlay = document.getElementById("ui-overlay-cta");
-        ctaOverlay.style.display = 'none'; // Hides the element and removes it from the layout
+        const ctaOverlayPortrait = document.getElementById("ui-overlay-cta-portrait");
+        ctaOverlayPortrait.style.display = 'none'; // Hides the element and removes it from the layout
+    
+        const ctaOverlayLandscape = document.getElementById("ui-overlay-cta-landscape");
+        ctaOverlayLandscape.style.display = 'none'; // Hides the element and removes it from the layout
+    
     }
 
     destroy()
