@@ -58,6 +58,9 @@ export class GameApplication {
         parent,
         this.loadedAudioByRef ); 
 
+        // override the defalut behaviour ( hopefully allows sound to start on pointerdown rather than up. needs testing)
+        HowlerGlobal.mobileAutoEnable = false;
+
         this.boundUpdate = this.update.bind(this);
         requestAnimationFrame(this.boundUpdate );
 
@@ -72,13 +75,15 @@ export class GameApplication {
     {
         console.log("onPointerdown" );
         document.removeEventListener("pointerdown",this.boundOnPointerdown);
+
+        if( !params.playMusic.value ) return;
         const music = this.loadedAudioByRef[ "mus_town_slow" ];
+        music.volume( getParamsNumberByID("musicVolume") * 0.01 );
         music.loop( true);
         music.play();
         this.music = music;
     }
 
-    music;
     lastTime;
     allAudioLoaded = false;
     
@@ -88,18 +93,19 @@ export class GameApplication {
         if( this.lastTime !== undefined){
             dt = (time - this.lastTime) / 1000;
         }
-
+        
         if( this.sceneManager ) this.sceneManager.update( dt);
         else if( this.allAudioLoaded )
-        {
-            this.postAssetLoadInit();
+            {
+                this.postAssetLoadInit();
+            }
+            
+            //console.log("", this.sceneManager, this.allAudioLoaded );
+            this.lastTime = time;
+            requestAnimationFrame(this.boundUpdate);
         }
-
-        //console.log("", this.sceneManager, this.allAudioLoaded );
-        this.lastTime = time;
-        requestAnimationFrame(this.boundUpdate);
-    }
-
+        
+    music;
     audioConfigs;
     loadedAudioCtr = 0;
 
@@ -108,24 +114,32 @@ export class GameApplication {
 
         this.audioConfigs = [
             { ref : "mus_town_slow" , src : [ mus_town_slow ] },
-            { ref : "sfx_bandit_attack_04" , src : [ sfx_bandit_attack_04 ] },
-            { ref : "sfx_player_sword_swing_02" , src : [ sfx_player_sword_swing_02 ] },
-            { ref : "sfx_quest_win" , src : [ sfx_quest_win ] },
-            { ref : "sfx_reward_xp_fly_01" , src : [ sfx_reward_xp_fly_01 ] },
-            { ref : "sfx_skeleton_alert_01" , src : [ sfx_skeleton_alert_01 ] },
-            { ref : "sfx_skillcheck_success_01" , src : [ sfx_skillcheck_success_01 ] },
+            { ref : "sfx_bandit_attack_04" , src : [ sfx_bandit_attack_04 ], group : "sfx" },
+            { ref : "sfx_player_sword_swing_02" , src : [ sfx_player_sword_swing_02 ], group : "sfx" },
+            { ref : "sfx_quest_win" , src : [ sfx_quest_win ], group : "sfx" },
+            { ref : "sfx_reward_xp_fly_01" , src : [ sfx_reward_xp_fly_01 ], group : "sfx" },
+            { ref : "sfx_skeleton_alert_01" , src : [ sfx_skeleton_alert_01 ], group : "sfx" },
+            { ref : "sfx_skillcheck_success_01" , src : [ sfx_skillcheck_success_01 ], group : "sfx" },
         ];
 
 
         //const audio = this.manifest.audio;
         this.audioConfigs.forEach(element => {
             console.log("element ", element )
+            // for now we can mute based on index.html params
+            let volume = 1;
+            if( element.group == "sfx")
+            {
+                if( !params.playSfx.value ) volume = 0;
+            }
+
             this.loadedAudioByRef[ element.ref ] = new Howl({
                 // src: [ this.baseURL + element.path],
                 src: element.src,
                 onload : ()=>{
                     this.onAudioLoaded();
-                }
+                },
+                volume : volume
               });              
         }); 
 

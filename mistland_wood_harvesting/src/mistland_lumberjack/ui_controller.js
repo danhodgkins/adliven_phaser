@@ -22,13 +22,13 @@ export class MistlandLumberjackUIController {
         logoImg.src = title_gameplay;
         
         const logoEl = this.uiLayerElement.querySelector("#logo-container");
-        logoEl.appendChild(logoImg);
+        if( !params.hideLogo.value ) logoEl.appendChild(logoImg);
 
         
         const ctaImg = new Image()
         ctaImg.src = play_gameplay;
         const ctaEl = this.uiLayerElement.querySelector("#button-container");
-        ctaEl.appendChild(ctaImg);
+        if( !params.hideCta.value ) ctaEl.appendChild(ctaImg);
         
     }
 
