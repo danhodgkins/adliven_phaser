@@ -24,6 +24,7 @@ import { bubble_wood } from '../../media/img_bubble_wood.webp.js';
 
 export class MistlandLumberjackApplication extends BaseScene{
 
+    skeletonControllers = [];
     timeoutID = -1;
 
     constructor({ config }) {
@@ -455,31 +456,50 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
         
-
+        // init skeletons
         if(params.skeletons.value){
-            this.Skeleton0 = new SkeletonController({
-                world: this.world,
-                scene: this.scene,
-                position: new Vector3(0, 3, 0), // Adjust as needed
-                rotation: new Quaternion(0, 0, 0, 1), // Adjust as needed
-                player: this.player
+           
+            const skeletonConfigs = [
+                { position : new Vector3(0, 1, 5) },
+                { position : new Vector3(5, 1, 0) },
+                { position : new Vector3(-5, 1,5) },
+            ]
+
+            skeletonConfigs.forEach(element => {
+                    this.skeletonControllers.push( 
+                        new SkeletonController({
+                        world: this.world,
+                        scene: this.scene,
+                        position: element.position,
+                        rotation: new Quaternion(0, 0, 0, 1), // Adjust as needed
+                        player: this.player
+                    })
+                )
             });
 
-            this.Skeleton1 = new SkeletonController({
-                world: this.world,
-                scene: this.scene,   
-                position: new Vector3(5, 0, 0), // Adjust as needed
-                rotation: new Quaternion(0, 0, 0, 1), // Adjust
-                player: this.player
-            });
+            // this.Skeleton0 = new SkeletonController({
+            //     world: this.world,
+            //     scene: this.scene,
+            //     position: new Vector3(0, 3, 0), // Adjust as needed
+            //     rotation: new Quaternion(0, 0, 0, 1), // Adjust as needed
+            //     player: this.player
+            // });
 
-            this.skeleton2 = new SkeletonController({
-                world: this.world,
-                scene: this.scene,
-                position: new Vector3(-5, 0, 0), // Adjust as needed
-                rotation: new Quaternion(0, 0, 0, 1), // Adjust
-                player: this.player
-            });
+            // this.Skeleton1 = new SkeletonController({
+            //     world: this.world,
+            //     scene: this.scene,   
+            //     position: new Vector3(5, 0, 0), // Adjust as needed
+            //     rotation: new Quaternion(0, 0, 0, 1), // Adjust
+            //     player: this.player
+            // });
+
+            // this.skeleton2 = new SkeletonController({
+            //     world: this.world,
+            //     scene: this.scene,
+            //     position: new Vector3(-5, 0, 0), // Adjust as needed
+            //     rotation: new Quaternion(0, 0, 0, 1), // Adjust
+            //     player: this.player
+            // });
         }
     }
 
@@ -494,11 +514,15 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.gemAnimator.update( dt );
 
         // Update skeletons
-        if( params.skeletons.value ) {
-            if (this.Skeleton0) this.Skeleton0.update(dt);
-            if (this.Skeleton1) this.Skeleton1.update(dt);
-            if (this.skeleton2) this.skeleton2.update(dt);
-        }
+        // if( params.skeletons.value ) {
+        //     if (this.Skeleton0) this.Skeleton0.update(dt);
+        //     if (this.Skeleton1) this.Skeleton1.update(dt);
+        //     if (this.skeleton2) this.skeleton2.update(dt);
+        // }
+
+        this.skeletonControllers.forEach(element => {
+            element.update(dt);
+        });
 
         if( this.trees ) {
             this.trees.forEach(element => {
@@ -519,7 +543,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.player.update(dt);
 
         // Update debug visualization
-        // this.cannonDebugRenderer.update();
+        //this.cannonDebugRenderer.update();
         this.renderer.render( this.scene, this.camera );
     }
 

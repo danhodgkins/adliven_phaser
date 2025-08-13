@@ -170,6 +170,7 @@ export class Player extends EventDispatcher {
             
             sphereBody.velocity.x = joystickInput.x * this.walkSpeed;
             sphereBody.velocity.z = -joystickInput.y * this.walkSpeed;
+            sphereBody.position.y = 0;
             
             // Sync mesh with physics body
             // sphereMesh.position.copy(sphereBody.position);
@@ -291,7 +292,7 @@ export class Player extends EventDispatcher {
             // Check if cooldown period has passed
             const currentTime = performance.now();
             if (currentTime - this.lastDropTime < this.dropCooldown) {
-                console.log(`Drop logs on cooldown. ${((this.dropCooldown - (currentTime - this.lastDropTime)) / 1000).toFixed(1)}s remaining`);
+                //console.log(`Drop logs on cooldown. ${((this.dropCooldown - (currentTime - this.lastDropTime)) / 1000).toFixed(1)}s remaining`);
                 return; // Still in cooldown period
             }
 

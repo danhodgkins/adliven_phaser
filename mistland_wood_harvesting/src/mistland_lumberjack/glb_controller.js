@@ -7,6 +7,7 @@ export default class GlbController{
         this.glb = glb;
         this.mixer = new AnimationMixer( glb.scene );       
         this.glbAnimationsList = glb.animations;
+        console.log("this.glbAnimationsList ", this.glbAnimationsList )		
     }
 
 
