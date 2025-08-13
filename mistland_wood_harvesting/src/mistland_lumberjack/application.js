@@ -311,7 +311,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         if( this.hintManager ) this.hintManager.onResize();
     }
 
-    skeletonsEnabled = false;
+    // skeletonsEnabled = false;
     setupEnvironmentMap(renderer, scene) {
         // Create a cube render target for the environment map
         const cubeRenderTarget = new WebGLCubeRenderTarget(256, {
@@ -447,34 +447,31 @@ export class MistlandLumberjackApplication extends BaseScene{
         
         this.followCam.setNewTarget( this.workshop.parentObj.position );
 
-        this.sensorsController = new SensorsController({ 
-            applicationModel : this.applicationModel,
-            trees : this.trees,
-            lumbermill : lumberMillZone,
-            workshop : this.workshop
-        })
 
-        this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
         
         // init skeletons
         if(params.skeletons.value){
+
+            this.boundOnSkeletonEvent = this.onSkeletonEvent.bind(this);
+            
            
             const skeletonConfigs = [
-                { position : new Vector3(0, 1, 5) },
-                { position : new Vector3(5, 1, 0) },
-                { position : new Vector3(-5, 1,5) },
+                { position : new Vector3(0, 1, -8) },
+                { position : new Vector3( 8, 1, -4) },
+                { position : new Vector3(-8, 1, -4) },
             ]
 
             skeletonConfigs.forEach(element => {
-                    this.skeletonControllers.push( 
-                        new SkeletonController({
+                const sc = new SkeletonController({
                         world: this.world,
                         scene: this.scene,
                         position: element.position,
                         rotation: new Quaternion(0, 0, 0, 1), // Adjust as needed
-                        player: this.player
-                    })
-                )
+                        player: this.player,
+                        loadedAudioByRef: this.loadedAudioByRef
+                    });
+                    sc.addEventListener('skeleton_event', this.boundOnSkeletonEvent );
+                    this.skeletonControllers.push( sc );
             });
 
             // this.Skeleton0 = new SkeletonController({
@@ -501,6 +498,15 @@ export class MistlandLumberjackApplication extends BaseScene{
             //     player: this.player
             // });
         }
+
+        this.sensorsController = new SensorsController({ 
+            applicationModel : this.applicationModel,
+            trees : this.trees,
+            lumbermill : lumberMillZone,
+            workshop : this.workshop
+        })
+
+        this.sensorsController.addEventListener( "sensor_event" , this.boundOnSensorEvent );
     }
 
     destroyLevelAfterStep = false;
@@ -635,6 +641,12 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.uiController.updateUI();
                 break;
         }
+    }
+
+    onSkeletonEvent( e ){
+        //console.log("on skeleton event ", e  );
+        this.applicationModel.onSkeletonAttack();
+        if( this.applicationModel.logCount > 0 ) this.player.DropMultipleLogs();
     }
     //////////////////////////////////////////////////////////////////////////////////// END EVENT HANDLERS 
 }

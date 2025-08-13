@@ -20,6 +20,14 @@ export class ApplicationModel extends EventDispatcher{
         }
     }
 
+    onSkeletonAttack()
+    {
+        if( this.logCount > 0 )
+        {
+             this.logCount--;
+        }
+    }
+
     handleLumbermillTick()
     {
         if( this.logCount  > 0 ) {

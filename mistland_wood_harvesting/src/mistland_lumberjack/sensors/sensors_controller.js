@@ -32,6 +32,10 @@ export default class SensorsController extends EventDispatcher{
         console.log("e = " , e.sensor.sensorType)
         switch( e.sensor.sensorType )
         {
+            case "skeleton":
+
+                break;
+
             case "workshop":
                 break;
 

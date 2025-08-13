@@ -51,6 +51,10 @@ export class Player extends EventDispatcher {
                         
             this.sphereMesh = new Object3D();
             scene.add(this.sphereMesh);
+
+            // Player body - prevent from launching up ( y ) on collision with skeletons
+            sphereBody.linearFactor.set(1, 0, 1);  // No vertical motion from collisions
+            sphereBody.angularFactor.set(0, 1, 0); // Can only rotate around Y
                 
             const loader = new GLTFLoader();
             loader.load(
@@ -170,7 +174,7 @@ export class Player extends EventDispatcher {
             
             sphereBody.velocity.x = joystickInput.x * this.walkSpeed;
             sphereBody.velocity.z = -joystickInput.y * this.walkSpeed;
-            sphereBody.position.y = 0;
+            // sphereBody.position.y = 0;
             
             // Sync mesh with physics body
             // sphereMesh.position.copy(sphereBody.position);
@@ -291,10 +295,10 @@ export class Player extends EventDispatcher {
         DropMultipleLogs(){
             // Check if cooldown period has passed
             const currentTime = performance.now();
-            if (currentTime - this.lastDropTime < this.dropCooldown) {
-                //console.log(`Drop logs on cooldown. ${((this.dropCooldown - (currentTime - this.lastDropTime)) / 1000).toFixed(1)}s remaining`);
-                return; // Still in cooldown period
-            }
+            // if (currentTime - this.lastDropTime < this.dropCooldown) {
+            //     //console.log(`Drop logs on cooldown. ${((this.dropCooldown - (currentTime - this.lastDropTime)) / 1000).toFixed(1)}s remaining`);
+            //     return; // Still in cooldown period
+            // }
 
             //for 0-5 logs, send flyinglogfromplayerto radius around player
             const logCount = 5;

@@ -3,20 +3,45 @@ import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import GlbController from "./glb_controller.js";
 import { Skeleton } from "../../media/Skeleton.glb.js";
 import { Body, Material, Sphere, Vec3 } from "cannon-es";
+import { SensorZone } from "./sensors/sensor.js";
 
 export class SkeletonController extends EventDispatcher {
 
+    STATE_WALKING = "STATE_WALKING";
+    STATE_CHOPPING = "STATE_CHOPPING";
     
-    constructor({ world, scene, position, rotation, player }) {
+    constructor({ world, scene, position, rotation, player, loadedAudioByRef }) {
         super();
         this.world = world;
         this.scene = scene;
         this.position = position;
         this.rotation = rotation;
         this.player = player;
+        this.loadedAudioByRef = loadedAudioByRef;
 
         this.initVisuals();
     }
+
+    setState( newState  )
+        {
+            let animRef = null;
+            switch( newState )
+            {
+                case this.STATE_WALKING:
+                    this.glbController.mixer.timeScale = 0.75;
+                    animRef = this.glbController.getAnimIndexByName("03_walk");
+                    this.glbController.playAnimByIndex( animRef );
+                    break;
+    
+                case this.STATE_CHOPPING:
+                    this.glbController.mixer.timeScale = 1;
+                    animRef = this.glbController.getAnimIndexByName("02_skeleton_attack");
+                    this.glbController.playAnimByIndex( animRef );
+                    break;
+            }
+    
+            this.currentState = newState;
+        }
 
     initVisuals() {
 
@@ -24,12 +49,12 @@ export class SkeletonController extends EventDispatcher {
         const defaultMaterial = new Material("default");
 
         // Movable sphere object
-        const radius = 1.5;
+        const radius = 1;
         const sphereShape = new Sphere(radius);
         const sphereBody = new Body({
             mass: 1,
             material: defaultMaterial,
-            position: new Vec3(0, radius, 0), // start above ground
+            position: this.position
         });
         sphereBody.addShape(sphereShape);
         sphereBody.collisionFilterGroup = 2;        // skeleton group
@@ -37,6 +62,27 @@ export class SkeletonController extends EventDispatcher {
         
         this.world.addBody(sphereBody);
         this.sphereBody = sphereBody;
+
+        const sensor = new SensorZone({
+            world : this.world, 
+            scene : this.scene,
+            position: this.position,
+            // position: position || new Vec3(0, 0, 0),
+            radius: 2,
+            playerBody: this.player.sphereBody, 
+            color: 0xff00ff,
+            sensorType : "skeleton",
+            visible : false
+        });
+
+        
+
+        this.boundOnPlayerEnter = this.onPlayerEnter.bind( this );
+        this.boundOnPlayerExit = this.onPlayerExit.bind( this );
+        sensor.addEventListener('enter', this.boundOnPlayerEnter );
+        sensor.addEventListener('exit', this.boundOnPlayerExit );
+
+        this.sensor = sensor;
 
         const loader = new GLTFLoader();
         loader.load(Skeleton, (gltf) => {
@@ -47,52 +93,75 @@ export class SkeletonController extends EventDispatcher {
             this.scene.add(zombieMesh);
             this.mesh = zombieMesh;
 
+            // listen for animation complete ( loop only, 'finished' will nly fir on non looping anims )
+            this.boundOnAnimComplete = this.onAnimComplete.bind(this);
+
             // Set up animation controller if needed
             this.glbController = new GlbController({  glb : gltf });
-            const animRef = this.glbController.getAnimIndexByName("02_skeleton_attack");
-            this.glbController.playAnimByIndex( animRef );
-            sphereBody.position.copy(this.mesh.position);
+            this.glbController.mixer.addEventListener('loop', this.boundOnAnimComplete )
+
+            this.setState( this.STATE_WALKING );
         });
+    }
+
+    onPlayerEnter()
+    {
+        if( this.currentState != this.STATE_CHOPPING ) this.setState( this.STATE_CHOPPING );
+        this.dispatchEvent({ type: 'skeleton_event', detail : "axe_chop_complete" });
+    }
+
+    onPlayerExit()
+    {
+        this.setState( this.STATE_WALKING );
+    }
+
+    onAnimComplete( e )
+    {
+        
+        switch( e.action._clip.name )
+        {
+            case "02_skeleton_attack":
+                // respond to chop loop complete
+                this.dispatchEvent({ type: 'skeleton_event', detail : "axe_chop_complete" });
+                break;
+        }
     }
 
     update(dt) {                
                 
-            if( !this.mesh ) return;
-            const { sphereBody, mesh } = this;
+        this.sensor.update();
+        
+        if( !this.mesh ) return;
+        const { sphereBody, mesh } = this;
+        
+        const walkSpeed = 1;
+        const skeletonPos = this.mesh.position;
+        const playerPos = this.player.sphereMesh.position;
+        this.sensor.body.position.copy( skeletonPos);
+        
+        const direction = new Vector3()
+            .subVectors(playerPos, skeletonPos)
+            .setY(0)
+            .normalize();
 
-            const walkSpeed = 1;
-            const skeletonPos = this.mesh.position;
-            const playerPos = this.player.sphereMesh.position;
+        // we want only horizontal (XZ) movement:
+        sphereBody.velocity.x = direction.x * walkSpeed;
+        sphereBody.velocity.y = 0;
+        sphereBody.velocity.z = direction.z * walkSpeed;
 
-            const direction = new Vector3()
-                .subVectors(playerPos, skeletonPos)
-                .setY(0)
-                .normalize();
+        // prevent any physics y on collision
+        sphereBody.position.y = 0.5
 
-            // we want only horizontal (XZ) movement:
-            sphereBody.velocity.x = direction.x * walkSpeed;
-            sphereBody.velocity.y = 0;
-            sphereBody.velocity.z = direction.z * walkSpeed;
+        // Make mesh face the player
+        const angle = Math.atan2(direction.x, direction.z); 
+        mesh.rotation.y = angle;
 
-            sphereBody.position.y = skeletonPos.y;
-
-            // Make mesh face the player
-            const angle = Math.atan2(direction.x, direction.z); 
-            mesh.rotation.y = angle;
-
-            // Sync mesh with physics body
-            // to fix the jitters - ease towards the physics object, 2nd param too low makes the hero slide 
-            mesh.position.lerp(sphereBody.position, 0.25); // 0.5 is smoothing factor
-            
-            if( !this.glbController ) return;
-
-            //     if( !this.isChopping && this.currentState != this.STATE_WALKING ) this.setState( this.STATE_WALKING );
-            // } else {
-            //     if( !this.isChopping && this.currentState != this.STATE_IDLE ) this.setState( this.STATE_IDLE );
-            // }
-
-            if( this.glbController ) this.glbController.update( dt );
-        }
+        // Sync mesh with physics body
+        // to fix the jitters - ease towards the physics object, 2nd param too low makes the hero slide 
+        mesh.position.lerp(sphereBody.position, 0.25); // 0.5 is smoothing factor
+        
+        if( this.glbController ) this.glbController.update( dt );
+    }
 
     // update(deltaTime) {
     //     if (this.mesh && this.player && this.player.sphereMesh) {
