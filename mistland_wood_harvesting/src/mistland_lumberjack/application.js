@@ -108,7 +108,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         renderer.shadowMap.type = 3;
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
-        renderer.domElement.style.filter = 'saturate(1.2) contrast(1) brightness(1)';
+        renderer.domElement.style.filter = 'saturate(1.2) contrast(1.1) brightness(1)';
         // Add CSS filters for enhanced visuals
         
         

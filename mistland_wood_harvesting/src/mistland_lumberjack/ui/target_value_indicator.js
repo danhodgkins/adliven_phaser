@@ -11,8 +11,14 @@ export default class TargetValueIndicator{
         const texture = tloader.load(textureRef, () => {
             texture.needsUpdate = true;
             const geometry = new PlaneGeometry(planeSize,planeSize); // Width and height
-            const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : true });
+            const material = new MeshBasicMaterial({ 
+                map: texture, 
+                side: DoubleSide, 
+                transparent: true,
+                depthTest: false // Disable depth testing to always render on top
+            });
             const plane = new Mesh(geometry, material);
+            plane.renderOrder = 100000; // High render order to draw on top
             plane.position.copy( target );
             plane.position.y += yOffset;
             scene.add(plane);
@@ -30,10 +36,16 @@ export default class TargetValueIndicator{
 
             // text plane 
             const textGeometry = new PlaneGeometry(planeSize,planeSize); // Width and height
-            const textMmaterial = new MeshBasicMaterial({ map: textTexture, side: DoubleSide, transparent : true });
+            const textMmaterial = new MeshBasicMaterial({ 
+                map: textTexture, 
+                side: DoubleSide, 
+                transparent: true,
+                depthTest: false // Disable depth testing to always render on top
+            });
             const textPlane = new Mesh(textGeometry, textMmaterial);
             textPlane.position.y-= 0.25;
             textPlane.position.z += 0.2;
+            textPlane.renderOrder = 100001; // High render order to draw on top of the indicator
             this.textPlane = textPlane;
             plane.add(textPlane);
         });  
