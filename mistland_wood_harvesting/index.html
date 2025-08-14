@@ -40,8 +40,21 @@
         playSfx: { value: true, default: true, type: "boolean", description: 'playSfx: turn on/off the SFX' },
         playMusic: { value: true, default: true, type: "boolean", description: 'playMusic: turn on/off music' },
         musicVolume: { value: 100, default: 100, min: 0, max: 100, type: "number", description: 'musicVolume: set the volume of the music, 1-100' },
-        timer: { value: 0, default: 0, min: 0, max: 120, type: "number", description: 'timer: set time before player fails in seconds, 0 to disable' }
+        timer: { value: 0, default: 0, min: 0, max: 120, type: "number", description: 'timer: set time before player fails in seconds, 0 to disable' },
+        locale: { value: 'en', default: 'en', type: "string", description: 'locale: options are en || fr' },
     };
+
+    var texts = {
+	en: {
+		inGameCta: 'Download Now!',
+		tutorial: 'Tap to start level',
+        winPopup: "Your strength ensures our survival! The village thrives thanks to you!"
+	},
+	fr: {
+		inGameCta: '...',
+		tutorial: '...'
+	}}
+
 
     // getters from params in index.html
     function getParamsNumberByID( id ) {

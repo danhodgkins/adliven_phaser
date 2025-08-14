@@ -1,7 +1,7 @@
 import { WebGLRenderer,PlaneGeometry } from "three/src/Three.js";
 import BaseScene from "../scene/basescene";
 import { AmbientLight, BoxGeometry, Clock, DoubleSide, EventDispatcher, Mesh, MeshBasicMaterial, OrthographicCamera, PerspectiveCamera, Quaternion, Raycaster, Scene, SphereGeometry, SRGBColorSpace, Vector3, DirectionalLight, WebGLCubeRenderTarget, CubeCamera, Color, Float32BufferAttribute, MathUtils } from "three/src/Three.Core.js";
-import { MistlandLumberjackUIController } from "./ui_controller";
+import { MistlandLumberjackUIController } from "./ui/ui_controller";
 import { World, Body, Box, Vec3, Plane, Material } from 'cannon-es'
 import { Player } from "./player";
 import { SkeletonController } from "./Skeleton";
@@ -573,6 +573,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             {
                 this.workshop.reveal();
                 this.workshop.disable();
+                this.uiController.onWin();
 
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
                 setTimeout( ()=>{ this.onSceneComplete() } , 3000 );

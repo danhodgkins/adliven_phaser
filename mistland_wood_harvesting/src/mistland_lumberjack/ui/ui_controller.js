@@ -1,10 +1,11 @@
-import { Assets, Container, Sprite, Texture } from 'pixi.js';
+import { Assets, Container, Graphics, Sprite, Texture } from 'pixi.js';
 // import { title_gameplay } from '../../media/pngs_title_gameplay.png.js';
-import { title_gameplay } from '../../media/img_title_gameplay.webp.js';
-import { play_gameplay } from '../../media/img_play_gameplay.webp.js';
+import { title_gameplay } from '../../../media/img_title_gameplay.webp.js';
+import { play_gameplay } from '../../../media/img_play_gameplay.webp.js';
 
 // import '@pixi/layout';
-import ProgressBarGems from './ui/progressbar_gems.js';
+import ProgressBarGems from './progressbar_gems.js';
+import WinPopup from './win_popup.js';
 
 export class MistlandLumberjackUIController {
 
@@ -29,12 +30,18 @@ export class MistlandLumberjackUIController {
         ctaImg.src = play_gameplay;
         const ctaEl = this.uiLayerElement.querySelector("#button-container");
         if( !params.hideCta.value ) ctaEl.appendChild(ctaImg);
-        
+
+    }
+
+    onWin()
+    {
+        this.winPopup.show();
     }
 
     destroy(){
         this.pixiApp = null;
         this.progressBar = null;
+        this.winPopup = null;
     }
 
     update( dt )
@@ -86,12 +93,16 @@ export class MistlandLumberjackUIController {
 
         headerContainer.addChild(progressBar.progressBarContainer);
         this.progressBar = progressBar;
+
+        const winPopup = new WinPopup({ pixiApp : this.pixiApp });
+        this.winPopup = winPopup;
     }
 
     onResize()
     {
         if( this.pixiApp ) this.pixiApp.resize();
         if( this.progressBar ) this.progressBar.onResize();
+        if( this.winPopup ) this.winPopup.onResize();
     }
     // splashUIString() {
     //     return `
