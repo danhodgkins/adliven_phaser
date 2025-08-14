@@ -95,6 +95,9 @@ export class Player extends EventDispatcher {
                     // listen for animation complete ( loop only, 'finished' will nly fir on non looping anims )
                     this.boundOnAnimComplete = this.onAnimComplete.bind(this);
                     this.glbController.mixer.addEventListener('loop', this.boundOnAnimComplete )
+
+                    
+                    this.switchAxe();
                 }, 
                 undefined, 
                 (e) => { console.error("error loading model", e); }
@@ -133,6 +136,7 @@ export class Player extends EventDispatcher {
                 this.directionMarker = plane;
 
                 this.hideHintArrow();
+
             });  
         }
 
@@ -149,6 +153,21 @@ export class Player extends EventDispatcher {
         upgradeAxe()
         {
             this.axeLevel++;
+            this.switchAxe();
+        }
+
+        switchAxe()
+        {
+            this.glbController.glb.scene.traverse(( child ) => {
+                if( child.name == "Axe_01_Common" )
+                {
+                    child.visible = this.axeLevel == 0;
+                }
+                if( child.name == "Axe_01_Legendary" )
+                {
+                    child.visible = this.axeLevel == 1;
+                }
+            });
         }
     
         setState( newState  )
