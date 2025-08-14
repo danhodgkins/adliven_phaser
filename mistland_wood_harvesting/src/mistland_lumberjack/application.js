@@ -78,14 +78,14 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         const scene = new Scene();
         this.scene = scene;
-
+        
         const color = 0xFFFFFF; // LemonChiffon (faint yellow)
-        const intensity = 1;
+        const intensity = 1.5;
         const light = new AmbientLight(color, intensity);
         scene.add(light);
 
         // Add a directional light
-        const dirLight = new DirectionalLight(0xFFFFFF, 6.5); // faint yellow
+        const dirLight = new DirectionalLight(0xFFFFFF, 4); // faint yellow
         dirLight.position.set(-20, 30, 10); // Lower and more horizontal for longer shadows
         dirLight.target.position.set(0, 0, 0); // Point at scene center
         scene.add(dirLight.target);
@@ -108,9 +108,9 @@ export class MistlandLumberjackApplication extends BaseScene{
         renderer.shadowMap.type = 3;
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
-        
+        renderer.domElement.style.filter = 'saturate(1.2) contrast(1) brightness(1)';
         // Add CSS filters for enhanced visuals
-        renderer.domElement.style.filter = 'saturate(1.1) contrast(1.1) brightness(0.9)';
+        
         
         this.renderer = renderer;
 

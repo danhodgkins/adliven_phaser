@@ -112,7 +112,7 @@ export class Player extends EventDispatcher {
                     transparent: false,
                     alphaTest: 0.1, // Pixels with alpha below 0.1 won't cast shadows
                     side: DoubleSide,
-                    color: 0x00ff00 // Green tint
+                    color: 0xffffff // Green tint
                 });
                 // const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : false, wireframe: true   });
                 const plane = new Mesh(geometry, material);
