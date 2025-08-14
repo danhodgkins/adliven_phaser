@@ -106,9 +106,20 @@ export class Player extends EventDispatcher {
             const texture = tloader.load(arrow_plane, () => {
                 texture.needsUpdate = true;
                 const geometry = new PlaneGeometry(6, 6); // Width and height
-                const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : true   });
+                const material = new MeshBasicMaterial({ 
+                    map: texture, 
+                    alphaMap: texture, // Use the same texture for alpha
+                    transparent: false,
+                    alphaTest: 0.1, // Pixels with alpha below 0.1 won't cast shadows
+                    side: DoubleSide,
+                    color: 0x00ff00 // Green tint
+                });
                 // const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : false, wireframe: true   });
                 const plane = new Mesh(geometry, material);
+                
+                // Enable shadow casting and receiving
+                plane.castShadow = true;
+                plane.receiveShadow = true;
     
                 // the model rotation is not visually aliging the texcture so manually set it for now
                 // plane.rotation.copy( rotation );
