@@ -86,6 +86,32 @@ export class SkeletonController extends EventDispatcher {
 
         const loader = new GLTFLoader();
         loader.load(Skeleton, (gltf) => {
+                                // Traverse the loaded model and update materials to cast shadows
+                                gltf.scene.traverse((child) => {
+                                    if (child.isMesh) {
+                                        // Enable shadow casting and receiving
+                                        child.castShadow = true;
+                                        child.receiveShadow = true;
+                                        
+                                        // Convert to MeshStandardMaterial if it isn't already
+                                        if (child.material && child.material.type !== 'MeshStandardMaterial') {
+                                            const oldMaterial = child.material;
+                                            const newMaterial = new MeshStandardMaterial({
+                                                map: oldMaterial.map || null,
+                                                color: oldMaterial.color || 0xffffff,
+                                                transparent: oldMaterial.transparent || false,
+                                                opacity: oldMaterial.opacity || 1,
+                                                roughness: 0.8,
+                                                metalness: 0.1
+                                            });
+                                            child.material = newMaterial;
+                                            
+                                            // Dispose of old material to prevent memory leaks
+                                            if (oldMaterial.dispose) oldMaterial.dispose();
+                                        }
+                                    }
+                                });
+                                
             const zombieMesh = gltf.scene;
             zombieMesh.scale.set(1,1,1);
             zombieMesh.position.copy(this.position);
