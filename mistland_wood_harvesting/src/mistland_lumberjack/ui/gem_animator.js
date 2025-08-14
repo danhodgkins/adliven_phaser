@@ -64,6 +64,47 @@ export class GemAnimator{
         
     }
 
+    fromTopRightTo3D(destinationVec) {
+        const plane = this.initGemPlane();
+
+        // Distance in front of camera for spawn position
+        const zDistance = 5;
+
+        // Convert top-right screen point to world coords
+        const spawnPos = screenToWorld(window.innerWidth, 0, this.camera, zDistance);
+
+        plane.position.copy(spawnPos);
+        plane.lookAt(this.camera.position);
+
+        const params = { 
+            x: plane.position.x, 
+            y: plane.position.y, 
+            z: plane.position.z,
+            scale: 0.1 // start small
+        };
+
+        const t = new Tween(params)
+            .to({ 
+                x: destinationVec.x, 
+                y: destinationVec.y, 
+                z: destinationVec.z,
+                scale: 1 // grow to normal size
+            }, 500)
+            .easing(Easing.Quadratic.Out)
+            .onUpdate(() => {
+                plane.position.set(params.x, params.y, params.z);
+                plane.scale.set(params.scale, params.scale, params.scale);
+            })
+            .onComplete(() => {
+                this.tweens.splice(this.tweens.indexOf(t), 1);
+                this.scene.remove(plane);
+            })
+            .start();
+
+        this.tweens.push(t);
+    }
+
+
     update( dt )
     {
         if( this.tweens.length > 0 ) 

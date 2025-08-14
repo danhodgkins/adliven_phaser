@@ -12,7 +12,7 @@ import LumberMillZone from "./sensors/lumbermill_zone";
 import nipplejs from 'nipplejs';
 import SensorsController from "./sensors/sensors_controller";
 import { ApplicationModel } from "./application_model";
-import WorkshopController from "./workshop_controller";
+import WorkshopController from "./sensors/workshop_controller.js";
 import layoutData from "./data/layout.json"
 import { layoutSceneHelper } from "../utils/layout";
 import CannonDebugger from "cannon-es-debugger";
@@ -569,26 +569,30 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         if( enter && sensorType == "workshop")
         {
-            console.log("player entered workshop sensor gems: ",  this.applicationModel.gemCount , getParamsNumberByID("gemsNeeded"))
-            if( this.applicationModel.gemCount >= getParamsNumberByID("gemsNeeded") )
-            {
-                this.workshop.reveal();
-                this.workshop.disable();
-                this.uiController.onWin();
 
-                if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
-                setTimeout( ()=>{ this.onSceneComplete() } , 3000 );
+            //screenToWorld(window.innerWidth, 0, this.camera, zDistance)
 
-                const winSFX = this.loadedAudioByRef[ "sfx_quest_win" ];
-                winSFX.play();
+            // console.log("player entered workshop sensor gems: ",  this.applicationModel.gemCount , getParamsNumberByID("gemsNeeded"))
+            // if( this.applicationModel.gemCount >= getParamsNumberByID("gemsNeeded") )
+            // {
+            //     this.workshop.reveal();
+            //     this.workshop.disable();
+            //     this.uiController.onWin();
+
+            //     if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
+            //     setTimeout( ()=>{ this.onSceneComplete() } , 3000 );
+
+            //     const winSFX = this.loadedAudioByRef[ "sfx_quest_win" ];
+            //     winSFX.play();
                 
-            }
+            // }
         }
     }
 
     onModelEvent( e )
     {
         //console.log("on model event ", e  );
+        let gemSFX;
         switch( e.detail )
         {
             case "unlock_axe":
@@ -627,11 +631,37 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.player.setHintVector( this.treeHintVector );
                 
                 
-                const gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
+                gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
                 gemSFX.play();
 
                 this.lumberMillZone.updateTargetIndicatorText( Math.max( getParamsNumberByID("gemsNeeded") - this.applicationModel.gemCount , 0 ))
 
+                break;
+
+            case "workshop_tick":
+                this.uiController.updateUI();
+                this.gemAnimator.fromTopRightTo3D( this.workshop.parentObj.position );
+                
+                gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
+                gemSFX.play();
+
+                this.workshop.updateTargetIndicatorText( Math.max( this.applicationModel.workshopGemsNeeded , 0 ))
+
+                break;
+
+            case "reveal_workshop":
+                this.workshop.reveal();
+                this.workshop.disable();
+                this.uiController.onWin();
+
+                // turn off tick interval
+                this.sensorsController.disable();
+
+                if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
+                setTimeout( ()=>{ this.onSceneComplete() } , 5000 );
+
+                const winSFX = this.loadedAudioByRef[ "sfx_quest_win" ];
+                winSFX.play();
                 break;
         }
     }

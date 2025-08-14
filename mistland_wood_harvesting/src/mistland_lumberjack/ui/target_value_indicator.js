@@ -66,6 +66,11 @@ export default class TargetValueIndicator{
         this.textPlane.material.map = textTexture;
     }
 
+    hide()
+    {
+        this.indicatorPlane.visible = false;
+    }
+
     update(dt) {
         if( this.indicatorPlane ) this.indicatorPlane.lookAt( this.camera.position );
     }

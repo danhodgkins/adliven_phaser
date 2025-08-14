@@ -1,12 +1,12 @@
 
 import { DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, PlaneGeometry, TextureLoader, Color, BackSide, FrontSide } from "three";
 // import { lock } from '../../media/pngs_lock.png.js';
-import { locked_area } from '../../media/img_locked_area.webp.js';
+import { locked_area } from '../../../media/img_locked_area.webp.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 import { Easing, Tween } from "@tweenjs/tween.js";
-import { SensorZone } from "./sensors/sensor.js";
-import TargetValueIndicator from "./ui/target_value_indicator.js";
-import { bubble_gem } from '../../media/img_bubble_gem.webp.js';
+import { SensorZone } from "./sensor.js";
+import TargetValueIndicator from "../ui/target_value_indicator.js";
+import { bubble_gem } from '../../../media/img_bubble_gem.webp.js';
 
 export default class WorkshopController{
     constructor({ scene, world, playerBody, sensorType})
@@ -122,10 +122,16 @@ export default class WorkshopController{
         })
     }
 
+    updateTargetIndicatorText( newVal )
+    {
+        this.targetValueIndicator.updateText( newVal );
+    }
+
     // stop sensor events firing after user has entered for final time
     disable()
     {
         this.sensor.deactivate();
+        this.targetValueIndicator.hide();
     }
 
     reveal()

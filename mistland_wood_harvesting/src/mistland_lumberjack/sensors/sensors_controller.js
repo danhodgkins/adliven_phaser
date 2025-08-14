@@ -24,6 +24,7 @@ export default class SensorsController extends EventDispatcher{
 
         this.boundOnChopWoodTick = this.onChopWoodTick.bind(this);
         this.boundOnLumbermillTick = this.onLumbermillTick.bind(this);
+        this.boundOnWorkshopTick = this.onWorkshopTick.bind(this);
 
         this.currentTreeSensor = null;
     }
@@ -37,6 +38,7 @@ export default class SensorsController extends EventDispatcher{
                 break;
 
             case "workshop":
+                this.intervalID = setInterval(this.boundOnWorkshopTick, this.intervalDuraion); // Chop wood every second
                 break;
 
             case "tree":
@@ -69,6 +71,15 @@ export default class SensorsController extends EventDispatcher{
         });
     }
 
+    disable()
+    {
+        if( this.intervalID !== -1) {
+            clearInterval(this.intervalID);
+            this.intervalID = -1;
+            this.currentTreeSensor = null;
+        }
+    }
+
     onChopWoodTick() {
         // this.applicationModel.onLogCollected();
         // this.uiController.updateUI();
@@ -76,5 +87,9 @@ export default class SensorsController extends EventDispatcher{
 
     onLumbermillTick() {
         this.applicationModel.handleLumbermillTick();
+    }
+
+    onWorkshopTick(){
+        this.applicationModel.handleWorkshopTick();
     }
 }
