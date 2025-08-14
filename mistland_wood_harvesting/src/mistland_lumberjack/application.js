@@ -423,7 +423,8 @@ export class MistlandLumberjackApplication extends BaseScene{
             defaultText : getParamsNumberByID("woodNeeded")
         })
 
-        this.player.setHintVector( new Vec3(-3.5, 0, -25) );
+        this.treeHintVector =  new Vec3(-3.5, 0, -25) ;
+        this.player.setHintVector( this.treeHintVector );
 
         // lumbermill zonenew 
         const lumberMillZone = new LumberMillZone({
@@ -622,7 +623,10 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.player.playLoseLogAnim( this.lumberMillZone.model.position );
                 this.uiController.updateUI();
                 this.gemAnimator.from3Dto2D( this.lumberMillZone.model.position );
-
+                
+                this.player.setHintVector( this.treeHintVector );
+                
+                
                 const gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
                 gemSFX.play();
 
