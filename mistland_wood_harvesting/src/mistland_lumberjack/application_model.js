@@ -2,6 +2,7 @@ import { EventDispatcher } from "three";
 
 export class ApplicationModel extends EventDispatcher{
 
+    skeletonAttackDamage = 5;
     logCount = 0;
     gemCount = 0;
 
@@ -24,10 +25,18 @@ export class ApplicationModel extends EventDispatcher{
 
     onSkeletonAttack()
     {
-        if( this.logCount > 0 )
+        let tLogsToLose;
+        if( this.logCount - this.skeletonAttackDamage >= 0 )
         {
-             this.logCount--;
+             this.logCount -= this.skeletonAttackDamage;
+             tLogsToLose = this.skeletonAttackDamage;
+        } else 
+        {
+            // if remaining logs is less than damage value, just return what that value is
+            tLogsToLose = this.logCount;
+            this.logCount = 0;
         }
+        return tLogsToLose;
     }
 
     handleLumbermillTick()

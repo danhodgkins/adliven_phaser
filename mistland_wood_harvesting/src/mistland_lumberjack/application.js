@@ -170,7 +170,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.player = new Player({
             world: world,
             scene: scene,
-            loadedAudioByRef : this.loadedAudioByRef
+            loadedAudioByRef : this.loadedAudioByRef,
+            applicationModel : this.applicationModel 
         });
 
 
@@ -680,8 +681,8 @@ export class MistlandLumberjackApplication extends BaseScene{
 
     onSkeletonEvent( e ){
         //console.log("on skeleton event ", e  );
-        this.applicationModel.onSkeletonAttack();
-        if( this.applicationModel.logCount > 0 ) this.player.DropMultipleLogs();
+        const numLogsToLose = this.applicationModel.onSkeletonAttack();
+        this.player.DropMultipleLogs( numLogsToLose );
     }
     //////////////////////////////////////////////////////////////////////////////////// END EVENT HANDLERS 
 }
