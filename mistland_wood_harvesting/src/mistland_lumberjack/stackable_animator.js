@@ -24,9 +24,10 @@ export default class StackableAnimator extends EventDispatcher
         this.boundOnLaunchableComplete = this.onLaunchableComplete.bind( this );
     }
 
-    launchItem( origin, destination, data )
+    launchItem( origin, destination, data, rotation )
     {
         const newLaunchableMesh = this.launchableMeshTemplate.clone();
+        newLaunchableMesh.rotation.copy( rotation );
         const launchableItem = new LaunchableItem({ 
             origin, 
             destination, 
@@ -81,8 +82,8 @@ class LaunchableItem{
     }
     
     elapsed = 0;
-    peakHeight = 2.0;
-    duration = 0.5;
+    peakHeight = 3.0;
+    duration = 0.25;
     update( dt )
     {
         this.elapsed += dt;

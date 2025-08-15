@@ -329,7 +329,16 @@ export class Player extends EventDispatcher {
             const start = this.currentSensorPosition;
             const logCount = this.carriedLogs.length + 1;
             const end = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
-            this.logLauncherAnimator.launchItem( start, end, { toPlayer : true } );
+            const rot = this.sphereMesh.rotation;
+            this.logLauncherAnimator.launchItem( start, end, { toPlayer : true } , rot);
+        }
+
+        SpawnFlyingLogFromPlayerToTarget(targetposition) {
+            const logCount = this.carriedLogs.length + 1;
+            const start = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
+            const end = targetposition.clone();   
+            const rot = this.sphereMesh.rotation;
+            this.logLauncherAnimator.launchItem( start, end, { toPlayer : false } , rot);
         }
 
         onLogLaunchComplete( e ){
@@ -337,6 +346,9 @@ export class Player extends EventDispatcher {
             if( e.launchable.data.toPlayer)
             {
                 this.logStackController.addItem();
+            } else 
+            {
+                this.logStackController.removeItem();
             }
         }
 
@@ -419,56 +431,56 @@ export class Player extends EventDispatcher {
             }        
         }
 
-        SpawnFlyingLogFromPlayerToTarget(targetposition) {
-            const logCount = this.carriedLogs.length + 1;
-            const start = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
-            const end = targetposition.clone();   
-            const scene = this.scene;
+        // SpawnFlyingLogFromPlayerToTarget(targetposition) {
+        //     const logCount = this.carriedLogs.length + 1;
+        //     const start = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
+        //     const end = targetposition.clone();   
+        //     const scene = this.scene;
 
-            // Load the Log_Single GLB model and animate it
-            const loader = new GLTFLoader();
-            loader.load(
-                Log_Single,
-                (gltf) => {
-                    const logMesh = gltf.scene;
-                    logMesh.position.copy(start);
-                    logMesh.rotation.copy(this.sphereMesh.rotation);
-                    logMesh.scale.set(0.4, 1.1, 1.1);; // Match player's rotation
-                    scene.add(logMesh);
+        //     // Load the Log_Single GLB model and animate it
+        //     const loader = new GLTFLoader();
+        //     loader.load(
+        //         Log_Single,
+        //         (gltf) => {
+        //             const logMesh = gltf.scene;
+        //             logMesh.position.copy(start);
+        //             logMesh.rotation.copy(this.sphereMesh.rotation);
+        //             logMesh.scale.set(0.4, 1.1, 1.1);; // Match player's rotation
+        //             scene.add(logMesh);
 
-                    const duration = 0.25; // seconds
-                    let elapsed = 0;
-                    const peakHeight = 2.0;
-                    let lastTime = performance.now();
+        //             const duration = 0.25; // seconds
+        //             let elapsed = 0;
+        //             const peakHeight = 2.0;
+        //             let lastTime = performance.now();
 
-                    const animate = () => {
-                        const now = performance.now();
-                        const dt = (now - lastTime) / 1000;
-                        lastTime = now;
-                        elapsed += dt;
-                        let t = Math.min(elapsed / duration, 1);
-                        const current = start.clone().lerp(end, t);
-                        current.y += peakHeight * Math.sin(Math.PI * t);
-                        logMesh.position.copy(current);
-                        if (t < 1) {
-                            requestAnimationFrame(animate);
-                        } else {
-                            scene.remove(logMesh);
-                            // After animation, spawn log on player's back
-                            // this.removeLogFromBack();
+        //             const animate = () => {
+        //                 const now = performance.now();
+        //                 const dt = (now - lastTime) / 1000;
+        //                 lastTime = now;
+        //                 elapsed += dt;
+        //                 let t = Math.min(elapsed / duration, 1);
+        //                 const current = start.clone().lerp(end, t);
+        //                 current.y += peakHeight * Math.sin(Math.PI * t);
+        //                 logMesh.position.copy(current);
+        //                 if (t < 1) {
+        //                     requestAnimationFrame(animate);
+        //                 } else {
+        //                     scene.remove(logMesh);
+        //                     // After animation, spawn log on player's back
+        //                     // this.removeLogFromBack();
 
-                            console.log("remove")
-                            this.logStackController.removeItem();
-                        }
-                    };
-                    requestAnimationFrame(animate);
-                },
-                undefined,
-                (error) => {
-                    console.error('Error loading Log_Single GLB:', error);
-                }
-            );
-        }
+        //                     console.log("remove")
+        //                     this.logStackController.removeItem();
+        //                 }
+        //             };
+        //             requestAnimationFrame(animate);
+        //         },
+        //         undefined,
+        //         (error) => {
+        //             console.error('Error loading Log_Single GLB:', error);
+        //         }
+        //     );
+        // }
 
         // addLogToBack() {
         //     const loader = new GLTFLoader();
