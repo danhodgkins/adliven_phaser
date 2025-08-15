@@ -10,14 +10,14 @@ export class SkeletonController extends EventDispatcher {
     STATE_WALKING = "STATE_WALKING";
     STATE_CHOPPING = "STATE_CHOPPING";
     
-    constructor({ world, scene, position, rotation, player, loadedAudioByRef }) {
+    constructor({ world, scene, position, rotation, player, audioController }) {
         super();
         this.world = world;
         this.scene = scene;
         this.position = position;
         this.rotation = rotation;
         this.player = player;
-        this.loadedAudioByRef = loadedAudioByRef;
+        this.audioController = audioController;
 
         this.initVisuals();
     }

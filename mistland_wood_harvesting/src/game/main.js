@@ -16,6 +16,7 @@ import SceneManager from '../scene/scenemanager.js';
 import { MistlandLumberjackApplication } from '../mistland_lumberjack/application.js';
 import { Application, Container, Graphics } from 'pixi.js';
 import CTAScene from '../cta/cta_scene.js';
+import AudioController from '../mistland_lumberjack/audio_controller.js';
 
 export class GameApplication {
     constructor() {
@@ -38,25 +39,26 @@ export class GameApplication {
         });
         el.appendChild(app.view);  
 
+        this.audioController = new AudioController({ loadedAudioByRef : this.loadedAudioByRef });
+
         this.sceneManager = new SceneManager([
             new MistlandLumberjackApplication({
                 config: {
                     id: 'main', 
                     parent: parent,
                     pixiApp : app,
-                    loadedAudioByRef : this.loadedAudioByRef
+                    audioController : this.audioController
                 }
             }),
             new CTAScene({
                 config: {
                     id: 'cta', 
                     parent: parent,
-                    loadedAudioByRef : this.loadedAudioByRef
+                    audioController : this.audioController
                 }
             })
         ], 
-        parent,
-        this.loadedAudioByRef ); 
+        parent ); 
 
         // override the defalut behaviour ( hopefully allows sound to start on pointerdown rather than up. needs testing)
         HowlerGlobal.mobileAutoEnable = false;
@@ -74,15 +76,10 @@ export class GameApplication {
     // one off handler for dutecting user gesture to start audio ( otherwise it will autoplay on pointer UP, not DOWN )
     onPointerdown()
     {
-        console.log("onPointerdown" );
         document.removeEventListener("pointerdown",this.boundOnPointerdown);
 
         if( !params.playMusic.value ) return;
-        const music = this.loadedAudioByRef[ "mus_town_slow" ];
-        music.volume( getParamsNumberByID("musicVolume") * 0.01 );
-        music.loop( true);
-        music.play();
-        this.music = music;
+        this.audioController.play("mus_town_slow", true , getParamsNumberByID("musicVolume") * 0.01);
     }
 
     lastTime;

@@ -31,7 +31,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         super({config});
         console.log("Application initialized with parent:", config);
 
-        this.loadedAudioByRef = config.loadedAudioByRef;
+        this.audioController = config.audioController;
         this.pixiApp = config.pixiApp;
         
         this.boundOnSensorEvent = this.onSensorEvent.bind( this );
@@ -170,7 +170,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.player = new Player({
             world: world,
             scene: scene,
-            loadedAudioByRef : this.loadedAudioByRef,
+            audioController : this.audioController,
             applicationModel : this.applicationModel 
         });
 
@@ -470,7 +470,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                         position: element.position,
                         rotation: new Quaternion(0, 0, 0, 1), // Adjust as needed
                         player: this.player,
-                        loadedAudioByRef: this.loadedAudioByRef
+                        audioController: this.audioController
                     });
                     sc.addEventListener('skeleton_event', this.boundOnSkeletonEvent );
                     this.skeletonControllers.push( sc );
@@ -601,8 +601,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.player.upgradeAxe();
                 this.axeUpgradeController.show( 4000 );
 
-                const upgradeSFX = this.loadedAudioByRef[ "sfx_skillcheck_success_01" ];
-                upgradeSFX.play();
+                const upgradeSFX = this.audioController.play("sfx_skillcheck_success_01");
 
                 break;
 
@@ -614,8 +613,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
                 this.timeoutID = setTimeout( ()=>{ this.followCam.setNewTarget( this.player.sphereMesh.position ) } , 2000 );
                 
-                const unlockSFX = this.loadedAudioByRef[ "sfx_skillcheck_success_01" ];
-                unlockSFX.play();
+                const unlockSFX = this.audioController.play("sfx_skillcheck_success_01");
                 
                 break;
             case "log_collected":
@@ -632,8 +630,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.player.setHintVector( this.treeHintVector );
                 
                 
-                gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
-                gemSFX.play();
+                gemSFX = this.audioController.play("sfx_reward_xp_fly_01");
 
                 this.lumberMillZone.updateTargetIndicatorText( Math.max( getParamsNumberByID("gemsNeeded") - this.applicationModel.gemCount , 0 ))
 
@@ -643,8 +640,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.uiController.updateUI();
                 this.gemAnimator.fromTopRightTo3D( this.workshop.parentObj.position );
                 
-                gemSFX = this.loadedAudioByRef[ "sfx_reward_xp_fly_01" ];
-                gemSFX.play();
+                gemSFX = this.audioController.play( "sfx_reward_xp_fly_01" );
 
                 this.workshop.updateTargetIndicatorText( Math.max( this.applicationModel.workshopGemsNeeded , 0 ))
 
@@ -661,8 +657,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 if( this.timeoutID > -1 ) clearTimeout( this.timeoutID );
                 setTimeout( ()=>{ this.onSceneComplete() } , 5000 );
 
-                const winSFX = this.loadedAudioByRef[ "sfx_quest_win" ];
-                winSFX.play();
+                const winSFX = this.audioController.play( "sfx_quest_win" );
                 break;
         }
     }
