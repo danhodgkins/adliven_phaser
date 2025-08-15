@@ -31,6 +31,8 @@ export default class StackController {
 
     removeItem()
     {
+        if( this.stackedItems.length <= 0 ) return;
+
         const stackableToRemove = this.stackedItems.pop();
         this.parent.remove(stackableToRemove);
 

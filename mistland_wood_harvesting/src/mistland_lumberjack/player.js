@@ -7,6 +7,7 @@ import GlbController from "./glb_controller.js";
 import { arrow_plane } from '../../media/img_arrow_plane.webp.js';
 import { degToRad } from "three/src/math/MathUtils.js";
 import StackController from "./stack_controller.js";
+import StackableAnimator from "./stackable_animator.js";
 
 const logSpacing = 0.3;
 export class Player extends EventDispatcher {
@@ -109,6 +110,13 @@ export class Player extends EventDispatcher {
                         scale : logScale
                     })
 
+                    this.logLauncherAnimator = new StackableAnimator( { 
+                        scene,
+                        launchableAsset : Log_Single,
+                        scale : logScale
+                    })
+                    this.boundOnLogLaunchComplete = this.onLogLaunchComplete.bind( this );
+                    this.logLauncherAnimator.addEventListener( "launch_complete" , this.boundOnLogLaunchComplete );
                     
                     this.switchAxe();
                 }, 
@@ -279,6 +287,7 @@ export class Player extends EventDispatcher {
             }
 
             if( this.glbController ) this.glbController.update( dt );
+            if( this.logLauncherAnimator ) this.logLauncherAnimator.update( dt );
         }
 
         
@@ -316,54 +325,70 @@ export class Player extends EventDispatcher {
         }
 
 
-        SpawnFlyingLogToPlayer() {
+        SpawnFlyingLogToPlayer(){
             const start = this.currentSensorPosition;
             const logCount = this.carriedLogs.length + 1;
             const end = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
-            const scene = this.scene;
-
-            // Load the Log_Single GLB model and animate it
-            const loader = new GLTFLoader();
-            loader.load(
-                Log_Single,
-                (gltf) => {
-                    const logMesh = gltf.scene;
-                    logMesh.position.copy(start);
-                    logMesh.rotation.copy(this.sphereMesh.rotation);
-                    logMesh.scale.set(0.4, 1.1, 1.1); // Match player's rotation
-                    scene.add(logMesh);
-
-                    const duration = 0.25; // seconds
-                    let elapsed = 0;
-                    const peakHeight = 2.0;
-                    let lastTime = performance.now();
-
-                    const animate = () => {
-                        const now = performance.now();
-                        const dt = (now - lastTime) / 1000;
-                        lastTime = now;
-                        elapsed += dt;
-                        let t = Math.min(elapsed / duration, 1);
-                        const current = start.clone().lerp(end, t);
-                        current.y += peakHeight * Math.sin(Math.PI * t);
-                        logMesh.position.copy(current);
-                        if (t < 1) {
-                            requestAnimationFrame(animate);
-                        } else {
-                            scene.remove(logMesh);
-                            // After animation, spawn log on player's back
-                            //this.addLogToBack();
-                            this.logStackController.addItem();
-                        }
-                    };
-                    requestAnimationFrame(animate);
-                },
-                undefined,
-                (error) => {
-                    console.error('Error loading Log_Single GLB:', error);
-                }
-            );
+            this.logLauncherAnimator.launchItem( start, end, { toPlayer : true } );
         }
+
+        onLogLaunchComplete( e ){
+            
+            if( e.launchable.data.toPlayer)
+            {
+                this.logStackController.addItem();
+            }
+        }
+
+
+        // SpawnFlyingLogToPlayer() {
+        //     const start = this.currentSensorPosition;
+        //     const logCount = this.carriedLogs.length + 1;
+        //     const end = this.sphereMesh.position.clone().add(new Vector3(0, logSpacing * logCount, -0.5));
+        //     const scene = this.scene;
+
+        //     // Load the Log_Single GLB model and animate it
+        //     const loader = new GLTFLoader();
+        //     loader.load(
+        //         Log_Single,
+        //         (gltf) => {
+        //             const logMesh = gltf.scene;
+        //             logMesh.position.copy(start);
+        //             logMesh.rotation.copy(this.sphereMesh.rotation);
+        //             logMesh.scale.set(0.4, 1.1, 1.1); // Match player's rotation
+        //             scene.add(logMesh);
+
+        //             const duration = 0.25; // seconds
+        //             let elapsed = 0;
+        //             const peakHeight = 2.0;
+        //             let lastTime = performance.now();
+
+        //             const animate = () => {
+        //                 const now = performance.now();
+        //                 const dt = (now - lastTime) / 1000;
+        //                 lastTime = now;
+        //                 elapsed += dt;
+        //                 let t = Math.min(elapsed / duration, 1);
+        //                 const current = start.clone().lerp(end, t);
+        //                 current.y += peakHeight * Math.sin(Math.PI * t);
+        //                 logMesh.position.copy(current);
+        //                 if (t < 1) {
+        //                     requestAnimationFrame(animate);
+        //                 } else {
+        //                     scene.remove(logMesh);
+        //                     // After animation, spawn log on player's back
+        //                     //this.addLogToBack();
+        //                     this.logStackController.addItem();
+        //                 }
+        //             };
+        //             requestAnimationFrame(animate);
+        //         },
+        //         undefined,
+        //         (error) => {
+        //             console.error('Error loading Log_Single GLB:', error);
+        //         }
+        //     );
+        // }
 
         DropMultipleLogs(){
             // Check if cooldown period has passed
