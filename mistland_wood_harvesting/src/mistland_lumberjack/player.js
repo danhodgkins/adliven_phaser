@@ -6,6 +6,7 @@ import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import GlbController from "./glb_controller.js";
 import { arrow_plane } from '../../media/img_arrow_plane.webp.js';
 import { degToRad } from "three/src/math/MathUtils.js";
+import StackController from "./stack_controller.js";
 
 const logSpacing = 0.3;
 export class Player extends EventDispatcher {
@@ -95,6 +96,18 @@ export class Player extends EventDispatcher {
                     // listen for animation complete ( loop only, 'finished' will nly fir on non looping anims )
                     this.boundOnAnimComplete = this.onAnimComplete.bind(this);
                     this.glbController.mixer.addEventListener('loop', this.boundOnAnimComplete )
+
+                    const logStackParent = new Object3D();
+                    logStackParent.position.set(0, 0, -1); // position stack parent slightly behind player
+                    this.sphereMesh.add( logStackParent );
+
+                    const logScale = new Vec3( 0.4, 1.1, 1.1 );
+                    this.logStackController = new StackController( { 
+                        scene, 
+                        stackableAsset : Log_Single, 
+                        parent3DObject : logStackParent,
+                        scale : logScale
+                    })
 
                     
                     this.switchAxe();
@@ -287,6 +300,9 @@ export class Player extends EventDispatcher {
         {
             // Ensure nearestTree is a Vector3
             this.currentSensorPosition = new Vector3(triggeringBody.position.x, triggeringBody.position.y, triggeringBody.position.z);
+            
+            // this.logStackController.addItem(); 
+            
             this.SpawnFlyingLogToPlayer();
             // will be called on each log collected, and receives sensors wolrd body position
             // console.log("triggeringBody", triggeringBody.position );
@@ -336,7 +352,8 @@ export class Player extends EventDispatcher {
                         } else {
                             scene.remove(logMesh);
                             // After animation, spawn log on player's back
-                            this.addLogToBack();
+                            //this.addLogToBack();
+                            this.logStackController.addItem();
                         }
                     };
                     requestAnimationFrame(animate);
@@ -413,7 +430,10 @@ export class Player extends EventDispatcher {
                         } else {
                             scene.remove(logMesh);
                             // After animation, spawn log on player's back
-                            this.removeLogFromBack();
+                            // this.removeLogFromBack();
+
+                            console.log("remove")
+                            this.logStackController.removeItem();
                         }
                     };
                     requestAnimationFrame(animate);
@@ -425,46 +445,46 @@ export class Player extends EventDispatcher {
             );
         }
 
-        addLogToBack() {
-            const loader = new GLTFLoader();
-            loader.load(
-                Log_Single,
-                (gltf) => {
-                    const logMesh = gltf.scene;
-                    // Stack logs higher for each new log
-                    const logCount = this.carriedLogs.length;
-                    logMesh.position.set(0, 1 + logCount * logSpacing, -0.5); // Adjust Y and Z for stacking
-                    logMesh.rotation.set(Math.PI / 2, 0, 0); // Optional: rotate to look more like a pile
-                    logMesh.scale.set(0.4, 1.1, 1.1); // Match player's rotation
-                    this.sphereMesh.add(logMesh);
-                    this.carriedLogs.push(logMesh);
-                },
-                undefined,
-                (error) => {
-                    console.error('Error loading Log_Single GLB for back:', error);
-                }
-            );
+        // addLogToBack() {
+        //     const loader = new GLTFLoader();
+        //     loader.load(
+        //         Log_Single,
+        //         (gltf) => {
+        //             const logMesh = gltf.scene;
+        //             // Stack logs higher for each new log
+        //             const logCount = this.carriedLogs.length;
+        //             logMesh.position.set(0, 1 + logCount * logSpacing, -0.5); // Adjust Y and Z for stacking
+        //             logMesh.rotation.set(Math.PI / 2, 0, 0); // Optional: rotate to look more like a pile
+        //             logMesh.scale.set(0.4, 1.1, 1.1); // Match player's rotation
+        //             this.sphereMesh.add(logMesh);
+        //             this.carriedLogs.push(logMesh);
+        //         },
+        //         undefined,
+        //         (error) => {
+        //             console.error('Error loading Log_Single GLB for back:', error);
+        //         }
+        //     );
         
-         }
+        //  }
 
-       removeLogFromBack() {
-           if (this.carriedLogs.length > 0) {
-               const logMesh = this.carriedLogs.pop();
-               this.sphereMesh.remove(logMesh);
-               logMesh.traverse((child) => {
-                   if (child.isMesh) {
-                       if (child.geometry) child.geometry.dispose();
-                       if (child.material) {
-                           if (Array.isArray(child.material)) {
-                               child.material.forEach(mat => mat.dispose());
-                           } else {
-                               child.material.dispose();
-                           }
-                       }
-                   }
-               });
-           }
-       }
+    //    removeLogFromBack() {
+    //        if (this.carriedLogs.length > 0) {
+    //            const logMesh = this.carriedLogs.pop();
+    //            this.sphereMesh.remove(logMesh);
+    //            logMesh.traverse((child) => {
+    //                if (child.isMesh) {
+    //                    if (child.geometry) child.geometry.dispose();
+    //                    if (child.material) {
+    //                        if (Array.isArray(child.material)) {
+    //                            child.material.forEach(mat => mat.dispose());
+    //                        } else {
+    //                            child.material.dispose();
+    //                        }
+    //                    }
+    //                }
+    //            });
+    //        }
+    //    }
     }
 
     // function faceTargetFlat(object, target) {
