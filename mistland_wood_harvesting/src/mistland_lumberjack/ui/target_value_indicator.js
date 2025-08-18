@@ -3,8 +3,10 @@ import { DoubleSide, MeshBasicMaterial, PlaneGeometry, TextureLoader, Mesh, Canv
 export default class TargetValueIndicator{
     constructor( { scene, camera, textureRef, target,  yOffset, defaultText, visibleOnInit = true})
     {
-        this.camera = camera; // This might be undefined initially with orthographic setup
+        //this.camera = camera; // This might be undefined initially with orthographic setup
         this.scene = scene; // Store scene reference to find camera later if needed
+
+        this.camera = scene.getObjectByName("main_cam");
         
          /// direction marker
         const tloader = new TextureLoader();
@@ -83,17 +85,17 @@ export default class TargetValueIndicator{
 
     update(dt) {
         // Handle case where camera might be undefined initially
-        if (!this.camera) {
-            // Try to get the camera from the follow cam wrapper
-            const followCamWrapper = this.scene.getObjectByName("main_cam");
-            if (followCamWrapper && followCamWrapper.getCamera) {
-                this.camera = followCamWrapper.getCamera();
-            }
-        }
+        // if (!this.camera) {
+        //     // Try to get the camera from the follow cam wrapper
+        //     const followCamWrapper = this.scene.getObjectByName("main_cam");
+        //     if (followCamWrapper && followCamWrapper.getCamera) {
+        //         this.camera = followCamWrapper.getCamera();
+        //     }
+        // }
         
-        if (this.indicatorPlane && this.camera && this.camera.position) {
-            this.indicatorPlane.lookAt(this.camera.position);
-        }
+        //if (this.indicatorPlane && this.camera && this.camera.position) {
+            if (this.indicatorPlane ) this.indicatorPlane.lookAt(this.camera.position);
+        //}
     }
 }
 

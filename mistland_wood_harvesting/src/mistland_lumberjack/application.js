@@ -213,7 +213,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 targetPosition: new Vector3(0, 0, 0),
                 focusObject: null, // Track if we're focusing on a specific object
                 isFollowingPlayer: false,
-                
+                // name : "main_cam",
                 setNewTarget: (targetPos) => {
                     this.followCam.targetPosition.copy(targetPos);
                     // Check if this is the player by comparing the target with player position
@@ -262,11 +262,10 @@ export class MistlandLumberjackApplication extends BaseScene{
                 mode: 'isometric', // Change to 'orthographic' for Z-only movement
                 getCamera: () => this.camera
             });
-            followCam.name="main_cam";
-            this.camera = followCam.getCamera();
-            this.followCam = followCam;
-            
 
+            this.camera = followCam.getCamera();
+            this.camera.name = "main_cam";
+            this.followCam = followCam;     
         }
 
         this.scene.add(this.camera);
