@@ -3,10 +3,12 @@ import { play_splash } from '../../media/img_play_splash.webp.js';
 import { splash } from '../../media/img_splash.webp.js';
 import { title_splash } from '../../media/img_title_splash.webp.js';
 
-import { warrior_atlas } from '../../media/spine_warrior_atlas.atlas.js';
-import { warrior_json } from '../../media/spine_warrior_json.json.js';
-import { warrior_webp } from '../../media/spine_warrior_webp.webp.js';
+
 import { icon_gem } from '../../media/pngs_icon_gem.png.js';
+
+import { warrior_atlas } from '../../media/spine_warrior_atlas.atlas.js';
+import { warrior_png } from '../../media/spine_warrior_png.png.js';
+import { warrio_jsonr } from '../../media/spine_warrio_jsonr.json.js';
 
 import 'pixi-spine'; // Register the loader
 import { TextureAtlas } from "@pixi-spine/base";
@@ -26,14 +28,14 @@ export default class CTAScene extends BaseScene{
     async initSpine(){
         
         // Decode base64 → text
-        const jsonText  = atob(warrior_json.split(",")[1]);
+        const jsonText  = atob(warrio_jsonr.split(",")[1]);
         const atlasText = atob(warrior_atlas.split(",")[1]);
 
         // Parse JSON
         const spineData = JSON.parse(jsonText);
 
         // Load texture from base64
-        const texture = await Assets.load(warrior_webp);
+        const texture = await Assets.load(warrior_png);
 
         // Create atlas + parser
         const atlas = new TextureAtlas(atlasText, (line, callback) => {
