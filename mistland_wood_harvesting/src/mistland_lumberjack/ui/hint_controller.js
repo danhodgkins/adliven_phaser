@@ -102,59 +102,81 @@ export default class HintManager{
         const handTexture = await Assets.load(hand);
         const handSprite = Sprite.from(handTexture);
 
-        const navBGTexture = await Assets.load( nav_area );
-        const navFGTexture = await Assets.load( nav_touch );
+        const navBGTexture = await Assets.load(nav_area);
+        const navFGTexture = await Assets.load(nav_touch);
         const navBGSprite = Sprite.from(navBGTexture);
         const navFGSprite = Sprite.from(navFGTexture);
         handContainer.addChild(navBGSprite);
         navBGSprite.addChild(navFGSprite);
         handContainer.addChild(handSprite);
+        
+        navBGSprite.anchor = { x: 0.5, y: 0.5 };
+        navFGSprite.anchor = { x: 0.5, y: 0.5 };
 
-        navBGSprite.anchor = { x : 0.5, y : 0.5 };
-        navFGSprite.anchor = { x : 0.5, y : 0.5 };
+        // Shrink both sprites by 25%
+        navBGSprite.scale.set(0.75, 0.75);
 
         this.navBG = navBGSprite;
-        this.handContainer = handContainer;        
+        this.handContainer = handContainer;
+        this.handSprite = handSprite; // Store reference to handSprite
         this.pixiApp.stage.addChild(handContainer);
-
-        this.handContainer.alpha= 0;
+        this.startPosition = { x: this.handSprite.x, y: this.handSprite.y };
+        this.handContainer.alpha = 0;
 
         this.onResize();
 
         
     }
 
-    startHandAnim()
-    {
-        console.log("start anim ")
-        this.handContainer.alpha= 1;
+    startHandAnim() {
+        console.log("start anim ");
+        this.handContainer.alpha = 1;
         this.navBG.alpha = 0;
+        this.handSprite.position.set(this.startPosition.x, this.startPosition.y);
+        this.cycleTween = null;
         const params = { opacity: 0 };
-        this.fadeInTween = new Tween( params )
-        .to({ opacity: 1 }, 1500 )
-        .easing(Easing.Sinusoidal.Out).onUpdate(()=>{
-            this.navBG.alpha = params.opacity;
-            
-        }).onComplete( ()=>{
-            
-        }).delay( 1000 ).start();
+        this.fadeInTween = new Tween(params)
+            .to({ opacity: 1 }, 1500)
+            .easing(Easing.Sinusoidal.Out)
+            .onUpdate(() => {
+                this.navBG.alpha = params.opacity;
+            })
+            .delay(1000)
+            .start();
 
         this.handContainer.y = window.innerHeight;
 
-        this.translateUpTween = new Tween( this.handContainer.position ).to( { y :  this.handContainer.y - 150 })
-        .start();
+        this.translateUpTween = new Tween(this.handContainer.position)
+            .to({ y: this.handContainer.y - 150 })
+            .onComplete(() => {
+                // Start cycling animation after the translate-up animation completes
+                this.startCycleAnimation();
+            })
+            .start();
 
-        params.opacity=1;
-        this.fadeOutTween = new Tween( params )
-        .to({ opacity: 0 }, 1500 )
-        .easing(Easing.Sinusoidal.Out).onUpdate(()=>{
-            this.handContainer.alpha = params.opacity;
-        }).onComplete( ()=>{
-            this.fadeInTween = null;
-            this.translateUpTween = null;
-            this.fadeOutTween = null;
-            
-        }).delay( 5000 ).start();
+        params.opacity = 1;
+        this.fadeOutTween = new Tween(params)
+            .to({ opacity: 0 }, 1500)
+            .easing(Easing.Sinusoidal.Out)
+            .onUpdate(() => {
+                this.handContainer.alpha = params.opacity;
+            })
+            .delay(5000)
+            .start();
+    }
+
+    startCycleAnimation() {
+        // Set the starting position explicitly
+        this.handSprite.position.set(this.startPosition.x, this.startPosition.y);
+
+        const topRightPosition = { x: this.startPosition.x + 100, y: this.startPosition.y - 100 }; // Move right by 100px and up by 100px
+
+        this.cycleTween = new Tween(this.handSprite.position)
+            .to(topRightPosition, 2000) // Move to the new position in 2 seconds
+            .easing(Easing.Sinusoidal.InOut)
+            .yoyo(true) // Cycle back and forth
+            .repeat(Infinity) // Repeat indefinitely
+            .start();
     }
 
     onResize()
@@ -170,5 +192,6 @@ export default class HintManager{
         if( this.fadeInTween ) this.fadeInTween.update();
         if( this.translateUpTween ) this.translateUpTween.update();
         if( this.fadeOutTween ) this.fadeOutTween.update();
+        if (this.cycleTween) this.cycleTween.update();
     }
 }
