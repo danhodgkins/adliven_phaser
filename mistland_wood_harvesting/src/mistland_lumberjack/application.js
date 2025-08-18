@@ -256,14 +256,16 @@ export class MistlandLumberjackApplication extends BaseScene{
                 targetTransformVector: new Vector3(0,0,0),
                 renderer,
                 scene,
-                zoom: 15,
+                zoom: 10,
                 lerpFactor: 0.1,
-                offset: new Vector3(0, 25, 25), // 20 units above the player
-                mode: 'isometric' // Change to 'orthographic' for Z-only movement
+                offset: new Vector3(10, 25, 25), // 20 units above the player
+                mode: 'isometric', // Change to 'orthographic' for Z-only movement
+                getCamera: () => this.camera
             });
-            
+            followCam.name="main_cam";
             this.camera = followCam.getCamera();
             this.followCam = followCam;
+            
 
         }
 
@@ -420,8 +422,10 @@ export class MistlandLumberjackApplication extends BaseScene{
             this.trees.push( tz );
         });
 
+        // Create the target value indicator AFTER camera is properly initialized
         this.treesTargetValueIndicator = new TargetValueIndicator({ 
             scene : this.scene,
+            camera : this.camera, // Camera is now properly initialized
             textureRef:bubble_wood,
             target: new Vec3(-3.5, 0, -25),
             yOffset:4,

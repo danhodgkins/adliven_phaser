@@ -245,30 +245,25 @@ export class Player extends EventDispatcher {
         }
         
         update(dt) {
-            
-            
             const { sphereBody, sphereMesh, joystickInput } = this;
             
             sphereBody.velocity.x = joystickInput.x * this.walkSpeed;
             sphereBody.velocity.z = -joystickInput.y * this.walkSpeed;
-            // sphereBody.position.y = 0;
+            
+            // Calculate current movement speed for animation
+            const currentSpeed = Math.sqrt(sphereBody.velocity.x ** 2 + sphereBody.velocity.z ** 2);
+            const normalizedSpeed = currentSpeed / this.walkSpeed; // This gives 0-1 range based on max speed
             
             // Sync mesh with physics body
-            // sphereMesh.position.copy(sphereBody.position);
-            // to fix the jitters - ease towards the physics object, 2nd param too low makes the hero slide 
-            sphereMesh.position.lerp(sphereBody.position, 0.25); // 0.5 is smoothing factor
-            if( this.directionMarker )
-            {
+            sphereMesh.position.lerp(sphereBody.position, 0.25);
+            
+            if( this.directionMarker ) {
                 this.directionMarker.position.copy(sphereBody.position);
-                // up it a litle so it clears the ground
                 this.directionMarker.position.y +=0.5;
 
-                // console.log("this.hintVector " , this.hintVector );
-                if( this.hintVector )
-                    {
-                        // Example usage in your render loop:
-                        faceTargetFlat(this.directionMarker, this.hintVector );
-                    } 
+                if( this.hintVector ) {
+                    faceTargetFlat(this.directionMarker, this.hintVector );
+                } 
             } 
             
             if( !this.glbController ) return;
@@ -279,11 +274,20 @@ export class Player extends EventDispatcher {
 
                 const q = new Quaternion();
                 q.setFromAxisAngle(new Vector3(0, 1, 0), angle);
-                sphereMesh.quaternion.slerp(q, 0.2); // Smooth turning
+                sphereMesh.quaternion.slerp(q, 0.2);
 
-                if( !this.isChopping && this.currentState != this.STATE_WALKING ) this.setState( this.STATE_WALKING );
+                if( !this.isChopping && this.currentState != this.STATE_WALKING ) {
+                    this.setState( this.STATE_WALKING );
+                }
+                
+                // Update animation speed based on movement speed when walking
+                if (this.currentState === this.STATE_WALKING && this.glbController) {
+                    this.glbController.mixer.timeScale = Math.max(0.1, normalizedSpeed * 2); // Minimum 0.1 to avoid stopping
+                }
             } else {
-                if( !this.isChopping && this.currentState != this.STATE_IDLE ) this.setState( this.STATE_IDLE );
+                if( !this.isChopping && this.currentState != this.STATE_IDLE ) {
+                    this.setState( this.STATE_IDLE );
+                }
             }
 
             if( this.glbController ) this.glbController.update( dt );

@@ -1,0 +1,70 @@
+warrior.webp
+	size: 1513, 529
+	filter: Linear, Linear
+	pma: true
+	scale: 0.75
+1
+	bounds: 1068, 4, 206, 126
+	rotate: 90
+10
+	bounds: 1462, 358, 48, 95
+11
+	bounds: 1452, 161, 63, 59
+	rotate: 90
+12
+	bounds: 1314, 262, 146, 65
+13
+	bounds: 1314, 455, 72, 173
+	rotate: 90
+14
+	bounds: 768, 20, 165, 187
+15
+	bounds: 355, 156, 51, 108
+	offsets: 0, 0, 60, 108
+	rotate: 90
+16
+	bounds: 977, 212, 44, 149
+	rotate: 90
+17
+	bounds: 1300, 12, 71, 134
+18
+	bounds: 1305, 148, 112, 145
+	rotate: 90
+19
+	bounds: 1101, 301, 211, 226
+2
+	bounds: 1314, 329, 146, 124
+20
+	bounds: 1128, 219, 80, 175
+	rotate: 90
+21
+	bounds: 305, 8, 112, 161
+	rotate: 90
+22
+	bounds: 355, 209, 575, 318
+23
+	bounds: 1196, 105, 102, 112
+24
+	bounds: 935, 24, 183, 131
+	rotate: 90
+24-1
+	bounds: 932, 209, 43, 47
+25
+	bounds: 1462, 226, 130, 43
+	rotate: 90
+3
+	bounds: 1373, 27, 123, 119
+4
+	bounds: 355, 130, 37, 24
+5
+	bounds: 932, 258, 269, 167
+	rotate: 90
+6
+	bounds: 2, 2, 107, 301
+	rotate: 90
+7
+	bounds: 468, 3, 298, 204
+8
+	bounds: 189, 122, 164, 405
+9
+	bounds: 2, 111, 185, 416
