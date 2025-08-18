@@ -28,8 +28,8 @@ export class Player extends EventDispatcher {
             this.scene = scene;
             this.audioController = audioController;
             this.axeLevel = 0;
-            this.chopSpeed0 = 5;
-            this.chopSpeed1 = 10;
+            this.chopSpeed0 = 2.5;
+            this.chopSpeed1 = 5;
 
             this.joystickInput = { x: 0, y: 0 };
             this.walkSpeed = getParamsNumberByID("walkSpeed");
