@@ -88,7 +88,7 @@ export class Player extends EventDispatcher {
                             }
                         }
                     });
-                    
+                    e.scene.position.y -= 0.3;
                     scene.add(e.scene);   
                     // console.log("e.scene:", e.scene );
                     this.sphereMesh.add( e.scene );
