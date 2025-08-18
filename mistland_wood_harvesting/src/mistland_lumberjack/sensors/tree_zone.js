@@ -8,10 +8,11 @@ export default class TreeZone {
 
     logsAvailable = 5;
 
-    constructor({ world, scene, position, radius = 1.5, playerBody, sensorType, model }) {
+    constructor({ world, scene, position, radius = 1.5, playerBody, sensorType, model , id }) {
         this.world = world;
         this.scene = scene;
         this.radius = radius;
+        this.id = id;
 
         const sensor = new SensorZone({
             world, 
@@ -40,6 +41,7 @@ export default class TreeZone {
             position: new Vec3(position.x, 1.0, position.z),
         });
         world.addBody(sphereBody);
+        this.body = sphereBody;
 
         this.targetValueIndicator = new TargetValueIndicator({ 
             scene,
@@ -47,7 +49,7 @@ export default class TreeZone {
             target: position,
             yOffset: 6,
             defaultText : this.logsAvailable,
-            visibleOnInit : false
+            visibleOnInit : true
         })
 
         this.sensor = sensor;
@@ -82,6 +84,8 @@ export default class TreeZone {
 
     destroy( tween , completCallback)
     {
+        this.world.removeBody(this.body);
+        
         this.targetValueIndicator.hide();
         this.sensor.removeEventListener('enter', this.boundOnPlayerEnter );
         this.sensor.removeEventListener('exit', this.boundOnPlayerExit );
