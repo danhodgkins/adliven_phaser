@@ -28,6 +28,23 @@ export default class StackableAnimator extends EventDispatcher
     {
         const newLaunchableMesh = this.launchableMeshTemplate.clone();
         newLaunchableMesh.rotation.copy( rotation );
+        
+        // Disable depth testing and set high render order for front rendering
+        newLaunchableMesh.traverse((child) => {
+            if (child.isMesh && child.material) {
+                if (Array.isArray(child.material)) {
+                    child.material.forEach(mat => {
+                        mat.depthTest = false;
+                        mat.depthWrite = false;
+                    });
+                } else {
+                    child.material.depthTest = false;
+                    child.material.depthWrite = false;
+                }
+                child.renderOrder = 9999; // High render order to draw on top
+            }
+        });
+        
         const launchableItem = new LaunchableItem({ 
             origin, 
             destination, 
@@ -82,7 +99,7 @@ class LaunchableItem{
     }
     
     elapsed = 0;
-    peakHeight = 3.0;
+    peakHeight = 1.5;
     duration = 0.25;
     update( dt )
     {
