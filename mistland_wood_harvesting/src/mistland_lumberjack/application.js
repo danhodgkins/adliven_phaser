@@ -612,7 +612,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "unlock_axe":
                 console.log("unlock axe");
                 this.player.upgradeAxe();
-                this.axeUpgradeController.show( 4000 );
+                this.axeUpgradeController.show( 2000 );
 
                 const upgradeSFX = this.audioController.play("sfx_skillcheck_success_01");
 
