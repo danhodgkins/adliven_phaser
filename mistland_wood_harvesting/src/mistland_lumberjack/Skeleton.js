@@ -86,38 +86,41 @@ export class SkeletonController extends EventDispatcher {
 
         const loader = new GLTFLoader();
         loader.load(Skeleton, (gltf) => {
-                                // Traverse the loaded model and update materials to cast shadows
-                                gltf.scene.traverse((child) => {
-                                    if (child.isMesh) {
-                                        // Enable shadow casting and receiving
-                                        child.castShadow = true;
-                                        child.receiveShadow = true;
-                                        
-                                        // Convert to MeshStandardMaterial if it isn't already
-                                        if (child.material && child.material.type !== 'MeshStandardMaterial') {
-                                            const oldMaterial = child.material;
-                                            const newMaterial = new MeshStandardMaterial({
-                                                map: oldMaterial.map || null,
-                                                color: oldMaterial.color || 0xffffff,
-                                                transparent: oldMaterial.transparent || false,
-                                                opacity: oldMaterial.opacity || 1,
-                                                roughness: 0.8,
-                                                metalness: 0.1
-                                            });
-                                            child.material = newMaterial;
-                                            
-                                            // Dispose of old material to prevent memory leaks
-                                            if (oldMaterial.dispose) oldMaterial.dispose();
-                                        }
-                                    }
-                                });
-                                
+            // Traverse the loaded model and update materials to cast shadows
+            gltf.scene.traverse((child) => {
+                if (child.isMesh) {
+                    // Enable shadow casting and receiving
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                    
+                    // Convert to MeshStandardMaterial if it isn't already
+                    if (child.material && child.material.type !== 'MeshStandardMaterial') {
+                        const oldMaterial = child.material;
+                        const newMaterial = new MeshStandardMaterial({
+                            map: oldMaterial.map || null,
+                            color: oldMaterial.color || 0xffffff,
+                            transparent: oldMaterial.transparent || false,
+                            opacity: oldMaterial.opacity || 1,
+                            roughness: 0.8,
+                            metalness: 0.1
+                        });
+                        child.material = newMaterial;
+                        
+                        // Dispose of old material to prevent memory leaks
+                        if (oldMaterial.dispose) oldMaterial.dispose();
+                    }
+                }
+            });
+            
             const zombieMesh = gltf.scene;
             zombieMesh.scale.set(1,1,1);
             zombieMesh.position.copy(this.position);
             zombieMesh.quaternion.setFromEuler(new Euler(0, Math.PI / 2, 0));
             this.scene.add(zombieMesh);
             this.mesh = zombieMesh;
+
+            // Store the visual offset
+            this.visualOffset = -0.2; // Adjust this value as needed
 
             // listen for animation complete ( loop only, 'finished' will nly fir on non looping anims )
             this.boundOnAnimComplete = this.onAnimComplete.bind(this);
@@ -154,7 +157,6 @@ export class SkeletonController extends EventDispatcher {
     }
 
     update(dt) {                
-                
         this.sensor.update();
         
         if( !this.mesh ) return;
@@ -176,15 +178,15 @@ export class SkeletonController extends EventDispatcher {
         sphereBody.velocity.z = direction.z * walkSpeed;
 
         // prevent any physics y on collision
-        sphereBody.position.y = 0.5
+        sphereBody.position.y = 1; // Keep physics body above ground
 
         // Make mesh face the player
         const angle = Math.atan2(direction.x, direction.z); 
         mesh.rotation.y = angle;
 
-        // Sync mesh with physics body
-        // to fix the jitters - ease towards the physics object, 2nd param too low makes the hero slide 
-        mesh.position.lerp(sphereBody.position, 0.25); // 0.5 is smoothing factor
+        // Sync mesh with physics body AND apply visual offset
+        mesh.position.lerp(sphereBody.position, 0.25);
+        mesh.position.y += this.visualOffset; // Apply the visual offset after lerp
         
         if( this.glbController ) this.glbController.update( dt );
     }
