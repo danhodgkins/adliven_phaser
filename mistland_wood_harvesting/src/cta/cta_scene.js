@@ -3,17 +3,62 @@ import { play_splash } from '../../media/img_play_splash.webp.js';
 import { splash } from '../../media/img_splash.webp.js';
 import { title_splash } from '../../media/img_title_splash.webp.js';
 
+import { warrior_atlas } from '../../media/spine_warrior_atlas.atlas.js';
+import { warrior_json } from '../../media/spine_warrior_json.json.js';
+import { warrior_webp } from '../../media/spine_warrior_webp.webp.js';
+import { icon_gem } from '../../media/pngs_icon_gem.png.js';
+
+import 'pixi-spine'; // Register the loader
+import { TextureAtlas } from "@pixi-spine/base";
+import { Spine, SkeletonJson, AtlasAttachmentLoader } from "@pixi-spine/runtime-4.1";
+import { Assets } from 'pixi.js';
+
 export default class CTAScene extends BaseScene{
-    constructor( {  config })
+    constructor( {  config  })
     {
-        super({config});
+        super({ config });
+        this.pixiApp = config.pixiApp;
     }
 
     portraitInited = false;
     landscapeInited = false;
 
+    async initSpine(){
+        
+        // Decode base64 → text
+        const jsonText  = atob(warrior_json.split(",")[1]);
+        const atlasText = atob(warrior_atlas.split(",")[1]);
+
+        // Parse JSON
+        const spineData = JSON.parse(jsonText);
+
+        // Load texture from base64
+        const texture = await Assets.load(warrior_webp);
+
+        // Create atlas + parser
+        const atlas = new TextureAtlas(atlasText, (line, callback) => {
+            callback(texture.baseTexture);
+        });
+
+        const atlasLoader = new AtlasAttachmentLoader(atlas);
+        const skeletonJson = new SkeletonJson(atlasLoader);
+
+        const skeletonData = skeletonJson.readSkeletonData(spineData);
+
+        // Create Spine object
+        const spineAnimation = new Spine(skeletonData);
+        spineAnimation.x = app.renderer.width / 2;
+        spineAnimation.y = app.renderer.height;
+        spineAnimation.state.setAnimation(0, "idle", true);
+
+        this.pixiApp.stage.addChild(spineAnimation);
+    }
+
     initPortrait()
     {
+        //this.initSpine();
+        //return;
+
         const ctaOverlayLandscape = document.getElementById("ui-overlay-cta-landscape");
         ctaOverlayLandscape.style.display = 'none';
 
@@ -151,7 +196,7 @@ export default class CTAScene extends BaseScene{
         uiOverlay.style.display = 'none'; // Hides the element and removes it from the layout
 
         const pixiOverlay = document.getElementById("pixi-container");
-        pixiOverlay.style.display = 'none'; // Hides the element and removes it from the layout
+        //pixiOverlay.style.display = 'none'; // Hides the element and removes it from the layout
 
         this.boundOnResize = this.onResize.bind( this );
         window.addEventListener('resize', this.boundOnResize );

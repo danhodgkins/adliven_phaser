@@ -38,7 +38,8 @@
         "howler": "^2.2.4",
         "http-server": "^14.1.1",
         "nipplejs": "^0.10.2",
-        "pixi.js": "^7.4.2",
+        "pixi-spine": "^4.0.6",
+        "pixi.js": "^7.4.3",
         "three": "^0.178.0"
     }
 }

@@ -138,8 +138,8 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         // Apply custom PNG styling
         joystick.on('added', function(evt, nipple) {
-            console.log('nav_area:', nav_area); // Debug: check what the imported value is
-            console.log('nav_touch:', nav_touch); // Debug: check what the imported value is
+            //console.log('nav_area:', nav_area); // Debug: check what the imported value is
+            //console.log('nav_touch:', nav_touch); // Debug: check what the imported value is
             
             // Base circle (outer ring)
             nipple.ui.el.style.backgroundImage = `url(${nav_area})`;
@@ -159,7 +159,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             nipple.ui.el.style.transformOrigin = 'center center'; // Set transform origin to center
             nipple.ui.el.style.position = 'absolute'; // Ensure absolute positioning
             
-            console.log('Base element styles:', nipple.ui.el.style.backgroundImage); // Debug
+            //console.log('Base element styles:', nipple.ui.el.style.backgroundImage); // Debug
             
             // Knob (inner circle)
             nipple.ui.front.style.backgroundImage = `url(${nav_touch})`;
@@ -181,7 +181,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             // Force visibility for debugging
             nipple.ui.front.style.opacity = '1';
             
-            console.log('Front element styles:', nipple.ui.front.style.backgroundImage); // Debug
+            //console.log('Front element styles:', nipple.ui.front.style.backgroundImage); // Debug
         });
 
         this.joystickInput = { x: 0, y: 0, rotation: 0 };  

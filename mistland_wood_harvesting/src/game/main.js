@@ -54,7 +54,8 @@ export class GameApplication {
                 config: {
                     id: 'cta', 
                     parent: parent,
-                    audioController : this.audioController
+                    audioController : this.audioController,
+                    pixiApp : app
                 }
             })
         ], 
@@ -66,8 +67,8 @@ export class GameApplication {
         this.boundUpdate = this.update.bind(this);
         requestAnimationFrame(this.boundUpdate );
 
-        this.sceneManager.setScene( 'main' );    
-        // this.sceneManager.setScene( 'cta' );    
+        // this.sceneManager.setScene( 'main' );    
+        this.sceneManager.setScene( 'cta' );    
 
         this.boundOnPointerdown = this.onPointerdown.bind(this);
         document.addEventListener("pointerdown",this.boundOnPointerdown);
