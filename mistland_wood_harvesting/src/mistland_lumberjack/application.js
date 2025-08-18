@@ -422,17 +422,19 @@ export class MistlandLumberjackApplication extends BaseScene{
         });
 
         // Create the target value indicator AFTER camera is properly initialized
-        this.treesTargetValueIndicator = new TargetValueIndicator({ 
-            scene : this.scene,
-            camera : this.camera, // Camera is now properly initialized
-            textureRef:bubble_wood,
-            target: new Vec3(-3.5, 0, -25),
-            yOffset:4,
-            defaultText : getParamsNumberByID("woodNeeded")
-        })
+        // this.treesTargetValueIndicator = new TargetValueIndicator({ 
+        //     scene : this.scene,
+        //     camera : this.camera, // Camera is now properly initialized
+        //     textureRef:bubble_wood,
+        //     target: new Vec3(-3.5, 0, -25),
+        //     yOffset:4,
+        //     defaultText : getParamsNumberByID("woodNeeded")
+        // })
 
-        this.treeHintVector =  new Vec3(-3.5, 0, -25) ;
-        this.player.setHintVector( this.treeHintVector );
+        // this.treeHintVector =  new Vec3(-3.5, 0, -25) ;
+        // this.player.setHintVector( this.treeHintVector );
+        
+        this.player.setHintVector( this.getTreeHintVector() );
 
         // lumbermill zonenew 
         const lumberMillZone = new LumberMillZone({
@@ -545,7 +547,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             });
         }
         
-        if( this.treesTargetValueIndicator ) this.treesTargetValueIndicator.update();
+        // if( this.treesTargetValueIndicator ) this.treesTargetValueIndicator.update();
         if( this.lumberMillZone ) this.lumberMillZone.update();
         if( this.workshop ) this.workshop.update( dt );
         if( this.uiController ) this.uiController.update( dt );
@@ -562,6 +564,10 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.renderer.render( this.scene, this.camera );
     }
 
+    getTreeHintVector()
+    {
+        return this.trees[ 0 ].sensor.position;
+    }
 
     //////////////////////////////////////////////////////////////////////////////////// EVENT HANDLERS 
     onSensorEvent( e )
@@ -690,7 +696,9 @@ export class MistlandLumberjackApplication extends BaseScene{
                 {
                     this.sensorsController.removeTree( targetTree );
                     //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
-                    targetTree.destroy( true );
+                    targetTree.destroy( true , ( tree )=>{
+                        this.trees.splice( this.trees.indexOf( tree , 1 ));
+                    });
                 }
                 break;
         }

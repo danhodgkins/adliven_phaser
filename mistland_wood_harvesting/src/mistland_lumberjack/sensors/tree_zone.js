@@ -80,7 +80,7 @@ export default class TreeZone {
         if( this.scaleDownTween ) this.scaleDownTween.update();
     }
 
-    destroy( tween )
+    destroy( tween , completCallback)
     {
         this.targetValueIndicator.hide();
         this.sensor.removeEventListener('enter', this.boundOnPlayerEnter );
@@ -98,6 +98,7 @@ export default class TreeZone {
             }, 850 )
             .easing(Easing.Elastic.In).onComplete( ()=>{
                 this.scaleDownTween =null;
+                completCallback();
             }).start();
 
         }
