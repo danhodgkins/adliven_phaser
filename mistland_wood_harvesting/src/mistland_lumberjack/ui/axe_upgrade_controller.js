@@ -20,7 +20,7 @@ export class AxeUpgradeController{
             const geometry = new PlaneGeometry(planeSize,planeSize); // Width and height
             const material = new MeshBasicMaterial({ map: texture, side: DoubleSide, transparent : true   });
             const plane = new Mesh(geometry, material);
-            plane.position.z -=1;
+            plane.position.z -=3;
             plane.position.y +=1;
             this.parentObj.add(plane);
             this.bgPlane = plane;
@@ -34,7 +34,7 @@ export class AxeUpgradeController{
                 if( params.perspectiveCamera.value ){
                     e.scene.scale.set( 3,3,3);
                 }else {
-                    e.scene.scale.set( 10,10,10);
+                    e.scene.scale.set( 6,6,6);
                 }
                 this.parentObj.add(e.scene);   
                 this.axe = e.scene;
