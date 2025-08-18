@@ -49,7 +49,7 @@ export default class TreeZone {
             target: position,
             yOffset: 6,
             defaultText : this.logsAvailable,
-            visibleOnInit : true
+            visibleOnInit : false
         })
 
         this.sensor = sensor;
