@@ -21,6 +21,8 @@ import HintManager from "./ui/hint_controller";
 import { GemAnimator } from "./ui/gem_animator";
 import TargetValueIndicator from "./ui/target_value_indicator";
 import { bubble_wood } from '../../media/img_bubble_wood.webp.js';
+import { nav_area } from "../../media/pngs_nav_area.png.js";
+import { nav_touch } from "../../media/pngs_nav_touch.png.js";
 
 export class MistlandLumberjackApplication extends BaseScene{
 
@@ -124,14 +126,63 @@ export class MistlandLumberjackApplication extends BaseScene{
         // input 
         
         var options = {           
-            mode: "dynamic",   // 'dynamic', 'static' or 'semi'
-            color: "white",
-            size : 200
-            // zone: document.getElementById('zone_joystick'), // Your container
+            mode: "dynamic",
+            color: "transparent", // Make base transparent since we'll use PNG
+            size: 150,
+            restOpacity: 0.8,
+            fadeTime: 300
         };
         
         var joystick = nipplejs.create(options);
         this.joystick = joystick;
+
+        // Apply custom PNG styling
+        joystick.on('added', function(evt, nipple) {
+            console.log('nav_area:', nav_area); // Debug: check what the imported value is
+            console.log('nav_touch:', nav_touch); // Debug: check what the imported value is
+            
+            // Base circle (outer ring)
+            nipple.ui.el.style.backgroundImage = `url(${nav_area})`;
+            nipple.ui.el.style.backgroundSize = 'cover';
+            nipple.ui.el.style.backgroundRepeat = 'no-repeat';
+            nipple.ui.el.style.backgroundPosition = 'center center'; // Ensure center positioning
+            nipple.ui.el.style.backgroundColor = 'transparent';
+            nipple.ui.el.style.border = 'none';
+            
+            // Force proper centering and positioning
+            nipple.ui.el.style.width = '150px';
+            nipple.ui.el.style.height = '150px';
+            nipple.ui.el.style.opacity = '1';
+            
+            // Key fixes for centering the pivot
+            nipple.ui.el.style.transform = 'translate(-50%, -50%)'; // Center the element on its position
+            nipple.ui.el.style.transformOrigin = 'center center'; // Set transform origin to center
+            nipple.ui.el.style.position = 'absolute'; // Ensure absolute positioning
+            
+            console.log('Base element styles:', nipple.ui.el.style.backgroundImage); // Debug
+            
+            // Knob (inner circle)
+            nipple.ui.front.style.backgroundImage = `url(${nav_touch})`;
+            nipple.ui.front.style.backgroundSize = 'cover';
+            nipple.ui.front.style.backgroundRepeat = 'no-repeat';
+            nipple.ui.front.style.backgroundPosition = 'center center'; // Center the background
+            nipple.ui.front.style.backgroundColor = 'transparent';
+            nipple.ui.front.style.border = 'none';
+
+            //nipple.ui.front.style.height = '75px'; // Set height for the knob
+            //nipple.ui.front.style.width = '75px'; // Set width for the knob
+            // Center the knob as well
+            nipple.ui.front.style.transform = 'translate(-50%, -50%)';
+            nipple.ui.front.style.transformOrigin = 'center center';
+            nipple.ui.front.style.position = 'absolute';
+            nipple.ui.front.style.left = '50%';
+            nipple.ui.front.style.top = '50%';
+
+            // Force visibility for debugging
+            nipple.ui.front.style.opacity = '1';
+            
+            console.log('Front element styles:', nipple.ui.front.style.backgroundImage); // Debug
+        });
 
         this.joystickInput = { x: 0, y: 0, rotation: 0 };  
              
@@ -612,7 +663,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "unlock_axe":
                 console.log("unlock axe");
                 this.player.upgradeAxe();
-                this.axeUpgradeController.show( 4000 );
+                this.axeUpgradeController.show( 2000 );
 
                 const upgradeSFX = this.audioController.play("sfx_skillcheck_success_01");
 

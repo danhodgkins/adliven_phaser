@@ -57,8 +57,53 @@ export default class TreeZone {
 
     decrementValue()
     {
-        if( this.logsAvailable > 0 ) this.logsAvailable--;
-        this.targetValueIndicator.updateText( this.logsAvailable )
+        if( this.logsAvailable > 0 ) {
+            this.logsAvailable--;
+            this.targetValueIndicator.updateText( this.logsAvailable );
+            
+            // Trigger feedback animation
+            this.playFeedbackAnimation();
+        }
+    }
+
+    playFeedbackAnimation() {
+        // Store original scale if not already stored
+        if (!this.originalScale) {
+            this.originalScale = {
+                x: this.model.scale.x,
+                y: this.model.scale.y,
+                z: this.model.scale.z
+            };
+        }
+
+        // Cancel any existing feedback tween
+        if (this.feedbackTween) {
+            this.feedbackTween.stop();
+        }
+
+        // Scale down to 0.9
+        this.feedbackTween = new Tween(this.model.scale)
+            .to({
+                x: this.originalScale.x * 1.05,
+                y: this.originalScale.y * 1.05,
+                z: this.originalScale.z * 1.05
+            }, 150) // Quick scale down
+            .easing(Easing.Sinusoidal.Out)
+            .onComplete(() => {
+                // Scale back up to original size
+                this.feedbackTween = new Tween(this.model.scale)
+                    .to({
+                        x: this.originalScale.x,
+                        y: this.originalScale.y,
+                        z: this.originalScale.z
+                    }, 300) // Slightly longer scale back up
+                    .easing(Easing.Elastic.Out)
+                    .onComplete(() => {
+                        this.feedbackTween = null;
+                    })
+                    .start();
+            })
+            .start();
     }
 
     onPlayerEnter()
@@ -80,6 +125,7 @@ export default class TreeZone {
         this.sensor.update();
         this.targetValueIndicator.update();
         if( this.scaleDownTween ) this.scaleDownTween.update();
+        if( this.feedbackTween ) this.feedbackTween.update(); // Update feedback tween
     }
 
     destroy( tween , completCallback)
@@ -92,6 +138,12 @@ export default class TreeZone {
 
         console.log("destroy tree zone")
 
+        // Stop feedback tween if running
+        if (this.feedbackTween) {
+            this.feedbackTween.stop();
+            this.feedbackTween = null;
+        }
+
         if( tween )
         {
             this.scaleDownTween = new Tween( this.model.scale )
@@ -101,10 +153,9 @@ export default class TreeZone {
                 z: 0 
             }, 850 )
             .easing(Easing.Elastic.In).onComplete( ()=>{
-                this.scaleDownTween =null;
+                this.scaleDownTween = null;
                 completCallback();
             }).start();
-
         }
     }
 
