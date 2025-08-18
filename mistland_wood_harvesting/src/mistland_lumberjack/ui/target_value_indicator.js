@@ -1,7 +1,7 @@
 import { DoubleSide, MeshBasicMaterial, PlaneGeometry, TextureLoader, Mesh, CanvasTexture} from "three";
 
 export default class TargetValueIndicator{
-    constructor( { scene, textureRef, target,  yOffset, defaultText })
+    constructor( { scene, textureRef, target,  yOffset, defaultText, visibleOnInit = true})
     {
         this.camera = scene.getObjectByName("main_cam");
          /// direction marker
@@ -48,6 +48,8 @@ export default class TargetValueIndicator{
             textPlane.renderOrder = 100001; // High render order to draw on top of the indicator
             this.textPlane = textPlane;
             plane.add(textPlane);
+
+            this.indicatorPlane.visible = visibleOnInit;
         });  
 
 
@@ -70,6 +72,12 @@ export default class TargetValueIndicator{
     {
         this.indicatorPlane.visible = false;
     }
+
+    show()
+    {
+        this.indicatorPlane.visible = true;
+    }
+
 
     update(dt) {
         if( this.indicatorPlane ) this.indicatorPlane.lookAt( this.camera.position );

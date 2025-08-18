@@ -397,7 +397,10 @@ export class MistlandLumberjackApplication extends BaseScene{
         const treeConfigs = [];
         matches.forEach(element => {
             // we need to convert Threes Vector3 to Cannons Vec3
-            const config = { position: new Vec3(element.position.x, element.position.y, element.position.z) }
+            const config = { 
+                position: new Vec3(element.position.x, element.position.y, element.position.z), 
+                child : element 
+            }
             treeConfigs.push( config );
         });
         
@@ -411,7 +414,8 @@ export class MistlandLumberjackApplication extends BaseScene{
                 position: element.position,
                 radius: 3,
                 playerBody: this.player.sphereBody,
-                sensorType: "tree"
+                sensorType: "tree",
+                model : element.child
             });            
             this.trees.push( tz );
         });
@@ -617,7 +621,12 @@ export class MistlandLumberjackApplication extends BaseScene{
                 
                 break;
             case "log_collected":
-                if(  this.sensorsController.currentTreeSensor ) this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
+                if(  this.sensorsController.currentTreeSensor ) 
+                {
+                    this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
+                    const targetTree = this.sensorsController.currentTreeSensor.parentController;
+                    targetTree.decrementValue();
+                }
                 this.uiController.updateUI();
                 this.player.setHintVector( this.lumberMillZone.model.position );
                 break;
@@ -668,14 +677,24 @@ export class MistlandLumberjackApplication extends BaseScene{
         {
             case "axe_chop_complete":
                 this.applicationModel.onLogCollected();
-                if( this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ) this.player.stopChopping();
-                this.uiController.updateUI();
+                const targetTree = this.sensorsController.currentTreeSensor.parentController;
+                if( 
+                    this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ||
+                    targetTree.logsAvailable <= 0
+                ) this.player.stopChopping();
+                
+                if( targetTree.logsAvailable <= 0 )
+                {
+                    this.sensorsController.removeTree( targetTree );
+                    //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
+                    targetTree.destroy( true );
+                }
                 break;
         }
     }
 
     onSkeletonEvent( e ){
-        //console.log("on skeleton event ", e  );
+        //
         const numLogsToLose = this.applicationModel.onSkeletonAttack();
         this.player.DropMultipleLogs( numLogsToLose );
     }

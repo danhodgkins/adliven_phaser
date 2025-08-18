@@ -1,13 +1,17 @@
 import { Body, Sphere, Vec3 } from "cannon-es";
 import { SensorZone } from "./sensor";
+import TargetValueIndicator from "../ui/target_value_indicator";
+import { bubble_wood } from '../../../media/img_bubble_wood.webp.js';
+import { Easing, Tween } from "@tweenjs/tween.js";
 
 export default class TreeZone {
-    constructor({ world, scene, position, radius = 1.5, playerBody, sensorType }) {
+
+    logsAvailable = 5;
+
+    constructor({ world, scene, position, radius = 1.5, playerBody, sensorType, model }) {
         this.world = world;
         this.scene = scene;
         this.radius = radius;
-        // this.sensorType = sensorType;
-
 
         const sensor = new SensorZone({
             world, 
@@ -18,8 +22,16 @@ export default class TreeZone {
             playerBody: playerBody, 
             color: 0xff00ff,
             sensorType : sensorType,
-            visible : false
+            visible : false,
+            parentController:this
         });
+                
+        this.boundOnPlayerEnter = this.onPlayerEnter.bind( this );
+        this.boundOnPlayerExit = this.onPlayerExit.bind( this );
+        sensor.addEventListener('enter', this.boundOnPlayerEnter );
+        sensor.addEventListener('exit', this.boundOnPlayerExit );
+
+        this.model = model;
 
         const sphereShape = new Sphere(radius * 0.75);
         const sphereBody = new Body({
@@ -29,11 +41,67 @@ export default class TreeZone {
         });
         world.addBody(sphereBody);
 
+        this.targetValueIndicator = new TargetValueIndicator({ 
+            scene,
+            textureRef:bubble_wood,
+            target: position,
+            yOffset: 6,
+            defaultText : this.logsAvailable,
+            visibleOnInit : false
+        })
 
         this.sensor = sensor;
     }
 
+    decrementValue()
+    {
+        if( this.logsAvailable > 0 ) this.logsAvailable--;
+        this.targetValueIndicator.updateText( this.logsAvailable )
+    }
+
+    onPlayerEnter()
+    {
+        this.targetValueIndicator.show();
+    }
+
+    onPlayerExit()
+    {
+        this.targetValueIndicator.hide();
+    }
+
+    updateTargetIndicatorText( newVal )
+    {
+        this.targetValueIndicator.updateText( newVal );
+    }
+
     update() {
         this.sensor.update();
+        this.targetValueIndicator.update();
+        if( this.scaleDownTween ) this.scaleDownTween.update();
     }
+
+    destroy( tween )
+    {
+        this.targetValueIndicator.hide();
+        this.sensor.removeEventListener('enter', this.boundOnPlayerEnter );
+        this.sensor.removeEventListener('exit', this.boundOnPlayerExit );
+
+        console.log("destroy tree zone")
+
+        if( tween )
+        {
+            this.scaleDownTween = new Tween( this.model.scale )
+            .to({
+                x: 0, 
+                y: 0, 
+                z: 0 
+            }, 850 )
+            .easing(Easing.Elastic.In).onComplete( ()=>{
+                this.scaleDownTween =null;
+            }).start();
+
+        }
+    }
+
+
 }

@@ -11,10 +11,12 @@ export default class SensorsController extends EventDispatcher{
         this.applicationModel = applicationModel;
         this.boundOnZoneEnter = this.onZoneEnter.bind(this);
         this.boundOnZoneExit = this.onZoneExit.bind(this);
+
         trees.forEach(element => {
             element.sensor.addEventListener('enter', this.boundOnZoneEnter );
             element.sensor.addEventListener('exit', this.boundOnZoneExit );
         });
+        this.trees = trees;
 
         lumbermill.sensor.addEventListener('enter',  this.boundOnZoneEnter);
         lumbermill.sensor.addEventListener('exit',  this.boundOnZoneExit);
@@ -27,6 +29,26 @@ export default class SensorsController extends EventDispatcher{
         this.boundOnWorkshopTick = this.onWorkshopTick.bind(this);
 
         this.currentTreeSensor = null;
+    }
+
+    removeTree( targetTree )
+    {
+        this.trees.forEach(element => {
+            if( element == targetTree ){
+
+                console.log("remoive tree zone ", element )
+                element.sensor.removeEventListener('enter', this.boundOnZoneEnter );
+                element.sensor.removeEventListener('exit', this.boundOnZoneExit );
+
+                // inform eveyrone sensor is gone so player exited
+                this.dispatchEvent({ 
+                    type:"sensor_event" , 
+                    //sensorType : e.sensor.sensorType,
+                    enter: false
+                });
+
+            }
+        });
     }
 
     onZoneEnter( e ) {
