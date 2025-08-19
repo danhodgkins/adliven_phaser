@@ -617,7 +617,7 @@ export class MistlandLumberjackApplication extends BaseScene{
 
     getTreeHintVector()
     {
-        return this.trees[ 0 ].sensor.position;
+        return this.trees[ 0 ].sensor.body.position;
     }
 
     //////////////////////////////////////////////////////////////////////////////////// EVENT HANDLERS 
@@ -696,7 +696,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.uiController.updateUI();
                 this.gemAnimator.from3Dto2D( this.lumberMillZone.model.position );
                 
-                this.player.setHintVector( this.treeHintVector );
+                this.player.setHintVector( this.getTreeHintVector() );
                 
                 
                 gemSFX = this.audioController.play("sfx_reward_xp_fly_01");
