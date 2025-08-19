@@ -1,0 +1,73 @@
+warrior.jpeg
+	size: 560, 110
+	filter: Linear, Linear
+	pma: true
+	scale: 0.2
+1
+	bounds: 347, 53, 55, 34
+	rotate: 90
+10
+	bounds: 227, 2, 13, 25
+11
+	bounds: 129, 4, 17, 16
+	rotate: 90
+12
+	bounds: 88, 4, 39, 17
+13
+	bounds: 2, 2, 19, 46
+	rotate: 90
+14
+	bounds: 383, 58, 44, 50
+15
+	bounds: 147, 7, 14, 29
+	offsets: 0, 0, 16, 29
+	rotate: 90
+16
+	bounds: 498, 68, 12, 40
+17
+	bounds: 50, 2, 19, 36
+	rotate: 90
+18
+	bounds: 513, 37, 30, 39
+	rotate: 90
+19
+	bounds: 289, 48, 56, 60
+2
+	bounds: 512, 69, 39, 33
+	rotate: 90
+20
+	bounds: 178, 5, 21, 47
+	rotate: 90
+21
+	bounds: 466, 65, 30, 43
+22
+	bounds: 2, 23, 153, 85
+23
+	bounds: 513, 5, 27, 30
+24
+	bounds: 429, 59, 49, 35
+	rotate: 90
+24-1
+	bounds: 242, 14, 11, 13
+25
+	bounds: 547, 73, 35, 11
+	rotate: 90
+3
+	bounds: 255, 2, 33, 32
+4
+	bounds: 242, 2, 10, 6
+	rotate: 90
+5
+	bounds: 243, 36, 72, 44
+	rotate: 90
+6
+	bounds: 157, 28, 28, 80
+7
+	bounds: 187, 29, 79, 54
+	rotate: 90
+8
+	bounds: 290, 2, 44, 108
+	rotate: 90
+9
+	bounds: 400, 7, 49, 111
+	rotate: 90
