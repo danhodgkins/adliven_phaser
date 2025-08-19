@@ -1,4 +1,4 @@
-import { DoubleSide, MeshBasicMaterial, PlaneGeometry, TextureLoader, Mesh, CanvasTexture} from "three";
+import { DoubleSide, MeshBasicMaterial, PlaneGeometry, TextureLoader, Mesh, CanvasTexture, Vector3} from "three";
 
 export default class TargetValueIndicator{
     constructor( { scene, camera, textureRef, target,  yOffset, defaultText, visibleOnInit = true})
@@ -52,7 +52,9 @@ export default class TargetValueIndicator{
             textPlane.renderOrder = 100001; // High render order to draw on top of the indicator
             this.textPlane = textPlane;
             plane.add(textPlane);
-
+            const lookAngle = new Vector3(350, 250, 1000);
+            if (this.indicatorPlane ) this.indicatorPlane.lookAt(lookAngle);
+           
             this.indicatorPlane.visible = visibleOnInit;
         });  
 
@@ -92,9 +94,9 @@ export default class TargetValueIndicator{
         //         this.camera = followCamWrapper.getCamera();
         //     }
         // }
-        
+        //Restore this if isometric
         //if (this.indicatorPlane && this.camera && this.camera.position) {
-            if (this.indicatorPlane ) this.indicatorPlane.lookAt(this.camera.position);
+            //if (this.indicatorPlane ) this.indicatorPlane.lookAt(this.camera.position);
         //}
     }
 }
