@@ -26,6 +26,8 @@ export default class CTAScene extends BaseScene{
     landscapeInited = false;
 
     async initSpine(){
+    // Avoid creating multiple Spine instances (resize can call this repeatedly)
+    if (this.spineAnimation) return;
         
         // Decode base64 → text
         const jsonText  = atob(warrio_jsonr.split(",")[1]);
@@ -49,16 +51,18 @@ export default class CTAScene extends BaseScene{
 
         // Create Spine object
         const spineAnimation = new Spine(skeletonData);
-        spineAnimation.x = app.renderer.width / 2;
-        spineAnimation.y = app.renderer.height;
+        spineAnimation.x = this.pixiApp.renderer.width / 2;
+        spineAnimation.y = this.pixiApp.renderer.height / 1.25;
         spineAnimation.state.setAnimation(0, "idle", true);
 
-        this.pixiApp.stage.addChild(spineAnimation);
+    // keep a reference so we don't re-create on resize (avoids ghosting)
+        this.spineAnimation = spineAnimation;
+        this.pixiApp.stage.addChild(this.spineAnimation);
     }
 
     initPortrait()
     {
-        //this.initSpine();
+        this.initSpine();
         //return;
 
         const ctaOverlayLandscape = document.getElementById("ui-overlay-cta-landscape");
@@ -118,6 +122,8 @@ export default class CTAScene extends BaseScene{
 
     initLandscape()
     {
+        this.initSpine();
+        //return;
         const ctaOverlayPortrait = document.getElementById("ui-overlay-cta-portrait");
         ctaOverlayPortrait.style.display = 'none';
 
