@@ -1,7 +1,7 @@
 {
 "skeleton": {
 	"hash": "S+CFEzL8sbk",
-	"spine": "4.2.43",
+	"spine": "4.1-from-4.2.43",
 	"x": -353.95,
 	"y": -637.67,
 	"width": 767,
@@ -40,7 +40,7 @@
 		"rotation": 168.99,
 		"x": 53.58,
 		"y": -1.92,
-		"inherit": "noRotationOrReflection",
+		"transform": "noRotationOrReflection",
 		"color": "ff3e6bff"
 	},
 	{
@@ -50,7 +50,7 @@
 		"rotation": 14.57,
 		"x": 53.34,
 		"y": -0.21,
-		"inherit": "noRotationOrReflection",
+		"transform": "noRotationOrReflection",
 		"color": "ff3e6bff"
 	},
 	{
@@ -136,7 +136,7 @@
 		"length": 100.26,
 		"rotation": -97.77,
 		"x": 315.46,
-		"inherit": "onlyTranslation",
+		"transform": "onlyTranslation",
 		"color": "cd81ffff"
 	},
 	{
@@ -165,7 +165,7 @@
 		"rotation": -47.43,
 		"x": 277.87,
 		"y": 2.7,
-		"inherit": "onlyTranslation",
+		"transform": "onlyTranslation",
 		"color": "cd81ffff"
 	},
 	{
@@ -175,7 +175,7 @@
 		"rotation": -4.76,
 		"x": 106.07,
 		"y": 0.66,
-		"inherit": "noRotationOrReflection",
+		"transform": "noRotationOrReflection",
 		"color": "cd81ffff"
 	},
 	{ "name": "target5", "parent": "Warrior_root", "x": -184.26, "y": -10.44, "color": "ff3f00ff", "icon": "ik" },
@@ -722,153 +722,6 @@
 		"mixScaleX": 0.2,
 		"mixShearY": 0.2
 	}
-],
-"physics": [
-	{ "name": "10", "order": 23, "bone": "10", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "11", "order": 25, "bone": "11", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "12", "order": 26, "bone": "12", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "13", "order": 27, "bone": "13", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "14", "order": 28, "bone": "14", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "15", "order": 29, "bone": "15", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "16", "order": 30, "bone": "16", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "17", "order": 31, "bone": "17", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{
-		"name": "18",
-		"order": 32,
-		"bone": "18",
-		"rotate": 1,
-		"inertia": 0.9314,
-		"damping": 0.8333,
-		"mass": 1.59
-	},
-	{
-		"name": "19",
-		"order": 33,
-		"bone": "19",
-		"rotate": 1,
-		"inertia": 0.9314,
-		"damping": 0.8333,
-		"mass": 2
-	},
-	{
-		"name": "20",
-		"order": 34,
-		"bone": "20",
-		"rotate": 1,
-		"inertia": 0.7059,
-		"damping": 0.85,
-		"mass": 2.6
-	},
-	{
-		"name": "21",
-		"order": 35,
-		"bone": "21",
-		"rotate": 1,
-		"inertia": 0.7059,
-		"damping": 0.85,
-		"mass": 2.6
-	},
-	{
-		"name": "22",
-		"order": 36,
-		"bone": "22",
-		"rotate": 1,
-		"inertia": 0.7059,
-		"damping": 0.85,
-		"mass": 2.6
-	},
-	{ "name": "23", "order": 37, "bone": "23", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{
-		"name": "24",
-		"order": 38,
-		"bone": "24",
-		"rotate": 1,
-		"inertia": 0.7451,
-		"strength": 121.6,
-		"damping": 0.85
-	},
-	{
-		"name": "25",
-		"order": 39,
-		"bone": "25",
-		"rotate": 1,
-		"inertia": 0.7451,
-		"strength": 121.6,
-		"damping": 0.85
-	},
-	{ "name": "29", "order": 40, "bone": "29", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{
-		"name": "30",
-		"order": 41,
-		"bone": "30",
-		"rotate": 1,
-		"inertia": 0.8529,
-		"damping": 0.85,
-		"mass": 2.17
-	},
-	{
-		"name": "31",
-		"order": 42,
-		"bone": "31",
-		"rotate": 1,
-		"inertia": 0.8529,
-		"damping": 0.85,
-		"mass": 2.17
-	},
-	{
-		"name": "32",
-		"order": 43,
-		"bone": "32",
-		"rotate": 1,
-		"inertia": 0.8529,
-		"damping": 0.85,
-		"mass": 2.17
-	},
-	{ "name": "33", "order": 44, "bone": "33", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "34", "order": 45, "bone": "34", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "35", "order": 46, "bone": "35", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "36", "order": 47, "bone": "36", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "37", "order": 48, "bone": "37", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{
-		"name": "Fightera9",
-		"order": 49,
-		"bone": "Fightera9",
-		"rotate": 1,
-		"inertia": 0.8,
-		"strength": 150,
-		"damping": 0.85
-	},
-	{
-		"name": "Fightera10",
-		"order": 50,
-		"bone": "Fightera10",
-		"rotate": 1,
-		"inertia": 0.8,
-		"strength": 150,
-		"damping": 0.85
-	},
-	{
-		"name": "Fightera11",
-		"order": 51,
-		"bone": "Fightera11",
-		"rotate": 1,
-		"inertia": 0.8,
-		"strength": 150,
-		"damping": 0.85
-	},
-	{
-		"name": "Fightera12",
-		"order": 52,
-		"bone": "Fightera12",
-		"rotate": 1,
-		"inertia": 0.8,
-		"strength": 150,
-		"damping": 0.85
-	},
-	{ "name": "Fightera24", "order": 53, "bone": "Fightera24", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "Fightera25", "order": 54, "bone": "Fightera25", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "Fightera26", "order": 55, "bone": "Fightera26", "rotate": 1, "inertia": 0.5, "damping": 0.85 },
-	{ "name": "Fightera27", "order": 56, "bone": "Fightera27", "rotate": 1, "inertia": 0.5, "damping": 0.85 }
 ],
 "skins": [
 	{
