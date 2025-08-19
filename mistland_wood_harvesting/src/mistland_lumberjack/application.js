@@ -65,12 +65,20 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         window.removeEventListener('resize', this.boundResizeListener );
 
-        // being lazy as we dont have to replay the scene
-        this.pixiApp.destroy(true, {
-            children: true,
-            texture: true,
-            baseTexture: true,
-        });
+        // Do NOT destroy the shared Pixi Application here.
+        // The application is created once in GameApplication and shared between scenes.
+        // Destroying it causes later scenes (like CTA) to have a null/invalid renderer.
+        // Instead, remove this scene's children from the stage and let SceneManager
+        // or the next scene reuse the existing application.
+        if (this.pixiApp && this.pixiApp.stage) {
+            try {
+                // remove all children added by this scene
+                this.pixiApp.stage.removeChildren();
+            } catch (err) {
+                // fallback: log but don't throw
+                console.warn('Failed to clear pixiApp stage during scene destroy', err);
+            }
+        }
     }
 
     init(){
