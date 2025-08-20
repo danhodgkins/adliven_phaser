@@ -367,6 +367,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+        this.renderer.setPixelRatio( 1.5 ); // Custom pixel ratio - 1.5x for balanced quality/performance
 
         if( this.uiController ) this.uiController.onResize();       
         if( this.hintManager ) this.hintManager.onResize();
