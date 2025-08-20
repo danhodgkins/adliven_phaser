@@ -58,24 +58,9 @@ export class PhysicsBounds {
 
             // Apply Y-axis rotation
             const quat = new Quaternion();
-            //quat.setFromEuler(new Euler(rotation.x, rotation.y, rotation.z)); // rotation in radians
-            // boxBody.quaternion.copy(rotation);
 
             boxBody.addShape(boxShape);
             this.world.addBody(boxBody);
-
-            // no need to create visual mesh here, as the debugger shows them
-            // Create visual mesh
-            // const boxGeometry = new BoxGeometry(5, 5, 5);
-            // const boxGeometry = new BoxGeometry(-scale.x * m, scale.y* m, scale.z* m);
-            // const boxMaterial = new MeshStandardMaterial({ color: 0xff0000 });
-            // const boxMesh = new Mesh(boxGeometry, boxMaterial);
-
-            // boxMesh.position.set(position.x, position.y, position.z);
-            // //boxMesh.rotation.set(new Euler(rotation.x, rotation.y, rotation.z));
-            // this.scene.add(boxMesh);
-
-            // this.boxMeshes.push(boxMesh);
          });
     }
 
