@@ -108,14 +108,19 @@ export class MistlandLumberjackApplication extends BaseScene{
         dirLight.shadow.camera.right = 40;
         dirLight.shadow.camera.top = 40;
         dirLight.shadow.camera.bottom = -40;
+        // Fix shadow acne/streaky lines with proper bias settings
+        dirLight.shadow.bias = -0.001;
+        dirLight.shadow.normalBias = 0.02;
         scene.add(dirLight);
 
         // renderer
-        const renderer = new WebGLRenderer();
+        const renderer = new WebGLRenderer({ antialias: true });
         renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setPixelRatio( 1.5 ); // Custom pixel ratio - 1.5x for balanced quality/performance
         renderer.outputEncoding = SRGBColorSpace;
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = 3;
+        renderer.shadowMap.type = 1; // PCFShadowMap - good quality without streaky lines
+        //renderer.shadowMap.
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
         renderer.domElement.style.filter = 'saturate(1.2) contrast(1.1) brightness(1)';
