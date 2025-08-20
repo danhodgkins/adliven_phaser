@@ -6,9 +6,13 @@ import { title_splash } from '../../media/img_title_splash.webp.js';
 
 import { icon_gem } from '../../media/pngs_icon_gem.png.js';
 
-import { warrior_atlas } from '../../media/spine_warrior_atlas.atlas.js';
+// import { warrior_atlas } from '../../media/spine_warrior_atlas.atlas.js';
+//import { warrior_png } from '../../media/spine_warrior_png.png.js';
+// import { warrio_jsonr } from '../../media/spine_warrio_jsonr.json.js';
+
 import { warrior_png } from '../../media/spine_warrior_png.png.js';
-import { warrio_jsonr } from '../../media/spine_warrio_jsonr.json.js';
+import { warrior_png_atlas } from '../../media/spine_warrior_png_atlas.atlas.js';
+import { warrior_png_json } from '../../media/spine_warrior_png_json.json.js';
 
 import 'pixi-spine'; // Register the loader
 import { TextureAtlas } from "@pixi-spine/base";
@@ -25,19 +29,29 @@ export default class CTAScene extends BaseScene{
     portraitInited = false;
     landscapeInited = false;
 
-    async initSpine(){
-    // Avoid creating multiple Spine instances (resize can call this repeatedly)
-    if (this.spineAnimation) return;
+    clearSpineAnimations() {
+        if (this.spineAnimations) {
+            this.spineAnimations.forEach(animation => {
+                if (animation.parent) {
+                    animation.parent.removeChild(animation);
+                }
+                animation.destroy();
+            });
+            this.spineAnimations = [];
+        }
+    }
+
+    async initSpine(spinejson, spineatlas, spinegraphic, posFactorX, posFactorY, scaleFactorX = 1, scaleFactorY = 1){
         
         // Decode base64 → text
-        const jsonText  = atob(warrio_jsonr.split(",")[1]);
-        const atlasText = atob(warrior_atlas.split(",")[1]);
+        const jsonText  = atob(spinejson.split(",")[1]);
+        const atlasText = atob(spineatlas.split(",")[1]);
 
         // Parse JSON
         const spineData = JSON.parse(jsonText);
 
         // Load texture from base64
-        const texture = await Assets.load(warrior_png);
+        const texture = await Assets.load(spinegraphic);
 
         // Create atlas + parser
         const atlas = new TextureAtlas(atlasText, (line, callback) => {
@@ -51,18 +65,52 @@ export default class CTAScene extends BaseScene{
 
         // Create Spine object
         const spineAnimation = new Spine(skeletonData);
-        spineAnimation.x = this.pixiApp.renderer.width / 2;
-        spineAnimation.y = this.pixiApp.renderer.height / 1.25;
+        
+        // Calculate proportional scale based on screen size
+        // Use a base reference resolution (e.g., 1920x1080 for landscape, 720x1280 for portrait)
+        const baseWidth = isPortrait() ? 720 : 1920;
+        const baseHeight = isPortrait() ? 1280 : 1080;
+        
+        const scaleX = (this.pixiApp.renderer.width / baseWidth) * scaleFactorX;
+        const scaleY = (this.pixiApp.renderer.height / baseHeight) * scaleFactorY;
+        
+        // Use the smaller scale to maintain aspect ratio
+        const uniformScale = Math.min(scaleX, scaleY);
+        
+        spineAnimation.scale.set(uniformScale);
+        
+        // Calculate responsive positioning that adapts to screen size
+        // Position as a factor of screen dimensions, accounting for orientation and aspect ratio
+        const screenWidth = this.pixiApp.renderer.width;
+        const screenHeight = this.pixiApp.renderer.height;
+        
+        // Calculate position factors that work consistently across different screen sizes
+        spineAnimation.x = screenWidth * posFactorX;
+        spineAnimation.y = screenHeight * posFactorY;
+        
         spineAnimation.state.setAnimation(0, "idle", true);
 
-    // keep a reference so we don't re-create on resize (avoids ghosting)
-        this.spineAnimation = spineAnimation;
-        this.pixiApp.stage.addChild(this.spineAnimation);
+        // Store in array to handle multiple spine animations
+        if (!this.spineAnimations) {
+            this.spineAnimations = [];
+        }
+        this.spineAnimations.push(spineAnimation);
+        this.pixiApp.stage.addChild(spineAnimation);
     }
 
     initPortrait()
     {
-        this.initSpine();
+        // Clear existing spine animations before creating new ones
+        this.clearSpineAnimations();
+        
+        // Create spine animations with portrait-specific position and scale factors
+        // Position factors: 0.0 = left/top edge, 1.0 = right/bottom edge, 0.5 = center
+        this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 0.25, 0.65, 0.5, 0.5);  // Left character
+        this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 0.75, 0.65, 0.5, 0.5);  // Right character
+        this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 0.50, 0.67, 0.5, 0.5);  // Center character
+        //this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 2, 1.5, 0.8, 0.8);
+
+        
         //return;
 
         const ctaOverlayLandscape = document.getElementById("ui-overlay-cta-landscape");
@@ -122,7 +170,14 @@ export default class CTAScene extends BaseScene{
 
     initLandscape()
     {
-        this.initSpine();
+        // Clear existing spine animations before creating new ones
+        this.clearSpineAnimations();
+        
+        // Create spine animations with landscape-specific position and scale factors
+        // Position factors: 0.0 = left/top edge, 1.0 = right/bottom edge, 0.5 = center
+        this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 0.1, 0.65, 0.5, 0.5);  // Left character
+        this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 0.3, 0.65, 0.45, 0.45);  // Right character
+        this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 0.45, 0.67, 0.5, 0.5);  // Center character
         //return;
         const ctaOverlayPortrait = document.getElementById("ui-overlay-cta-portrait");
         ctaOverlayPortrait.style.display = 'none';
@@ -209,5 +264,20 @@ export default class CTAScene extends BaseScene{
         this.boundOnResize = this.onResize.bind( this );
         window.addEventListener('resize', this.boundOnResize );
         this.boundOnResize();
+   }
+
+   destroy() {
+        // Clean up spine animations
+        this.clearSpineAnimations();
+        
+        // Remove resize event listener
+        if (this.boundOnResize) {
+            window.removeEventListener('resize', this.boundOnResize);
+        }
+        
+        // Call parent destroy if it exists
+        if (super.destroy) {
+            super.destroy();
+        }
    }
 }
