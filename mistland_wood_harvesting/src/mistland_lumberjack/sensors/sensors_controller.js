@@ -33,18 +33,25 @@ export default class SensorsController extends EventDispatcher{
         this.activeTrees = [];
     }
 
+    // Call this method only when a tree is permanently destroyed/removed from the game
+    // NOT when player temporarily exits the sensor area
     removeTree( targetTree )
     {
+        // Remove from active trees list
         for (let index = 0; index < this.activeTrees.length; index++) {
             const element = this.activeTrees[index];
             if( targetTree.id == element.id )
             {
-                element.sensor.removeEventListener('enter', this.boundOnZoneEnter );
-                element.sensor.removeEventListener('exit', this.boundOnZoneExit );
                 this.activeTrees.splice( index , 1 );
+                break;
             }
         }
 
+        // Permanently remove event listeners since tree is destroyed
+        targetTree.sensor.removeEventListener('enter', this.boundOnZoneEnter );
+        targetTree.sensor.removeEventListener('exit', this.boundOnZoneExit );
+
+        // If there are still active trees, switch to the first one
         if( this.activeTrees.length > 0 ){
             this.currentTreeSensor = this.activeTrees[0].sensor;
 
@@ -53,61 +60,13 @@ export default class SensorsController extends EventDispatcher{
                 sensorType : this.currentTreeSensor.sensorType,
                 enter: true
             });
-
-            //this.onZoneEnter( this.activeTrees[0] )
-        }  else {
-            // this.currentTreeSensor = null;
-            //this.onZoneExit( this.activeSensors[0].parentController )
-        }
-
-        return;
-
-
-        this.trees.forEach(element => {
-            if( element.id == targetTree.id ){
-
-                
-                element.sensor.removeEventListener('enter', this.boundOnZoneEnter );
-                element.sensor.removeEventListener('exit', this.boundOnZoneExit );
-                console.log("this.activeTrees.splice ", this.activeTrees.indexOf( targetTree ) )
-                this.activeTrees.splice( this.activeTrees.indexOf(targetTree), 1 );
-
-
-                // if( this.activeTrees.length > 0 ){
-                //     //this.currentTreeSensor = this.activeSensors[0];
-                //     this.onZoneEnter( this.activeTrees[0] )
-                // }  else {
-                //     //this.onZoneExit( this.activeSensors[0].parentController )
-                // }
-
-                // if( this.activeSensors.length > 0 ){
-                //     this.currentTreeSensor = this.activeSensors[0];
-                //     console.log( "dispatch overlap sensor  , " , this.currentTreeSensor.sensorType )
-                //     this.dispatchEvent({ 
-                //         type:"sensor_event" , 
-                //         sensorType : this.currentTreeSensor.sensorType,
-                //         enter: true
-                //     });
-                // } 
-                // else {
-                //     this.currentTreeSensor = null;
-                //     //inform eveyrone sensor is gone so player exited
-                //     this.dispatchEvent({ 
-                //         type:"sensor_event" , 
-                //         //sensorType : e.sensor.sensorType,
-                //         enter: false
-                //     });
-                // }
-
-
-            }
-        });
-
-        if( this.activeTrees.length > 0 ){
-            //this.currentTreeSensor = this.activeSensors[0];
-            this.onZoneEnter( this.activeTrees[0] )
-        }  else {
-            //this.onZoneExit( this.activeSensors[0].parentController )
+        } else {
+            // No active trees left, dispatch exit event
+            this.dispatchEvent({ 
+                type:"sensor_event" , 
+                sensorType : "tree",
+                enter: false
+            });
         }
     }
 
@@ -163,13 +122,16 @@ export default class SensorsController extends EventDispatcher{
             return;
         }
 
+        // For trees: only remove from activeTrees temporarily, don't remove event listeners
+        // This allows the tree to be re-entered later
         for (let index = 0; index < this.activeTrees.length; index++) {
             const element = this.activeTrees[index];
             if( e.parentController.id == element.id )
             {
-                //element.sensor.removeEventListener('enter', this.boundOnZoneEnter );
-                //element.sensor.removeEventListener('exit', this.boundOnZoneExit );
+                // Only remove from active list, don't remove event listeners
+                // Event listeners should only be removed when tree is permanently destroyed
                 this.activeTrees.splice( index , 1 );
+                break; // Exit loop once found
             }
         }
 
@@ -191,44 +153,6 @@ export default class SensorsController extends EventDispatcher{
             });
             // this.currentTreeSensor = null;
         }
-
-        return;
-
-        this.activeTrees.splice( this.activeSensors.indexOf( e.sensor ), 1 );
-
-        
-        if( this.activeSensors.length > 0 ){
-            //this.onZoneEnter( this.activeSensors[0].parentController )
-        } else {
-            this.dispatchEvent({ 
-                type:"sensor_event" , 
-                sensorType : e.sensor.sensorType,
-                enter: false
-            });
-            this.currentTreeSensor = null;
-        }
-
-        // if( this.activeSensors.length > 0 ){
-        //     this.currentTreeSensor = this.activeSensors[0];
-        //     console.log( "dispatch overlap sensor  , " , this.currentTreeSensor.sensorType )
-        //     this.dispatchEvent({ 
-        //         type:"sensor_event" , 
-        //         sensorType : this.currentTreeSensor.sensorType,
-        //         enter: true
-        //     });
-        // } 
-        // else this.currentTreeSensor = null;
-
-        // this.currentTreeSensor = null;
-
-        //console.log( "onZoneExit , " , this.activeSensors.length )
-
-        
-        // this.dispatchEvent({ 
-        //     type:"sensor_event" , 
-        //     sensorType : e.sensor.sensorType,
-        //     enter: false
-        // });
     }
 
     disable()
