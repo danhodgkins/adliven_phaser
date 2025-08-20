@@ -1,0 +1,7 @@
+bush2.png
+	size: 50, 34
+	filter: Linear, Linear
+	pma: true
+	scale: 0.2
+75
+	bounds: 2, 2, 46, 30

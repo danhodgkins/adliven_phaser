@@ -1,0 +1,21 @@
+dragon.png
+	size: 93, 142
+	filter: Linear, Linear
+	pma: true
+	scale: 0.2
+59
+	bounds: 65, 67, 18, 35
+60
+	bounds: 65, 104, 26, 36
+61
+	bounds: 2, 2, 42, 11
+62
+	bounds: 2, 15, 125, 61
+	rotate: 90
+63
+	bounds: 65, 17, 21, 17
+	rotate: 90
+64
+	bounds: 65, 40, 16, 25
+65
+	bounds: 46, 2, 23, 11

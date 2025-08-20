@@ -1,0 +1,48 @@
+wizard.png
+	size: 110, 361
+	filter: Linear, Linear
+	pma: true
+	scale: 0.2
+42
+	bounds: 2, 217, 58, 31
+43
+	bounds: 59, 159, 49, 44
+	offsets: 0, 0, 52, 44
+44
+	bounds: 48, 62, 16, 5
+	rotate: 90
+45
+	bounds: 62, 205, 46, 27
+46
+	bounds: 2, 5, 28, 38
+	offsets: 3, 0, 31, 38
+	rotate: 90
+47
+	bounds: 76, 234, 31, 63
+48
+	bounds: 2, 35, 43, 44
+	rotate: 90
+49
+	bounds: 48, 30, 12, 40
+	rotate: 90
+50
+	bounds: 86, 328, 21, 31
+51
+	bounds: 76, 310, 9, 6
+	rotate: 90
+52
+	bounds: 2, 250, 72, 69
+53
+	bounds: 90, 30, 16, 12
+54
+	bounds: 59, 44, 44, 113
+55
+	bounds: 2, 321, 38, 82
+	rotate: 90
+56
+	bounds: 2, 80, 55, 135
+57
+	bounds: 42, 2, 26, 26
+58
+	bounds: 86, 299, 27, 16
+	rotate: 90
