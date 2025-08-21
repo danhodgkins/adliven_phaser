@@ -1,5 +1,6 @@
 
 import { DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, PlaneGeometry, TextureLoader, Color, BackSide, FrontSide } from "three";
+import { Box, Body, Vec3, Quaternion } from "cannon-es";
 // import { lock } from '../../media/pngs_lock.png.js';
 import { locked_area } from '../../../media/img_locked_area.webp.js';
 import { degToRad } from "three/src/math/MathUtils.js";
@@ -20,7 +21,7 @@ export default class WorkshopController{
         
         this.clonedScale = model.scale.clone();
         this.clonedPosition = model.position.clone();
-
+        this.clonedRotation = model.quaternion.clone(); // Use quaternion instead of rotation
         // create parent object for model ( as the models scale is inversed from the layout process ) to prevent weird animation when we scale it up in the unlock
         const parentObj = new Object3D();
         parentObj.position.copy( this.clonedPosition );
@@ -68,6 +69,7 @@ export default class WorkshopController{
                     // Move white mesh slightly forward to ensure it's in front
                     child.position.z += 0.001;
             }
+            //this.addWorkshopCollider();
         });
 
         parentObj.scale.set(0, 0, 0);
@@ -162,7 +164,50 @@ export default class WorkshopController{
             z: 1 
         }, 500 )
         .easing(Easing.Elastic.Out).onComplete( ()=>{
+            // Add box collider after workshop is fully scaled up
+            this.addWorkshopCollider();
         }).delay( 1000 ).start();
+    }
+
+    addWorkshopCollider()
+    {
+        // Get workshop model dimensions and position for collider
+        const position = this.clonedPosition;
+        const scale = this.clonedScale;
+        
+        const m = 1;
+        // Create box collider with similar dimensions to the workshop
+        const halfExtents = new Vec3( 
+            Math.abs(scale.x / 2) * m, 
+            Math.abs(scale.y / 2) * m, 
+            Math.abs(scale.z / 2) * m
+        );
+        const boxShape = new Box(new Vec3(2.4,3.4,4.2));
+
+        // Convert Three.js quaternion to Cannon.js quaternion
+        const cannonQuat = new Quaternion(
+            this.clonedRotation.x,
+            this.clonedRotation.y,
+            this.clonedRotation.z,
+            this.clonedRotation.w
+        );
+
+        // Create static body for workshop collision
+        const boxBody = new Body({
+            mass: 0,
+            position: new Vec3(position.x, position.y, position.z),
+            collisionFilterGroup: 2, // This is the "collidable" group
+            collisionFilterMask: 4 | 1, // Collide with player (4) and planes (1)
+            quaternion: cannonQuat
+        });
+
+        boxBody.addShape(boxShape);
+        this.world.addBody(boxBody);
+        
+        // Store reference to remove later if needed
+        this.workshopCollider = boxBody;
+        
+        console.log("Workshop collider added at position:", position);
     }
 
     update(dt){

@@ -1,0 +1,25 @@
+bird.png
+	size: 232, 62
+	filter: Linear, Linear
+	pma: true
+	scale: 0.2
+67
+	bounds: 67, 10, 84, 50
+68
+	bounds: 153, 18, 42, 52
+	rotate: 90
+69
+	bounds: 207, 5, 17, 17
+	offsets: 0, 0, 17, 18
+70
+	bounds: 153, 2, 14, 18
+	rotate: 90
+71
+	bounds: 173, 2, 14, 15
+	rotate: 90
+72
+	bounds: 2, 3, 57, 63
+	rotate: 90
+73
+	bounds: 207, 24, 36, 23
+	rotate: 90

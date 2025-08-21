@@ -66,12 +66,20 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         window.removeEventListener('resize', this.boundResizeListener );
 
-        // being lazy as we dont have to replay the scene
-        this.pixiApp.destroy(true, {
-            children: true,
-            texture: true,
-            baseTexture: true,
-        });
+        // Do NOT destroy the shared Pixi Application here.
+        // The application is created once in GameApplication and shared between scenes.
+        // Destroying it causes later scenes (like CTA) to have a null/invalid renderer.
+        // Instead, remove this scene's children from the stage and let SceneManager
+        // or the next scene reuse the existing application.
+        if (this.pixiApp && this.pixiApp.stage) {
+            try {
+                // remove all children added by this scene
+                this.pixiApp.stage.removeChildren();
+            } catch (err) {
+                // fallback: log but don't throw
+                console.warn('Failed to clear pixiApp stage during scene destroy', err);
+            }
+        }
     }
 
     init(){
@@ -101,14 +109,19 @@ export class MistlandLumberjackApplication extends BaseScene{
         dirLight.shadow.camera.right = 40;
         dirLight.shadow.camera.top = 40;
         dirLight.shadow.camera.bottom = -40;
+        // Fix shadow acne/streaky lines with proper bias settings
+        dirLight.shadow.bias = -0.001;
+        dirLight.shadow.normalBias = 0.02;
         scene.add(dirLight);
 
         // renderer
-        const renderer = new WebGLRenderer();
+        const renderer = new WebGLRenderer({ antialias: true });
         renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.setPixelRatio( 1.5 ); // Custom pixel ratio - 1.5x for balanced quality/performance
         renderer.outputEncoding = SRGBColorSpace;
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = 3;
+        renderer.shadowMap.type = 1; // PCFShadowMap - good quality without streaky lines
+        //renderer.shadowMap.
         const el = document.getElementById( this.config.parent );
         el.appendChild( renderer.domElement );
         renderer.domElement.style.filter = 'saturate(1.2) contrast(1.1) brightness(1)';
@@ -360,6 +373,7 @@ export class MistlandLumberjackApplication extends BaseScene{
         
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+        this.renderer.setPixelRatio( 1.5 ); // Custom pixel ratio - 1.5x for balanced quality/performance
 
         if( this.uiController ) this.uiController.onResize();       
         if( this.hintManager ) this.hintManager.onResize();
@@ -618,7 +632,7 @@ export class MistlandLumberjackApplication extends BaseScene{
 
     getTreeHintVector()
     {
-        return this.trees[ 0 ].sensor.position;
+        return this.trees[ 0 ].sensor.body.position;
     }
 
     //////////////////////////////////////////////////////////////////////////////////// EVENT HANDLERS 
@@ -697,7 +711,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.uiController.updateUI();
                 this.gemAnimator.from3Dto2D( this.lumberMillZone.model.position );
                 
-                this.player.setHintVector( this.treeHintVector );
+                this.player.setHintVector( this.getTreeHintVector() );
                 
                 
                 gemSFX = this.audioController.play("sfx_reward_xp_fly_01");

@@ -67,7 +67,7 @@ export class GameApplication {
         this.boundUpdate = this.update.bind(this);
         requestAnimationFrame(this.boundUpdate );
 
-         this.sceneManager.setScene( 'main' );    
+        this.sceneManager.setScene( 'main' );    
         //this.sceneManager.setScene( 'cta' );    
 
         this.boundOnPointerdown = this.onPointerdown.bind(this);
