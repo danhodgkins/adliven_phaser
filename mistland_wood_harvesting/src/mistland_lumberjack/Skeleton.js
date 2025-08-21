@@ -23,6 +23,10 @@ export class SkeletonController extends EventDispatcher {
         this.attackRange = 2.0;
         this.followRange = 7.0;
 
+        // Add animation progress tracking (like in player.js)
+        this.animationProgress = new Map();
+        this.halfwayTriggered = new Map();
+
         this.initVisuals();
     }
 
@@ -122,11 +126,56 @@ export class SkeletonController extends EventDispatcher {
 
     onAnimComplete( e )
     {
-        
         switch( e.action._clip.name )
         {
             case "02_skeleton_attack":
-                // respond to chop loop complete
+                // Keep this for any end-of-animation logic if needed
+                break;
+        }
+    }
+
+    // Add the animation progress checking method (copied from player.js)
+    checkAnimationProgress() {
+        if (!this.glbController || !this.glbController.mixer) return;
+        
+        // Get the current action
+        const actions = this.glbController.mixer._actions;
+        const currentAction = actions.find(action => action.isRunning() && action.getEffectiveWeight() > 0);
+        if (!currentAction) return;
+        
+        const clipName = currentAction._clip.name;
+        const duration = currentAction._clip.duration;
+        const currentTime = currentAction.time;
+        const progress = (currentTime % duration) / duration;
+        
+        // Check if we've crossed the 1/3 point (0.33)
+        const triggerPoint = 0.33;
+        
+        // Get previous progress, default to 0 if undefined
+        const previousProgress = this.animationProgress.get(clipName) || 0;
+        const triggerAlreadyFired = this.halfwayTriggered.get(clipName) || false;
+        
+        const wasBeforeTrigger = previousProgress < triggerPoint;
+        const isAfterTrigger = progress >= triggerPoint;
+        
+        if (wasBeforeTrigger && isAfterTrigger && !triggerAlreadyFired) {
+            this.onAnimTriggerPoint({ action: currentAction });
+            this.halfwayTriggered.set(clipName, true);
+        }
+        
+        // Reset trigger when animation loops back to beginning
+        if (progress < 0.1) {
+            this.halfwayTriggered.set(clipName, false);
+        }
+        
+        this.animationProgress.set(clipName, progress);
+    }
+
+    // Add the trigger point handler
+    onAnimTriggerPoint( e ) {
+        switch( e.action._clip.name ) {
+            case "02_skeleton_attack":
+                // Trigger the hit at 1/3 of the animation instead of at the start
                 this.dispatchEvent({ type: 'skeleton_event', detail : "axe_chop_complete" });
                 break;
         }
@@ -149,7 +198,8 @@ export class SkeletonController extends EventDispatcher {
         if (distance <= this.attackRange) {
             if (this.currentState !== this.STATE_CHOPPING) {
                 this.setState(this.STATE_CHOPPING);
-                this.dispatchEvent({ type: 'skeleton_event', detail : "axe_chop_complete" });
+                // Remove immediate event dispatch - let animation progress handle it
+                // this.dispatchEvent({ type: 'skeleton_event', detail : "axe_chop_complete" });
             }
             // Stop movement when attacking but maintain Y position
             sphereBody.velocity.x = 0;
@@ -197,6 +247,10 @@ export class SkeletonController extends EventDispatcher {
         mesh.position.y += this.visualOffset;
 
         // Update animation controller if it exists
-        if (this.glbController) this.glbController.update(dt);
+        if (this.glbController) {
+            this.glbController.update(dt);
+            // Add animation progress checking (like in player.js)
+            this.checkAnimationProgress();
+        }
     }
 }
