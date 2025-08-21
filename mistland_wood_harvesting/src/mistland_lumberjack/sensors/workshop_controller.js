@@ -182,14 +182,14 @@ export default class WorkshopController{
             Math.abs(scale.y / 2) * m, 
             Math.abs(scale.z / 2) * m
         );
-        const boxShape = new Box(new Vec3(2.4,3.4,4.2));
+        const boxShape = new Box(new Vec3(2.8,3.4,4.6));
 
         // Convert Three.js quaternion to Cannon.js quaternion
         const cannonQuat = new Quaternion(
-            this.clonedRotation.x,
-            this.clonedRotation.y,
-            this.clonedRotation.z,
-            this.clonedRotation.w
+            0,
+            -0.342,
+            0,
+            0.940
         );
 
         // Create static body for workshop collision
