@@ -287,7 +287,7 @@ export class Player extends EventDispatcher {
             
             // Update animation speed based on movement speed when walking
             if (this.currentState === this.STATE_WALKING && this.glbController) {
-                this.glbController.mixer.timeScale = Math.max(0.1, normalizedSpeed * 2); // Minimum 0.1 to avoid stopping
+                this.glbController.mixer.timeScale = Math.max(0.1, normalizedSpeed * 2) * 0.66; // Minimum 0.1 to avoid stopping
             }
         } else {
             if( !this.isChopping && this.currentState != this.STATE_IDLE ) {
