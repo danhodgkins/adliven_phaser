@@ -8,7 +8,7 @@ export default class WinPopup{
 
     constructor({ pixiApp })
     {
-        console.log("wtf");
+        console.log("showing popup");
         const onWinPopupContainer = new Container({ });   
 
         // dynamic text field 
