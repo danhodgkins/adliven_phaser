@@ -21,6 +21,11 @@ export default class WinPopup {
             align: 'center',
             wordWrap: true,
             wordWrapWidth: this.popupWidth - this.textMargin * 2,
+            dropShadow: true, // Enable drop shadow
+            dropShadowColor: '#333333', // Shadow color
+            dropShadowBlur: 2, // Blur radius
+            dropShadowAngle: Math.PI / 4, // Shadow angle (in radians)
+            dropShadowDistance: 3, // Distance of the shadow
         });
 
         // Use goodjob image as background
