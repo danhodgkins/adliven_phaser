@@ -104,7 +104,7 @@ export class SkeletonController extends EventDispatcher {
             });
             
             const zombieMesh = gltf.scene;
-            zombieMesh.scale.set(1,1,1);
+            zombieMesh.scale.set(1.5,1.5,1.5);
             zombieMesh.position.copy(this.position);
             zombieMesh.quaternion.setFromEuler(new Euler(0, Math.PI / 2, 0));
             this.scene.add(zombieMesh);
