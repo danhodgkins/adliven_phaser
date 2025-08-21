@@ -142,7 +142,7 @@ export default class CTAScene extends BaseScene{
         // Ground characters (z-index: 40-50)
         this.initSpine(wizard_json, wizard_atlas, wizard, 0.25, 0.67, 0.5, 0.5, 40); // Wizard - foreground
         this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 0.5, 0.65, 0.5, 0.5, 45); // Warrior - foreground
-        this.initSpine(archer_json, archer_atlas, archer, 0.75, 0.65, 0.5, 0.5, 50); // Archer - front
+        this.initSpine(archer_json, archer_atlas, archer, 0.75, 0.65, 0.5, 0.5, 40); // Archer - front
         //this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 2, 1.5, 0.8, 0.8);
 
         
@@ -223,7 +223,7 @@ export default class CTAScene extends BaseScene{
         // Ground characters (z-index: 40-50)
         this.initSpine(wizard_json, wizard_atlas, wizard, 0.2, 0.67, 0.5, 0.5, 40); // Wizard - foreground
         this.initSpine(warrior_png_json, warrior_png_atlas, warrior_png, 0.3, 0.65, 0.5, 0.5, 45); // Warrior - foreground
-        this.initSpine(archer_json, archer_atlas, archer, 0.4, 0.67, 0.5, 0.5, 50); // Archer - front
+        this.initSpine(archer_json, archer_atlas, archer, 0.4, 0.67, 0.5, 0.5, 40); // Archer - front
         //return;
         const ctaOverlayPortrait = document.getElementById("ui-overlay-cta-portrait");
         ctaOverlayPortrait.style.display = 'none';

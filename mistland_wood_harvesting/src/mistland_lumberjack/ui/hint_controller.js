@@ -121,8 +121,10 @@ export default class HintManager{
         this.handSprite = handSprite; // Store reference to handSprite
         this.pixiApp.stage.addChild(handContainer);
         this.startPosition = { x: this.handSprite.x, y: this.handSprite.y };
+        
         this.handContainer.alpha = 0;
-
+        this.navTouchIcon = navFGSprite;
+        this.touchStartPosition = { x: this.navTouchIcon.x, y: this.navTouchIcon.y };
         this.onResize();
 
         
