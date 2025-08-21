@@ -1,4 +1,3 @@
-
 import { DoubleSide, Mesh, MeshBasicMaterial, MeshStandardMaterial, Object3D, PlaneGeometry, TextureLoader, Color, BackSide, FrontSide } from "three";
 import { Box, Body, Vec3, Quaternion } from "cannon-es";
 // import { lock } from '../../media/pngs_lock.png.js';
@@ -8,6 +7,7 @@ import { Easing, Tween } from "@tweenjs/tween.js";
 import { SensorZone } from "./sensor.js";
 import TargetValueIndicator from "../ui/target_value_indicator.js";
 import { bubble_gem } from '../../../media/img_bubble_gem.webp.js';
+import { starburst } from '../../../media/img_starburst.webp.js';
 
 export default class WorkshopController{
     constructor({ scene, world, playerBody, sensorType})
@@ -22,6 +22,10 @@ export default class WorkshopController{
         this.clonedScale = model.scale.clone();
         this.clonedPosition = model.position.clone();
         this.clonedRotation = model.quaternion.clone(); // Use quaternion instead of rotation
+        
+        // Get camera reference for billboard effect
+        this.camera = scene.children.find(child => child.isCamera) || scene.getObjectByName("camera");
+        
         // create parent object for model ( as the models scale is inversed from the layout process ) to prevent weird animation when we scale it up in the unlock
         const parentObj = new Object3D();
         parentObj.position.copy( this.clonedPosition );
@@ -141,6 +145,9 @@ export default class WorkshopController{
         this.whiteoutModel.scale.set(0, 0, 0);
         console.log("reveal");
 
+        // Create startburst effect
+        this.createStartburstEffect();
+
         const params = { opacity: 0 };
 
         this.fadeInTween = new Tween( params )
@@ -148,7 +155,59 @@ export default class WorkshopController{
             this.materialToFadeIn.opacity = params.opacity;
         }).onComplete( ()=>{
             console.log("fade in complete");
+            // Remove startburst after fade in completes
+            //this.removeStartburstEffect();
         }).start();
+    }
+
+    createStartburstEffect()
+    {
+        const loader = new TextureLoader();
+        
+        loader.load(starburst, (texture) => {
+            texture.needsUpdate = true;
+            
+            const geometry = new PlaneGeometry(24, 24);
+            const material = new MeshBasicMaterial({ 
+                map: texture, 
+                side: DoubleSide, 
+                transparent: true,
+                depthTest: false,
+                depthWrite: false
+            });
+            
+            const startburstQuad = new Mesh(geometry, material);
+            
+            // Fixed positioning calculation
+            const buildingPos = this.clonedPosition.clone();
+            if (this.camera) {
+                const cameraPos = this.camera.position.clone();
+                const direction = buildingPos.clone().sub(cameraPos).normalize();
+                const distance = cameraPos.distanceTo(buildingPos);
+                // Position 60% of the way from camera to building
+                startburstQuad.position.copy(buildingPos.clone());
+            } else {
+                startburstQuad.position.copy(buildingPos);
+                startburstQuad.position.z += 2;
+            }
+            
+            startburstQuad.position.y = buildingPos.y + 1;
+            
+            this.scene.add(startburstQuad);
+            this.startburstQuad = startburstQuad;
+
+            console.log("Camera found:", this.camera);
+            console.log("Building position:", buildingPos);
+            console.log("Starburst position:", startburstQuad.position);
+        });
+    }
+
+    removeStartburstEffect()
+    {
+        if (this.startburstQuad) {
+            this.scene.remove(this.startburstQuad);
+            this.startburstQuad = null;
+        }
     }
 
     unlock()
@@ -215,5 +274,10 @@ export default class WorkshopController{
         if( this.fadeInTween ) this.fadeInTween.update();
         if( this.targetValueIndicator ) this.targetValueIndicator.update();
         this.sensor.update();
+        
+        // Make starburst spin on X-axis
+        if (this.startburstQuad) {
+            this.startburstQuad.rotation.z -= dt * 0.5; // Adjust speed by changing the multiplier
+        }
     }
 }
