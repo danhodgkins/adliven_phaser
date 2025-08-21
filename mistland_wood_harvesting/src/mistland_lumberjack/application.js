@@ -632,7 +632,21 @@ export class MistlandLumberjackApplication extends BaseScene{
 
     getTreeHintVector()
     {
-        return this.trees[ 0 ].sensor.body.position;
+        // Find the first tree that still has logs available
+        const availableTree = this.trees.find(tree => tree.logsAvailable > 0);
+        
+        if (availableTree) {
+            return availableTree.sensor.body.position;
+        }
+        
+        // Fallback: if no trees with logs available, return the first tree's position
+        // or a default position if no trees exist
+        if (this.trees.length > 0) {
+            return this.trees[0].sensor.body.position;
+        }
+        
+        // Default fallback position if no trees exist
+        return new Vec3(0, 0, 0);
     }
 
     //////////////////////////////////////////////////////////////////////////////////// EVENT HANDLERS 
@@ -763,7 +777,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                     this.sensorsController.removeTree( targetTree );
                     //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
                     targetTree.destroy( true , ( tree )=>{
-                        this.trees.splice( this.trees.indexOf( tree , 1 ));
+                        this.trees.splice( this.trees.indexOf( tree ), 1 );
                     });
                 }
                 break;
