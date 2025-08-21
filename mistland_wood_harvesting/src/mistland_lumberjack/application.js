@@ -30,7 +30,8 @@ export class MistlandLumberjackApplication extends BaseScene{
     timeoutID = -1;
 
     constructor({ config }) {
-        super({config});
+        super({ config });
+        this.skeletonEventCooldown = false; // Initialize cooldown flag
         console.log("Application initialized with parent:", config);
 
         this.audioController = config.audioController;
@@ -756,9 +757,16 @@ export class MistlandLumberjackApplication extends BaseScene{
     }
 
     onSkeletonEvent( e ){
-        //
+        if (this.skeletonEventCooldown) return; // Prevent triggering if cooldown is active
+
+        this.skeletonEventCooldown = true; // Activate cooldown
         const numLogsToLose = this.applicationModel.onSkeletonAttack();
-        this.player.DropMultipleLogs( numLogsToLose );
+        this.player.DropMultipleLogs(numLogsToLose);
+
+        // Set a timer to reset the cooldown after 3 seconds
+        setTimeout(() => {
+            this.skeletonEventCooldown = false;
+        }, 3000);
     }
     //////////////////////////////////////////////////////////////////////////////////// END EVENT HANDLERS 
 }

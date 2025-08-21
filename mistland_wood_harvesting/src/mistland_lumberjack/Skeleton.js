@@ -156,39 +156,50 @@ export class SkeletonController extends EventDispatcher {
         }
     }
 
-    update(dt) {                
+    update(dt) {
         this.sensor.update();
-        
-        if( !this.mesh ) return;
+
+        if (!this.mesh) return;
         const { sphereBody, mesh } = this;
-        
+
         const walkSpeed = 1;
         const skeletonPos = this.mesh.position;
         const playerPos = this.player.sphereMesh.position;
-        this.sensor.body.position.copy( skeletonPos);
-        
-        const direction = new Vector3()
-            .subVectors(playerPos, skeletonPos)
-            .setY(0)
-            .normalize();
 
-        // we want only horizontal (XZ) movement:
-        sphereBody.velocity.x = direction.x * walkSpeed;
-        sphereBody.velocity.y = 0;
-        sphereBody.velocity.z = direction.z * walkSpeed;
+        // Calculate distance to the player
+        const distance = skeletonPos.distanceTo(playerPos);
 
-        // prevent any physics y on collision
-        sphereBody.position.y = 1; // Keep physics body above ground
+        // Only move if within 5 meters of the player
+        if (distance <= 15.0) {
+            const direction = new Vector3()
+                .subVectors(playerPos, skeletonPos)
+                .setY(0)
+                .normalize();
 
-        // Make mesh face the player
-        const angle = Math.atan2(direction.x, direction.z); 
-        mesh.rotation.y = angle;
+            // Apply horizontal (XZ) movement
+            sphereBody.velocity.x = direction.x * walkSpeed;
+            sphereBody.velocity.y = 0;
+            sphereBody.velocity.z = direction.z * walkSpeed;
+
+            // Prevent any physics Y movement on collision
+            sphereBody.position.y = 1; // Keep physics body above ground
+
+            // Smoothly rotate the skeleton to face the player
+            const targetAngle = Math.atan2(direction.x, direction.z);
+            const currentAngle = mesh.rotation.y;
+            const lerpFactor = 0.1; // Adjust for smoother or faster rotation
+            mesh.rotation.y = currentAngle + (targetAngle - currentAngle) * lerpFactor;
+        } else {
+            // Stop movement if out of range
+            sphereBody.velocity.set(0, 0, 0);
+        }
 
         // Sync mesh with physics body AND apply visual offset
         mesh.position.lerp(sphereBody.position, 0.25);
         mesh.position.y += this.visualOffset; // Apply the visual offset after lerp
-        
-        if( this.glbController ) this.glbController.update( dt );
+
+        // Update animation controller if it exists
+        if (this.glbController) this.glbController.update(dt);
     }
 
     // update(deltaTime) {
