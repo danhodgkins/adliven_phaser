@@ -1,1 +1,1 @@
-export const bush2_atlas = "data:text/plain;base64,YnVzaDIucG5nDQoJc2l6ZTogNTAsIDM0DQoJZmlsdGVyOiBMaW5lYXIsIExpbmVhcg0KCXBtYTogdHJ1ZQ0KCXNjYWxlOiAwLjINCjc1DQoJYm91bmRzOiAyLCAyLCA0NiwgMzANCg==";
+export const bush2_atlas = "data:text/plain;base64,YnVzaDIucG5nCglzaXplOiA1MCwgMzQKCWZpbHRlcjogTGluZWFyLCBMaW5lYXIKCXBtYTogdHJ1ZQoJc2NhbGU6IDAuMgo3NQoJYm91bmRzOiAyLCAyLCA0NiwgMzAK";
