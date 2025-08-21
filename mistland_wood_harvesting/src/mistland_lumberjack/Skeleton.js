@@ -3,12 +3,12 @@ import { GLTFLoader } from "three/examples/jsm/Addons.js";
 import GlbController from "./glb_controller.js";
 import { Skeleton } from "../../media/Skeleton.glb.js";
 import { Body, Material, Sphere, Vec3 } from "cannon-es";
-import { SensorZone } from "./sensors/sensor.js";
 
 export class SkeletonController extends EventDispatcher {
 
     STATE_WALKING = "STATE_WALKING";
     STATE_CHOPPING = "STATE_CHOPPING";
+    STATE_IDLE = "STATE_IDLE";
     
     constructor({ world, scene, position, rotation, player, audioController }) {
         super();
@@ -18,6 +18,10 @@ export class SkeletonController extends EventDispatcher {
         this.rotation = rotation;
         this.player = player;
         this.audioController = audioController;
+
+        // Attack range for triggering chop state
+        this.attackRange = 2.0;
+        this.followRange = 7.0;
 
         this.initVisuals();
     }
@@ -38,6 +42,10 @@ export class SkeletonController extends EventDispatcher {
                     animRef = this.glbController.getAnimIndexByName("02_skeleton_attack");
                     this.glbController.playAnimByIndex( animRef );
                     break;
+                case this.STATE_IDLE:
+                    this.glbController.mixer.timeScale = 1;
+                    animRef = this.glbController.getAnimIndexByName("01_skeleton_idle");
+                    this.glbController.playAnimByIndex( animRef );
             }
     
             this.currentState = newState;
@@ -62,27 +70,6 @@ export class SkeletonController extends EventDispatcher {
         
         this.world.addBody(sphereBody);
         this.sphereBody = sphereBody;
-
-        const sensor = new SensorZone({
-            world : this.world, 
-            scene : this.scene,
-            position: this.position,
-            // position: position || new Vec3(0, 0, 0),
-            radius: 2,
-            playerBody: this.player.sphereBody, 
-            color: 0xff00ff,
-            sensorType : "skeleton",
-            visible : false
-        });
-
-        
-
-        this.boundOnPlayerEnter = this.onPlayerEnter.bind( this );
-        this.boundOnPlayerExit = this.onPlayerExit.bind( this );
-        sensor.addEventListener('enter', this.boundOnPlayerEnter );
-        sensor.addEventListener('exit', this.boundOnPlayerExit );
-
-        this.sensor = sensor;
 
         const loader = new GLTFLoader();
         loader.load(Skeleton, (gltf) => {
@@ -129,19 +116,8 @@ export class SkeletonController extends EventDispatcher {
             this.glbController = new GlbController({  glb : gltf });
             this.glbController.mixer.addEventListener('loop', this.boundOnAnimComplete )
 
-            this.setState( this.STATE_WALKING );
+            this.setState( this.STATE_IDLE );
         });
-    }
-
-    onPlayerEnter()
-    {
-        if( this.currentState != this.STATE_CHOPPING ) this.setState( this.STATE_CHOPPING );
-        this.dispatchEvent({ type: 'skeleton_event', detail : "axe_chop_complete" });
-    }
-
-    onPlayerExit()
-    {
-        this.setState( this.STATE_WALKING );
     }
 
     onAnimComplete( e )
@@ -157,20 +133,35 @@ export class SkeletonController extends EventDispatcher {
     }
 
     update(dt) {
-        this.sensor.update();
-
         if (!this.mesh) return;
+        
         const { sphereBody, mesh } = this;
-
         const walkSpeed = 1;
         const skeletonPos = this.mesh.position;
-        const playerPos = this.player.sphereMesh.position;
-
+        
+        // Use player physics body position for consistency
+        const playerPos = new Vector3().copy(this.player.sphereBody.position);
+        
         // Calculate distance to the player
         const distance = skeletonPos.distanceTo(playerPos);
-
-        // Only move if within 5 meters of the player
-        if (distance <= 15.0) {
+        
+        // Check if player is in attack range
+        if (distance <= this.attackRange) {
+            if (this.currentState !== this.STATE_CHOPPING) {
+                this.setState(this.STATE_CHOPPING);
+                this.dispatchEvent({ type: 'skeleton_event', detail : "axe_chop_complete" });
+            }
+            // Stop movement when attacking but maintain Y position
+            sphereBody.velocity.x = 0;
+            sphereBody.velocity.z = 0;
+            sphereBody.position.y = 1; // Fix Y position
+        }
+        // Check if player is in follow range but outside attack range
+        else if (distance <= this.followRange) {
+            if (this.currentState !== this.STATE_WALKING) {
+                this.setState(this.STATE_WALKING);
+            }
+            
             const direction = new Vector3()
                 .subVectors(playerPos, skeletonPos)
                 .setY(0)
@@ -182,77 +173,30 @@ export class SkeletonController extends EventDispatcher {
             sphereBody.velocity.z = direction.z * walkSpeed;
 
             // Prevent any physics Y movement on collision
-            sphereBody.position.y = 1; // Keep physics body above ground
+            sphereBody.position.y = 1;
 
             // Smoothly rotate the skeleton to face the player
             const targetAngle = Math.atan2(direction.x, direction.z);
             const currentAngle = mesh.rotation.y;
-            const lerpFactor = 0.1; // Adjust for smoother or faster rotation
+            const lerpFactor = 0.1;
             mesh.rotation.y = currentAngle + (targetAngle - currentAngle) * lerpFactor;
-        } else {
-            // Stop movement if out of range
-            sphereBody.velocity.set(0, 0, 0);
+        } 
+        // Player is out of range
+        else {
+            if (this.currentState !== this.STATE_IDLE) {
+                this.setState(this.STATE_IDLE);
+            }
+            // Stop movement but fix Y position to prevent sinking
+            sphereBody.velocity.x = 0;
+            sphereBody.velocity.z = 0;
+            sphereBody.position.y = 1; // Fix Y position to prevent falling
         }
 
         // Sync mesh with physics body AND apply visual offset
         mesh.position.lerp(sphereBody.position, 0.25);
-        mesh.position.y += this.visualOffset; // Apply the visual offset after lerp
+        mesh.position.y += this.visualOffset;
 
         // Update animation controller if it exists
         if (this.glbController) this.glbController.update(dt);
     }
-
-    // update(deltaTime) {
-    //     if (this.mesh && this.player && this.player.sphereMesh) {
-    //         // Get positions as Vector3
-    //         const skeletonPos = this.mesh.position;
-    //         const playerPos = this.player.sphereMesh.position;
-            
-    //         // Calculate distance to player
-    //         const distance = skeletonPos.distanceTo(playerPos);
-            
-    //         // Move towards player if within 5 meter radius
-    //         const followRadius = 10.0;
-    //         const moveSpeed = 1.0; // Units per second
-    //         const rotationSpeed = 2.0; // Radians per second
-            
-    //         if (distance <= followRadius && distance > 0.5) { // Don't move if too close (0.5m)
-    //             // Calculate direction vector from skeleton to player
-    //             const direction = new Vector3()
-    //                 .subVectors(playerPos, skeletonPos)
-    //                 .normalize();
-                
-    //             // Move towards player
-    //             const movement = direction.multiplyScalar(moveSpeed * deltaTime);
-    //             this.mesh.position.add(movement);
-                
-    //             // Smooth rotation to face the player
-    //             const targetAngle = Math.atan2(direction.x, direction.z);
-    //             const currentAngle = this.mesh.rotation.y;
-                
-    //             // Calculate the shortest angular distance
-    //             let angleDiff = targetAngle - currentAngle;
-    //             while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI;
-    //             while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI;
-                
-    //             // Apply smooth rotation
-    //             const maxRotation = rotationSpeed * deltaTime;
-    //             const rotationAmount = Math.sign(angleDiff) * Math.min(Math.abs(angleDiff), maxRotation);
-    //             this.mesh.rotation.y += rotationAmount;
-                
-    //         }
-
-    //         if (distance < 0.5){
-    //             //Attack Player
-    //             this.player.DropMultipleLogs();
-    //         }
-            
-    //         // Update animation controller if it exists
-    //         if (this.glbController) {
-    //             this.glbController.update(deltaTime);
-    //         }
-    //     }
-    // }
-
-    
 }
