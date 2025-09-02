@@ -23,6 +23,8 @@ import TargetValueIndicator from "./ui/target_value_indicator";
 import { bubble_wood } from '../../media/img_bubble_wood.webp.js';
 import { nav_area } from "../../media/pngs_nav_area.png.js";
 import { nav_touch } from "../../media/pngs_nav_touch.png.js";
+import { Tree } from "../../media/Tree.glb.js";
+import TreeSensorsController from "./sensors/tree_sensors_controller.js";
 
 export class MistlandLumberjackApplication extends BaseScene{
 
@@ -482,8 +484,11 @@ export class MistlandLumberjackApplication extends BaseScene{
                 radius: 3,
                 playerBody: this.player.sphereBody,
                 sensorType: "tree",
-                model : element.child
+                model : element.child,
+                id : element.child.uuid
             });            
+
+            //console.log("element = " , element , tz.id  );
             this.trees.push( tz );
         });
 
@@ -575,6 +580,12 @@ export class MistlandLumberjackApplication extends BaseScene{
             //     player: this.player
             // });
         }
+
+        this.treesSensorsController = new TreeSensorsController({ 
+            applicationModel : this.applicationModel,
+            trees : this.trees,
+            player : this.player
+        })
 
         this.sensorsController = new SensorsController({ 
             applicationModel : this.applicationModel,
@@ -710,12 +721,12 @@ export class MistlandLumberjackApplication extends BaseScene{
                 
                 break;
             case "log_collected":
-                if(  this.sensorsController.currentTreeSensor ) 
-                {
-                    this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
-                    const targetTree = this.sensorsController.currentTreeSensor.parentController;
-                    targetTree.decrementValue();
-                }
+                // if(  this.sensorsController.currentTreeSensor ) 
+                // {
+                //     this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
+                //     const targetTree = this.sensorsController.currentTreeSensor.parentController;
+                //     targetTree.decrementValue();
+                // }
                 this.uiController.updateUI();
                 this.player.setHintVector( this.lumberMillZone.model.position );
                 break;
@@ -761,28 +772,52 @@ export class MistlandLumberjackApplication extends BaseScene{
     }
 
     onPlayerEvent( e ){
-        //console.log("on player event ", e  );
-        switch( e.detail )
-        {
-            case "axe_chop_complete":
-                this.applicationModel.onLogCollected();
-                const targetTree = this.sensorsController.currentTreeSensor.parentController;
-                if( 
-                    this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ||
-                    targetTree.logsAvailable <= 0
-                ) this.player.stopChopping();
+        // //console.log("on player event ", e  );
+        // switch( e.detail )
+        // {
+        //     case "axe_chop_complete":
+        //         this.applicationModel.onLogCollected();
+        //         const targetTree = this.sensorsController.currentTreeSensor.parentController;
+        //         if( 
+        //             this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ||
+        //             targetTree.logsAvailable <= 0
+        //         ) this.player.stopChopping();
                 
-                if( targetTree.logsAvailable <= 0 )
-                {
-                    this.sensorsController.removeTree( targetTree );
-                    //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
-                    targetTree.destroy( true , ( tree )=>{
-                        this.trees.splice( this.trees.indexOf( tree ), 1 );
-                    });
-                }
-                break;
-        }
+        //         if( targetTree.logsAvailable <= 0 )
+        //         {
+        //             this.sensorsController.removeTree( targetTree );
+        //             //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
+        //             targetTree.destroy( true , ( tree )=>{
+        //                 this.trees.splice( this.trees.indexOf( tree ), 1 );
+        //             });
+        //         }
+        //         break;
+        // }
     }
+
+    // onPlayerEvent( e ){
+    //     //console.log("on player event ", e  );
+    //     switch( e.detail )
+    //     {
+    //         case "axe_chop_complete":
+    //             this.applicationModel.onLogCollected();
+    //             const targetTree = this.sensorsController.currentTreeSensor.parentController;
+    //             if( 
+    //                 this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ||
+    //                 targetTree.logsAvailable <= 0
+    //             ) this.player.stopChopping();
+                
+    //             if( targetTree.logsAvailable <= 0 )
+    //             {
+    //                 this.sensorsController.removeTree( targetTree );
+    //                 //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
+    //                 targetTree.destroy( true , ( tree )=>{
+    //                     this.trees.splice( this.trees.indexOf( tree ), 1 );
+    //                 });
+    //             }
+    //             break;
+    //     }
+    // }
 
     onSkeletonEvent( e ){
         if (this.skeletonEventCooldown) return; // Prevent triggering if cooldown is active

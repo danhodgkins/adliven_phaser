@@ -101,8 +101,9 @@ export class Player extends EventDispatcher {
                 this.setState( this.STATE_IDLE );
 
                 // Remove or comment out these lines since onAnimComplete doesn't exist
-                // this.boundOnAnimComplete = this.onAnimComplete.bind(this);
+                this.boundOnAnimComplete = this.onAnimComplete.bind(this);
                 // this.glbController.mixer.addEventListener('loop', this.boundOnAnimComplete )
+                this.glbController.mixer.addEventListener('finished', this.boundOnAnimComplete )
 
                 const logStackParent = new Object3D();
                 logStackParent.position.set(0, 0.5, -0.5); // position stack parent slightly behind player
@@ -218,7 +219,7 @@ export class Player extends EventDispatcher {
                 const speed = this.axeLevel == 0 ? this.chopSpeed0 : this.chopSpeed1; 
                 this.glbController.mixer.timeScale = speed;
                 animRef = this.glbController.getAnimIndexByName("03_chop");
-                this.glbController.playAnimByIndex( animRef );
+                this.glbController.playAnimByIndex( animRef, 1 );
 
                 const axeSFX = this.audioController.play("sfx_player_sword_swing_02");
 
@@ -237,12 +238,22 @@ export class Player extends EventDispatcher {
     startChopping()
     {
         this.isChopping = true;
+        console.log("startChopping ");
         this.setState( this.STATE_CHOPPING );
     }
 
     stopChopping()
     {
         this.isChopping = false;
+        // const currentSpeed = Math.sqrt( this.sphereBody.velocity.x ** 2 + this.sphereBody.velocity.z ** 2);
+        // if( currentSpeed > 0) 
+        // {
+        //     this.setState( this.STATE_WALKING );
+        // } else {
+        //     // this.isChopping = false;
+        //     this.setState( this.STATE_IDLE );
+        // }
+        console.log("stopChopping ");
     }
     
     setInput(x, y, rotation) {
@@ -342,11 +353,13 @@ export class Player extends EventDispatcher {
     }
 
     onAnimHalfway( e ) {
+        
         switch( e.action._clip.name ) {
             case "03_chop":
+                console.log(`chop!`); // Debug log
                 // respond to chop halfway complete
-                this.dispatchEvent({ type: 'player_event', detail : "axe_chop_complete" });
-                const axeSFX = this.audioController.play("sfx_player_sword_swing_02");
+                // this.dispatchEvent({ type: 'player_event', detail : "axe_chop_complete" });
+                // const axeSFX = this.audioController.play("sfx_player_sword_swing_02");
                 break;
         }
     }
@@ -428,7 +441,16 @@ export class Player extends EventDispatcher {
     onAnimComplete( e ) {
         // This method was referenced but didn't exist
         // Add any end-of-animation logic here if needed
-        console.log("Animation complete:", e.action._clip.name);
+        switch(  e.action._clip.name )
+        {
+            case "03_chop":
+                console.log("Animation complete:", e.action._clip.name);
+                this.dispatchEvent({ type: 'player_event', detail : "axe_chop_complete" });
+                const axeSFX = this.audioController.play("sfx_player_sword_swing_02");
+                break;
+        }
+
+        
     }
 }
 

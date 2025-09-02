@@ -29,8 +29,8 @@ export default class TreeZone {
                 
         this.boundOnPlayerEnter = this.onPlayerEnter.bind( this );
         this.boundOnPlayerExit = this.onPlayerExit.bind( this );
-        sensor.addEventListener('enter', this.boundOnPlayerEnter );
-        sensor.addEventListener('exit', this.boundOnPlayerExit );
+        // sensor.addEventListener('enter', this.boundOnPlayerEnter );
+        // sensor.addEventListener('exit', this.boundOnPlayerExit );
 
         this.model = model;
 
@@ -154,7 +154,7 @@ export default class TreeZone {
             }, 850 )
             .easing(Easing.Elastic.In).onComplete( ()=>{
                 this.scaleDownTween = null;
-                completCallback();
+                if( completCallback) completCallback();
             }).start();
         }
     }
