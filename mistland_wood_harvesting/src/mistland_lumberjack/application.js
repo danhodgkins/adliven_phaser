@@ -555,30 +555,6 @@ export class MistlandLumberjackApplication extends BaseScene{
                     sc.addEventListener('skeleton_event', this.boundOnSkeletonEvent );
                     this.skeletonControllers.push( sc );
             });
-
-            // this.Skeleton0 = new SkeletonController({
-            //     world: this.world,
-            //     scene: this.scene,
-            //     position: new Vector3(0, 3, 0), // Adjust as needed
-            //     rotation: new Quaternion(0, 0, 0, 1), // Adjust as needed
-            //     player: this.player
-            // });
-
-            // this.Skeleton1 = new SkeletonController({
-            //     world: this.world,
-            //     scene: this.scene,   
-            //     position: new Vector3(5, 0, 0), // Adjust as needed
-            //     rotation: new Quaternion(0, 0, 0, 1), // Adjust
-            //     player: this.player
-            // });
-
-            // this.skeleton2 = new SkeletonController({
-            //     world: this.world,
-            //     scene: this.scene,
-            //     position: new Vector3(-5, 0, 0), // Adjust as needed
-            //     rotation: new Quaternion(0, 0, 0, 1), // Adjust
-            //     player: this.player
-            // });
         }
 
         this.treesSensorsController = new TreeSensorsController({ 
@@ -589,7 +565,6 @@ export class MistlandLumberjackApplication extends BaseScene{
 
         this.sensorsController = new SensorsController({ 
             applicationModel : this.applicationModel,
-            trees : this.trees,
             lumbermill : lumberMillZone,
             workshop : this.workshop
         })
@@ -606,13 +581,6 @@ export class MistlandLumberjackApplication extends BaseScene{
         this.axeUpgradeController.update(dt);
         this.hintManager.update( dt );
         this.gemAnimator.update( dt );
-
-        // Update skeletons
-        // if( params.skeletons.value ) {
-        //     if (this.Skeleton0) this.Skeleton0.update(dt);
-        //     if (this.Skeleton1) this.Skeleton1.update(dt);
-        //     if (this.skeleton2) this.skeleton2.update(dt);
-        // }
 
         this.skeletonControllers.forEach(element => {
             element.update(dt);
@@ -666,11 +634,11 @@ export class MistlandLumberjackApplication extends BaseScene{
         // tree or lumbermill
         const sensorType = e.sensorType;
         const enter = e.enter;
-        if( sensorType == "tree")
-        {
-            if( enter ) this.player.startChopping();
-            else this.player.stopChopping();
-        }
+        // if( sensorType == "tree")
+        // {
+        //     if( enter ) this.player.startChopping();
+        //     else this.player.stopChopping();
+        // }
 
         if( enter && sensorType == "workshop")
         {
@@ -721,12 +689,6 @@ export class MistlandLumberjackApplication extends BaseScene{
                 
                 break;
             case "log_collected":
-                // if(  this.sensorsController.currentTreeSensor ) 
-                // {
-                //     this.player.playLogCollectionAnim( this.sensorsController.currentTreeSensor.body );
-                //     const targetTree = this.sensorsController.currentTreeSensor.parentController;
-                //     targetTree.decrementValue();
-                // }
                 this.uiController.updateUI();
                 this.player.setHintVector( this.lumberMillZone.model.position );
                 break;
@@ -772,52 +734,9 @@ export class MistlandLumberjackApplication extends BaseScene{
     }
 
     onPlayerEvent( e ){
-        // //console.log("on player event ", e  );
-        // switch( e.detail )
-        // {
-        //     case "axe_chop_complete":
-        //         this.applicationModel.onLogCollected();
-        //         const targetTree = this.sensorsController.currentTreeSensor.parentController;
-        //         if( 
-        //             this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ||
-        //             targetTree.logsAvailable <= 0
-        //         ) this.player.stopChopping();
-                
-        //         if( targetTree.logsAvailable <= 0 )
-        //         {
-        //             this.sensorsController.removeTree( targetTree );
-        //             //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
-        //             targetTree.destroy( true , ( tree )=>{
-        //                 this.trees.splice( this.trees.indexOf( tree ), 1 );
-        //             });
-        //         }
-        //         break;
-        // }
+
     }
 
-    // onPlayerEvent( e ){
-    //     //console.log("on player event ", e  );
-    //     switch( e.detail )
-    //     {
-    //         case "axe_chop_complete":
-    //             this.applicationModel.onLogCollected();
-    //             const targetTree = this.sensorsController.currentTreeSensor.parentController;
-    //             if( 
-    //                 this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ||
-    //                 targetTree.logsAvailable <= 0
-    //             ) this.player.stopChopping();
-                
-    //             if( targetTree.logsAvailable <= 0 )
-    //             {
-    //                 this.sensorsController.removeTree( targetTree );
-    //                 //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
-    //                 targetTree.destroy( true , ( tree )=>{
-    //                     this.trees.splice( this.trees.indexOf( tree ), 1 );
-    //                 });
-    //             }
-    //             break;
-    //     }
-    // }
 
     onSkeletonEvent( e ){
         if (this.skeletonEventCooldown) return; // Prevent triggering if cooldown is active
