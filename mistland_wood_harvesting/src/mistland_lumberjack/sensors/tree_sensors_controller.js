@@ -16,6 +16,8 @@ export default class TreeSensorsController extends EventDispatcher{
         this.boundOnModelEvent = this.onModelEvent.bind( this );
         this.applicationModel.addEventListener('model_event', this.boundOnModelEvent );
 
+        this.boundOnChopDelayComplete = this.onChopDelayComplete.bind(this);
+
         trees.forEach(element => {
             element.sensor.addEventListener('enter', this.boundOnZoneEnter );
             element.sensor.addEventListener('exit', this.boundOnZoneExit );
@@ -26,6 +28,76 @@ export default class TreeSensorsController extends EventDispatcher{
         this.activeTrees = [];
     }
 
+
+    // onModelEvent( e )
+    // {
+    //     console.log("onModelEvent = " );
+    //     switch( e.detail )
+    //     {
+    //         case "log_collected":
+    //             this.player.playLogCollectionAnim( this.axeTargetTree.sensor.body );
+    //             this.axeTargetTree.decrementValue();
+
+ 
+    //             if( this.axeTargetTree.logsAvailable == 0 )
+    //             {
+    //                 const tTree = this.axeTargetTree;
+    //                 this.activeTrees.splice( this.activeTrees.indexOf( tTree ) , 1 );
+
+    //                 // Permanently remove event listeners since tree is destroyed
+    //                 tTree.sensor.removeEventListener('enter', this.boundOnZoneEnter );
+    //                 tTree.sensor.removeEventListener('exit', this.boundOnZoneExit );
+    //                 tTree.destroy( true );
+    //                 this.axeTargetTree = null;
+
+    //                 // if( this.activeTrees.length > 0 ){
+    //                 //     this.axeTargetTree = this.activeTrees[0];   
+    //                 // }
+
+    //                 console.log("tree delpeted and destroyd = " ,this.activeTrees);
+    //             } 
+    //             else {
+    //                 if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") )
+    //                 {
+    //                     this.player.startChopping();
+    //                 }
+    //             }
+
+                
+
+    //             // this.axeTargetTree = null;
+
+    //             // is player in ranghe of any other trees?
+    //             if( !this.axeTargetTree ) {
+    //                 if( this.activeTrees.length > 0 ){
+    //                     this.axeTargetTree = this.activeTrees[0];   
+                        
+    //                     if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") )
+    //                     {
+    //                         this.player.startChopping();
+    //                     }
+    //                 }
+    //                 else 
+    //                 {
+    //                     console.log("wtf no zones left");
+    //                     this.player.stopChopping();
+    //                 }
+    //            } 
+
+
+
+    //             //  else 
+    //             // {
+    //             //     if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") )
+    //             //     {
+    //             //         this.player.startChopping();
+    //             //     }
+    //             // }
+
+                
+    //             break;
+    //     }
+    // }
 
     onModelEvent( e )
     {
@@ -46,7 +118,7 @@ export default class TreeSensorsController extends EventDispatcher{
                     tTree.sensor.removeEventListener('enter', this.boundOnZoneEnter );
                     tTree.sensor.removeEventListener('exit', this.boundOnZoneExit );
                     tTree.destroy( true );
-                    this.axeTargetTree = null;
+                    // this.axeTargetTree = null;
 
                     // if( this.activeTrees.length > 0 ){
                     //     this.axeTargetTree = this.activeTrees[0];   
@@ -54,33 +126,35 @@ export default class TreeSensorsController extends EventDispatcher{
 
                     console.log("tree delpeted and destroyd = " ,this.activeTrees);
                 } 
-                else {
-                    if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") )
-                    {
-                        this.player.startChopping();
-                    }
-                }
+
+                this.axeTargetTree = null;
+                // else {
+                //     if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") )
+                //     {
+                //         this.player.startChopping();
+                //     }
+                // }
 
                 
 
                 // this.axeTargetTree = null;
 
                 // is player in ranghe of any other trees?
-                if( !this.axeTargetTree ) {
-                    if( this.activeTrees.length > 0 ){
-                        this.axeTargetTree = this.activeTrees[0];   
+            //     if( !this.axeTargetTree ) {
+            //         if( this.activeTrees.length > 0 ){
+            //             this.axeTargetTree = this.activeTrees[0];   
                         
-                        if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") )
-                        {
-                            this.player.startChopping();
-                        }
-                    }
-                    else 
-                    {
-                        console.log("wtf no zones left");
-                        this.player.stopChopping();
-                    }
-               } 
+            //             if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") )
+            //             {
+            //                 this.player.startChopping();
+            //             }
+            //         }
+            //         else 
+            //         {
+            //             console.log("wtf no zones left");
+            //             this.player.stopChopping();
+            //         }
+            //    } 
 
 
 
@@ -96,30 +170,61 @@ export default class TreeSensorsController extends EventDispatcher{
                 break;
         }
     }
-            
+
+    chopDelayTimeout = -1;
+    onChopDelayComplete()
+    {
+        this.chopDelayTimeout = -1;
+        this.applicationModel.onLogCollected();
+    }
 
     onPlayerEvent( e ){
         switch( e.detail )
         {
             case "axe_chop_complete":
-                this.applicationModel.onLogCollected();
-                // const targetTree = this.sensorsController.currentTreeSensor.parentController;
-                // if( 
-                //     this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ||
-                //     targetTree.logsAvailable <= 0
-                // ) this.player.stopChopping();
-                
-                // if( targetTree.logsAvailable <= 0 )
-                // {
-                //     this.sensorsController.removeTree( targetTree );
-                //     //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
-                //     targetTree.destroy( true , ( tree )=>{
-                //         this.trees.splice( this.trees.indexOf( tree ), 1 );
-                //     });
-                // }
+                //if( !this.axeTargetTree ) {
+                    if( this.activeTrees.length > 0 ){
+                        this.axeTargetTree = this.activeTrees[0];   
+
+                        if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") )
+                        {
+                            const delay = this.player.axeLevel == 0 ? 100 : 20; 
+                            this.chopDelayTimeout = setTimeout( this.boundOnChopDelayComplete , delay );
+                            this.player.startChopping();
+                        }
+                    }
+                    else 
+                    {
+                        console.log("wtf no zones left");
+                        this.player.stopChopping();
+                    }
+                //} 
                 break;
         }
     }
+
+    // onPlayerEvent( e ){
+    //     switch( e.detail )
+    //     {
+    //         case "axe_chop_complete":
+    //             this.applicationModel.onLogCollected();
+    //             // const targetTree = this.sensorsController.currentTreeSensor.parentController;
+    //             // if( 
+    //             //     this.applicationModel.logCount >= getParamsNumberByID("backpackSize") ||
+    //             //     targetTree.logsAvailable <= 0
+    //             // ) this.player.stopChopping();
+                
+    //             // if( targetTree.logsAvailable <= 0 )
+    //             // {
+    //             //     this.sensorsController.removeTree( targetTree );
+    //             //     //this.trees.splice( this.trees.indexOf( targetTree , 1 ));
+    //             //     targetTree.destroy( true , ( tree )=>{
+    //             //         this.trees.splice( this.trees.indexOf( tree ), 1 );
+    //             //     });
+    //             // }
+    //             break;
+    //     }
+    // }
 
     onZoneEnter( e ) {
         
@@ -142,6 +247,7 @@ export default class TreeSensorsController extends EventDispatcher{
             if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") || this.axeTargetTree.logsAvailable > 0 )
             {
                 this.player.startChopping();
+                this.chopDelayTimeout = setTimeout( this.boundOnChopDelayComplete , 50 );
             }
         }
         //console.log("e = " , enteredTree , this.currentTree.id )

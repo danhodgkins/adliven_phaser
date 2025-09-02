@@ -308,61 +308,61 @@ export class Player extends EventDispatcher {
 
         if( this.glbController ) {
             this.glbController.update( dt );
-            this.checkAnimationProgress();
+            //this.checkAnimationProgress();
         }
         if( this.logLauncherAnimator ) this.logLauncherAnimator.update( dt );
     }
 
-    checkAnimationProgress() {
-        if (!this.glbController || !this.glbController.mixer) return;
+    // checkAnimationProgress() {
+    //     if (!this.glbController || !this.glbController.mixer) return;
         
-        // Get the current action
-        // const currentAction = this.glbController.currentAction;
-        // Alternative way to get current action if currentAction property doesn't exist
-        const actions = this.glbController.mixer._actions;
-        const currentAction = actions.find(action => action.isRunning() && action.getEffectiveWeight() > 0);
-        if (!currentAction) return;
+    //     // Get the current action
+    //     // const currentAction = this.glbController.currentAction;
+    //     // Alternative way to get current action if currentAction property doesn't exist
+    //     const actions = this.glbController.mixer._actions;
+    //     const currentAction = actions.find(action => action.isRunning() && action.getEffectiveWeight() > 0);
+    //     if (!currentAction) return;
         
-        const clipName = currentAction._clip.name;
-        const duration = currentAction._clip.duration;
-        const currentTime = currentAction.time;
-        const progress = (currentTime % duration) / duration;
+    //     const clipName = currentAction._clip.name;
+    //     const duration = currentAction._clip.duration;
+    //     const currentTime = currentAction.time;
+    //     const progress = (currentTime % duration) / duration;
         
-        // Check if we've crossed the halfway point
-        const halfwayPoint = 0.3;
+    //     // Check if we've crossed the halfway point
+    //     const halfwayPoint = 0.3;
         
-        // Get previous progress, default to 0 if undefined
-        const previousProgress = this.animationProgress.get(clipName) || 0;
-        const halfwayAlreadyTriggered = this.halfwayTriggered.get(clipName) || false;
+    //     // Get previous progress, default to 0 if undefined
+    //     const previousProgress = this.animationProgress.get(clipName) || 0;
+    //     const halfwayAlreadyTriggered = this.halfwayTriggered.get(clipName) || false;
         
-        const wasBeforeHalfway = previousProgress < halfwayPoint;
-        const isAfterHalfway = progress >= halfwayPoint;
+    //     const wasBeforeHalfway = previousProgress < halfwayPoint;
+    //     const isAfterHalfway = progress >= halfwayPoint;
         
-        if (wasBeforeHalfway && isAfterHalfway && !halfwayAlreadyTriggered) {
-            //console.log(`Halfway triggered for ${clipName} at progress ${progress}`); // Debug log
-            this.onAnimHalfway({ action: currentAction });
-            this.halfwayTriggered.set(clipName, true);
-        }
+    //     if (wasBeforeHalfway && isAfterHalfway && !halfwayAlreadyTriggered) {
+    //         //console.log(`Halfway triggered for ${clipName} at progress ${progress}`); // Debug log
+    //         this.onAnimHalfway({ action: currentAction });
+    //         this.halfwayTriggered.set(clipName, true);
+    //     }
         
-        // Reset halfway trigger when animation loops back to beginning
-        if (progress < 0.1) {
-            this.halfwayTriggered.set(clipName, false);
-        }
+    //     // Reset halfway trigger when animation loops back to beginning
+    //     if (progress < 0.1) {
+    //         this.halfwayTriggered.set(clipName, false);
+    //     }
         
-        this.animationProgress.set(clipName, progress);
-    }
+    //     this.animationProgress.set(clipName, progress);
+    // }
 
-    onAnimHalfway( e ) {
+    // onAnimHalfway( e ) {
         
-        switch( e.action._clip.name ) {
-            case "03_chop":
-                console.log(`chop!`); // Debug log
-                // respond to chop halfway complete
-                // this.dispatchEvent({ type: 'player_event', detail : "axe_chop_complete" });
-                // const axeSFX = this.audioController.play("sfx_player_sword_swing_02");
-                break;
-        }
-    }
+    //     switch( e.action._clip.name ) {
+    //         case "03_chop":
+    //             console.log(`chop!`); // Debug log
+    //             // respond to chop halfway complete
+    //             // this.dispatchEvent({ type: 'player_event', detail : "axe_chop_complete" });
+    //             // const axeSFX = this.audioController.play("sfx_player_sword_swing_02");
+    //             break;
+    //     }
+    // }
 
     currentSensorPosition = new Vector3(0, 0, 0);
     playLogCollectionAnim( triggeringBody )
