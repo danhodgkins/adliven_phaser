@@ -73,6 +73,10 @@ export default class TreeSensorsController extends EventDispatcher{
                         const delay = this.player.axeLevel == 0 ? this.slowChopDelay : this.fastChopDelay; 
                         this.chopDelayTimeout = setTimeout( this.boundOnChopDelayComplete , delay );
                         this.player.startChopping();
+                    }else {
+                        console.log("backpack full");   
+                        this.axeTargetTree = null;
+                        this.player.stopChopping();
                     }
                 }
                 else 
@@ -93,11 +97,18 @@ export default class TreeSensorsController extends EventDispatcher{
         if( !this.axeTargetTree ) 
         {
             this.axeTargetTree = enteredTree;
-            if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") || this.axeTargetTree.logsAvailable > 0 )
+            if( this.axeTargetTree.logsAvailable > 0 )
+            // if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") && this.axeTargetTree.logsAvailable > 0 )
             {
-                this.player.startChopping();
-                const delay = this.player.axeLevel == 0 ? this.slowChopDelay : this.fastChopDelay; 
-                this.chopDelayTimeout = setTimeout( this.boundOnChopDelayComplete , delay );
+                if( this.applicationModel.logCount < getParamsNumberByID("backpackSize") )
+                {
+                    this.player.startChopping();
+                    const delay = this.player.axeLevel == 0 ? this.slowChopDelay : this.fastChopDelay; 
+                    this.chopDelayTimeout = setTimeout( this.boundOnChopDelayComplete , delay );
+                } else {
+                    console.log("backpack full");   
+                    this.axeTargetTree = null;
+                }
             }
         }        
     }
