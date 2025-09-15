@@ -7,6 +7,7 @@
         "dev": "webpack-dev-server --config webpack/config.js --open",
         "build": "webpack --config webpack/config.prod.js",
         "build-inline": "webpack --config webpack/config.prod.js",
+        "build-to-minigame-wrapper": "webpack --config webpack/config.prod.js && copyfiles -u 1 ./dist/**/*.* ../../minigame_react_wrapper/www/public/mistland -E ",
         "dev-nolog": "webpack-dev-server --config webpack/config.js --open",
         "build-nolog": "webpack --config webpack/config.prod.js"
     },
@@ -40,6 +41,7 @@
         "nipplejs": "^0.10.2",
         "pixi-spine": "^4.0.6",
         "pixi.js": "^7.4.3",
-        "three": "^0.178.0"
+        "three": "^0.178.0",
+        "copyfiles": "^2.4.1"
     }
 }

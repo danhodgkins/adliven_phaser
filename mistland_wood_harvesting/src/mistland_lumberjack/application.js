@@ -59,6 +59,22 @@ export class MistlandLumberjackApplication extends BaseScene{
     
     }
 
+    postMessageToURL( ref, data )
+    {
+        // this.postMessageURL = "https://games.ramjam.co.uk/";
+        this.postMessageURL = "http://localhost:5173/";
+
+        if( !this.postMessageURL ) {
+            console.log("attempt to post message to url - no postmessage url set. you must override initPostMessage")
+        } else{
+            //console.log("post message to url ref: " , ref)
+        
+            window.parent.window.postMessage({
+                type:ref, data:data
+            },this.postMessageURL);
+        }
+    }  
+
     destroy()
     {
         super.destroy();
@@ -357,6 +373,8 @@ export class MistlandLumberjackApplication extends BaseScene{
         });
 
         this.renderer.render(this.scene, this.camera);
+
+        this.postMessageToURL( "game_mounted" );
     }
 
     onResize()
@@ -691,6 +709,7 @@ export class MistlandLumberjackApplication extends BaseScene{
             case "log_collected":
                 this.uiController.updateUI();
                 this.player.setHintVector( this.lumberMillZone.model.position );
+                this.postMessageToURL( "scoreUpdate" , this.applicationModel.logCount );
                 break;
             
             case "lumbermill_tick":
@@ -699,6 +718,7 @@ export class MistlandLumberjackApplication extends BaseScene{
                 this.gemAnimator.from3Dto2D( this.lumberMillZone.model.position );
                 
                 this.player.setHintVector( this.getTreeHintVector() );
+                
                 
                 
                 gemSFX = this.audioController.play("sfx_reward_xp_fly_01");
